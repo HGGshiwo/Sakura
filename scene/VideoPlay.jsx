@@ -1,7 +1,7 @@
-import {Tab, TabView, Button, Text} from '@rneui/themed';
+import {Tab, TabView, Button, Text, Image} from '@rneui/themed';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useState, useEffect} from 'react';
-import {StyleSheet, Dimensions, View, FlatList} from 'react-native';
+import {StyleSheet, Dimensions, View, FlatList, ScrollView} from 'react-native';
 import Video from 'react-native-video';
 import {Vp} from '../api/yhdm';
 
@@ -106,7 +106,7 @@ const DetailLine = () => {
   );
 };
 
-const AnthologyTitleLine = () => {
+const ListTitleLine = ({title, buttonText}) => {
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
@@ -122,71 +122,107 @@ const AnthologyTitleLine = () => {
     },
     text: {
       fontSize: 18,
-      fontWeight:'bold'
-    }
+      fontWeight: 'bold',
+    },
   });
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>选集</Text>
+      <Text style={styles.text}>{title}</Text>
       <Button
         type="clear"
         titleStyle={styles.buttonTitle}
         containerStyle={styles.buttonContainer}>
-        {`已完结，全${12}话 >`}
+        {buttonText}
       </Button>
     </View>
   );
 };
 
-const AnthologyLine = () => {
-  const anthologys = [
-    {title: '第1集', id: 0},
-    {title: '第2集', id: 1},
-    {title: '第3集', id: 2},
-  ];
-
+const RelaviteLine = ({data}) => {
   const styles = StyleSheet.create({
-    titleContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+    title: {
+      fontSize: 18,
+      color: 'black',
+      fontWeight: 'normal',
     },
-    anthologysContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+  });
+  const renderItem = ({item}) => {
+    return <Button titleStyle={styles.title} type="clear" title={item.title} />;
+  };
+  return (
+    <FlatList
+      horizontal={true}
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={item => item.id}
+    />
+  );
+};
+
+const ListLine = ({data}) => {
+  const styles = StyleSheet.create({
+    container: {
+      marginBottom: 20,
     },
-    anthologyContainer: {
+    itemContainer: {
       backgroundColor: 'lightgray',
       width: 150,
       height: 75,
       marginHorizontal: 10,
       padding: 10,
     },
-    buttonContainer: {
-      width: 150,
-      height: 38,
-      paddingLeft: 50,
-    },
-    buttonTitle: {
-      color: 'gray',
-    },
     text: {
       fontSize: 20,
-    }
+    },
   });
   const renderItem = ({item}) => {
     return (
-      <View style={styles.anthologyContainer}>
+      <View style={styles.itemContainer}>
         <Text style={styles.text}>{item.title}</Text>
       </View>
     );
   };
   return (
     <FlatList
+      style={styles.container}
       horizontal={true}
-      data={anthologys}
+      data={data}
       renderItem={renderItem}
       keyExtractor={item => item.id}
     />
+  );
+};
+
+const RecommandLine = ({item}) => {
+  const styles = StyleSheet.create({
+    itemContainer: {
+      flexDirection: 'row',
+      height: 200,
+      width: '100%',
+    },
+    image: {
+      flex: 2,
+    },
+    infoContainer: {
+      flex: 3,
+    },
+    rateContainer: {
+      flex: 1,
+    },
+  });
+  return (
+    <View style={styles.itemContainer}>
+      <Image containerStyle={styles.image} source={{uri: item.src}} />
+      <View style={styles.infoContainer}>
+        <Text>{item.title}</Text>
+        <Text>{item.detail}</Text>
+      </View>
+      <View style={styles.rateContainer}>
+        <View>
+          <Text>9.7分</Text>
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -200,18 +236,44 @@ const VideoPlay = () => {
   const [videoWidth, setVideoWidth] = useState(0);
   const ratio = 0.56; //视频长宽比例
 
+  const anthologys = [
+    {title: '第1集', id: 0},
+    {title: '第2集', id: 1},
+    {title: '第3集', id: 2},
+  ];
+
+  const relatives = [
+    {title: '第一季', id: 0},
+    {title: '第二季', id: 1},
+  ];
+
+  const recommands = [
+    {
+      title: '飙速宅男',
+      id: 0,
+      detail: '全11话',
+      src: 'https://lz.sinaimg.cn/large/008kBpBlgy1h0j7utzk1xj305i07njrp.jpg',
+    },
+    {
+      title: '飙速宅男',
+      id: 1,
+      detail: '全11话',
+      src: 'https://lz.sinaimg.cn/large/008kBpBlgy1h0j7utzk1xj305i07njrp.jpg',
+    },
+  ];
+
   useEffect(() => {
     const vp = new Vp(url);
     setVideoWidth(Dimensions.get('window').width);
     setVideoHeight(Dimensions.get('window').width * ratio);
 
-    vp.load(() => {
-      console.log('loaded');
-      setVideoUrl(vp.src);
-      setEpisode(vp.episode);
-      setTitle(vp.title);
-      setLoading(false);
-    });
+    // vp.load(() => {
+    //   console.log('loaded');
+    //   setVideoUrl(vp.src);
+    //   setEpisode(vp.episode);
+    //   setTitle(vp.title);
+    //   setLoading(false);
+    // });
   }, []);
 
   // Later on in your styles..
@@ -220,32 +282,39 @@ const VideoPlay = () => {
   const [index, setIndex] = useState(0);
   return (
     <>
-      <Player
-        videoHeight={videoHeight}
-        videoWidth={videoWidth}
-        videoUrl={videoUrl}
-        loading={loading}
+      <FlatList
+        ListHeaderComponent={
+          <>
+            <Player
+              videoHeight={videoHeight}
+              videoWidth={videoWidth}
+              videoUrl={videoUrl}
+              loading={loading}
+            />
+            <Tab value={index} onChange={setIndex} dense style={{width: '20%', marginLeft: 20}}>
+              <Tab.Item>简介</Tab.Item>
+            </Tab>
+            <View style={{padding: 10}}>
+              <TitleLine title={title} />
+              <DetailLine />
+              <ListTitleLine
+                title={'播放列表'}
+                buttonText={`共${3}个播放列表 >`}
+              />
+              <ListLine data={anthologys} />
+              <ListTitleLine
+                title={'选集'}
+                buttonText={`已完结，全${12}话 >`}
+              />
+              {relatives.length == 0 ? null : <RelaviteLine data={relatives} />}
+              <ListLine data={anthologys} />
+            </View>
+          </>
+        }
+        data={recommands}
+        renderItem={RecommandLine}
+        keyExtractor={item => item.id}
       />
-      <Tab value={index} onChange={setIndex} dense style={{width: '30%'}}>
-        <Tab.Item>简介</Tab.Item>
-        <Tab.Item>评论</Tab.Item>
-      </Tab>
-      <TabView value={index} onChange={setIndex} style={{width: '100%'}}>
-        <TabView.Item style={{width: '100%'}}>
-          <View style={{padding: 10}}>
-            <TitleLine title={title} />
-            <DetailLine />
-            <AnthologyTitleLine />
-            <AnthologyLine />
-          </View>
-        </TabView.Item>
-        <TabView.Item style={{backgroundColor: 'red', width: '100%'}}>
-          <Text h1>五六七之暗影宿命</Text>
-          <Text h1>{`episode: ${episode}`}</Text>
-          <Text h1>{`video url: ${videoUrl}`}</Text>
-          <Button>Start</Button>
-        </TabView.Item>
-      </TabView>
     </>
   );
 };
