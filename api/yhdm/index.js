@@ -1,13 +1,27 @@
 //樱花动漫api
 import {getDomFromString} from '../../public/Dom';
 
-class Vp {
+class Agent {
   constructor(_url) {
     this._url = _url;
-    this.title = '';
-    this.episode = '';
-    this.src = '';
   }
+
+  afterLoadTitle(callback) {
+    this._afterLoadTitle = callback
+  }
+
+  afterLoadInfo(callback) {
+    this._afterLoadinfo = callback
+  }
+
+  afterLoadInfoSub(callback) {
+    this._afterLoadInfoSub = callback
+  }
+
+  afterLoadPlayList(callback) {
+    this._afterLoadPlayList = callback
+  }
+
 
   async __getset_play(_getplay_url, times) {
     console.log(`尝试第${times}次`);
@@ -25,57 +39,96 @@ class Vp {
     });
   }
 
-  load(callback) {
+  load() {
     fetch(this._url)
       .then(response => response.text())
       .then(responseText => {
         const document = getDomFromString(responseText);
-        let tit = document.getElementsByClass('tit')[0];
-        this.title = tit.getElementsByTagName('a')[0].innerHTML;
-        this.episode = tit.getElementsByTagName('span')[0].innerHTML;
-        const _getplay_url = __yh_cb_getplay_url(this._url);
-        this._getplay_url = _getplay_url;
-        return _getplay_url;
-      })
-      .then(() => {
-        return this.__getset_play(this._getplay_url, 1);
-      })
-      .then(_json_text => {
-        console.log(_json_text);
-        if (_json_text.includes('ipchk:操')) {
-          if (callback) {
-            callback();
-          }
-          return;
+        let show = document.getElementsByClass('show')[0]
+        let title = show.getElementsByTagName('h1')[0]
+        if(this._afterLoadTitle) {
+          this._afterLoadTitle(title.innerHTML)
+          console.log(title.innerHTML)
         }
-        var _json_obj = JSON.parse(_json_text);
-        var _purl = __getplay_rev_data(_json_obj['purl']);
-        var _vurl = __getplay_rev_data(_json_obj['vurl']);
-        var _play_ex = _json_obj['ex'];
-        var vlt_lr = __get_vlt_lr(_play_ex);
-        var _vurlp2_getplay_url =
-          '&getplay_url=' + encodeURIComponent(this._getplay_url);
-        var src = ___make_url_vlt_param(
-          _purl + _vurl + _vurlp2_getplay_url,
-          vlt_lr,
-        );
-        return src;
-      })
-      .then(src => {
-        //内嵌播放器的url
-        var url = this._url.replace(/\/vp\/(\d+?)-(\d+?)-(\d+?)\.html.*/, src);
-        this.src = GetVUrl(url);
-        console.log(this.src);
-      })
-      .then(() => {
-        console.log('use callback');
-        if (callback) {
-          callback();
+        
+        
+        let infoSubDoms = show.getElementsByClass('info-sub')[0].getElementsByTagName("p")
+        let infoSub = {
+          author: infoSubDoms[0].innerHTML,
+          alias: infoSubDoms[1].innerHTML.split("/"),
+          state: infoSubDoms[2],
+          time: infoSubDoms[3],
+          type: infoSubDoms[4].getElementsByTagName('a').map((a)=>{
+            return a.innerHTML
+          }),
+          produce: infoSubDoms[5] 
         }
+        if(this._afterLoadInfoSub) {
+          this._afterLoadInfoSub(infoSub)
+        }
+        
+
+        let infoDom = document.getElementsByClass("info")[0]
+        if(this._afterLoadIn) {
+          this._afterLoadInfo(infoDom.innerHTML)
+        }
+
+        let playTabDoms = document.getElementById("play_tabs").getElementById("menu0").getElementsByTagName("li")
+        console.log(playTabDoms)
+        let movurlDoms = document.getElementsByClass("movurl")
+        let playList = {}
+        
+        playTabDoms.forEach((playTab, index)=>{
+          playList[playTab.innerHTML] = movurlDoms[index].getElementsByTagName("li").map((liDom)=>{
+            return liDom.innerHTML
+          })
+        })
+        if(this._afterLoadPlayList) {
+          this._afterLoadPlayList(playList)
+        } 
+        // const _getplay_url = __yh_cb_getplay_url(this._url);
+        // this._getplay_url = _getplay_url;
+        // return _getplay_url;
       })
-      .catch(err => {
-        console.log('load err', err);
-      });
+      // .then(() => {
+      //   return this.__getset_play(this._getplay_url, 1);
+      // })
+      // .then(_json_text => {
+      //   console.log(_json_text);
+      //   if (_json_text.includes('ipchk:操')) {
+      //     if (callback) {
+      //       callback();
+      //     }
+      //     return;
+      //   }
+      //   var _json_obj = JSON.parse(_json_text);
+      //   var _purl = __getplay_rev_data(_json_obj['purl']);
+      //   var _vurl = __getplay_rev_data(_json_obj['vurl']);
+      //   var _play_ex = _json_obj['ex'];
+      //   var vlt_lr = __get_vlt_lr(_play_ex);
+      //   var _vurlp2_getplay_url =
+      //     '&getplay_url=' + encodeURIComponent(this._getplay_url);
+      //   var src = ___make_url_vlt_param(
+      //     _purl + _vurl + _vurlp2_getplay_url,
+      //     vlt_lr,
+      //   );
+      //   return src;
+      // })
+      // .then(src => {
+      //   //内嵌播放器的url
+      //   var url = this._url.replace(/\/vp\/(\d+?)-(\d+?)-(\d+?)\.html.*/, src);
+      //   this.src = GetVUrl(url);
+      //   console.log(this.src);
+      // })
+      // .then(() => {
+      //   console.log('use callback');
+      //   if (callback) {
+      //     callback();
+      //   }
+      // })
+      // .catch(err => {
+      //   console.log('load err', err);
+      // });
   }
 }
 function __yh_cb_getplay_url(_url) {
@@ -324,4 +377,4 @@ function GetDPVT(url) {
   return dpvt + host_t;
 }
 
-export {Vp};
+export {Agent};

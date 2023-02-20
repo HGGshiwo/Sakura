@@ -3,7 +3,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useState, useEffect} from 'react';
 import {StyleSheet, Dimensions, View, FlatList, ScrollView} from 'react-native';
 import Video from 'react-native-video';
-import {Vp} from '../api/yhdm';
+import {Agent} from '../api/yhdm';
 
 const Player = ({loading, videoUrl, videoHeight, videoWidth}) => {
   var styles = StyleSheet.create({
@@ -227,20 +227,14 @@ const RecommandLine = ({item}) => {
 };
 
 const VideoPlay = () => {
-  const url = 'https://m.yhdmp.net/vp/23116-2-0.html';
+  const url = 'https://m.yhdmp.net/showp/22598.html';
   const [title, setTitle] = useState('title');
-  const [episode, setEpisode] = useState('');
+  const [anthologys, setAnthologys] = useState([]);
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [videoHeight, setVideoHeight] = useState(0);
   const [videoWidth, setVideoWidth] = useState(0);
   const ratio = 0.56; //视频长宽比例
-
-  const anthologys = [
-    {title: '第1集', id: 0},
-    {title: '第2集', id: 1},
-    {title: '第3集', id: 2},
-  ];
 
   const relatives = [
     {title: '第一季', id: 0},
@@ -263,17 +257,20 @@ const VideoPlay = () => {
   ];
 
   useEffect(() => {
-    const vp = new Vp(url);
+    const agent = new Agent(url);
+    agent.afterLoadTitle(setTitle);
+    agent.afterLoadPlayList(playList => {
+      console.log(playList)
+      let anthologys = Object.keys(playList).map((title, id) => {
+        return {title, id};
+      });
+      setAnthologys(anthologys);
+    });
+
     setVideoWidth(Dimensions.get('window').width);
     setVideoHeight(Dimensions.get('window').width * ratio);
 
-    // vp.load(() => {
-    //   console.log('loaded');
-    //   setVideoUrl(vp.src);
-    //   setEpisode(vp.episode);
-    //   setTitle(vp.title);
-    //   setLoading(false);
-    // });
+    agent.load();
   }, []);
 
   // Later on in your styles..
@@ -282,39 +279,51 @@ const VideoPlay = () => {
   const [index, setIndex] = useState(0);
   return (
     <>
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <Player
-              videoHeight={videoHeight}
-              videoWidth={videoWidth}
-              videoUrl={videoUrl}
-              loading={loading}
-            />
-            <Tab value={index} onChange={setIndex} dense style={{width: '20%', marginLeft: 20}}>
-              <Tab.Item>简介</Tab.Item>
-            </Tab>
-            <View style={{padding: 10}}>
-              <TitleLine title={title} />
-              <DetailLine />
-              <ListTitleLine
-                title={'播放列表'}
-                buttonText={`共${3}个播放列表 >`}
-              />
-              <ListLine data={anthologys} />
-              <ListTitleLine
-                title={'选集'}
-                buttonText={`已完结，全${12}话 >`}
-              />
-              {relatives.length == 0 ? null : <RelaviteLine data={relatives} />}
-              <ListLine data={anthologys} />
-            </View>
-          </>
-        }
-        data={recommands}
-        renderItem={RecommandLine}
-        keyExtractor={item => item.id}
+      <Player
+        videoHeight={videoHeight}
+        videoWidth={videoWidth}
+        videoUrl={videoUrl}
+        loading={loading}
       />
+      <Tab
+        value={index}
+        onChange={setIndex}
+        dense
+        style={{width: '30%', marginLeft: 10}}>
+        <Tab.Item>简介</Tab.Item>
+        <Tab.Item>评论</Tab.Item>
+      </Tab>
+      <TabView value={index} onChange={setIndex}>
+        <TabView.Item>
+          <FlatList
+            ListHeaderComponent={
+              <>
+                <View style={{padding: 10}}>
+                  <TitleLine title={title} />
+                  <DetailLine />
+                  <ListTitleLine
+                    title={'播放列表'}
+                    buttonText={`共${anthologys.length}个播放列表 >`}
+                  />
+                  <ListLine data={anthologys} />
+                  <ListTitleLine
+                    title={'选集'}
+                    buttonText={`已完结，全${12}话 >`}
+                  />
+                  {relatives.length == 0 ? null : (
+                    <RelaviteLine data={relatives} />
+                  )}
+                  <ListLine data={anthologys} />
+                </View>
+              </>
+            }
+            data={recommands}
+            renderItem={RecommandLine}
+            keyExtractor={item => item.id}
+          />
+        </TabView.Item>
+        <TabView.Item></TabView.Item>
+      </TabView>
     </>
   );
 };

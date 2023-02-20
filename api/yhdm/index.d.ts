@@ -1,9 +1,10 @@
-class Vp {
+class Agent {
     constructor(url: string);
-    title: string;
-    episode: string;
-    src: string;
-    load(callback: Function): void;
+    load(): void;
+    afterLoadTitle(callback: Function): void;
+    afterLoadInfo(callback: Function): void
+    afterLoadInfoSub(callback: Function): void
+    afterLoadPlayList(callback: Function): void
 }
 
-export { Vp }
+export { Agent }
