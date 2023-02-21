@@ -5,7 +5,7 @@ import {Agent} from '../../api/yhdm';
 import {Source} from '../../type/Source';
 import {PlayList} from '../../type/PlayList';
 import {InfoSub} from '../../type/InfoSub';
-import {DetailLine} from './DetailLine';
+import {DetailSheet} from './DetailSheet';
 import {RecommandLine} from './RecommandLine';
 import {ListLine} from './ListLine';
 import {DetailButtonLine} from './DetailButtonLine';
@@ -13,6 +13,7 @@ import {ListTitleLine} from './ListTitleLine';
 import {Player} from './Player';
 import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
+import {AnthologySheet} from './AnthologySheet';
 
 const VideoPage = () => {
   const url = 'https://m.yhdmp.net/showp/22598.html';
@@ -45,8 +46,9 @@ const VideoPage = () => {
   const [anthologys, setAnthologys] = useState<Source[]>([]); //选集列表
   const [asources, setAsources] = useState<Source[]>([]); //播放源列表
 
-  const [detailLineVisible, setDetailLineVisible] = useState(false);
-
+  const [detailLineVisible, setDetailSheetVisible] = useState(false);
+  const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
+  const [sourcesVisible, setSourcesVisible] = useState(false)
   const ratio = 0.56; //视频长宽比例
 
   const relatives = [
@@ -69,9 +71,9 @@ const VideoPage = () => {
     },
   ];
 
-  useEffect(() => {    
-    const height = Dimensions.get('window').height
-    const width = Dimensions.get('window').width
+  useEffect(() => {
+    const height = Dimensions.get('window').height;
+    const width = Dimensions.get('window').width;
     setWindowHeight(height);
     setWindowWidth(width);
     setVideoWidth(width);
@@ -128,11 +130,7 @@ const VideoPage = () => {
         loading={loading}
       />
 
-      <Tab
-        value={index}
-        onChange={setIndex}
-        dense
-        style={styles.tabContainer}>
+      <Tab value={index} onChange={setIndex} dense style={styles.tabContainer}>
         <Tab.Item>简介</Tab.Item>
         <Tab.Item>评论</Tab.Item>
       </Tab>
@@ -142,20 +140,22 @@ const VideoPage = () => {
           <FlatList
             ListHeaderComponent={
               <>
-                <View style={{padding: 10}}>
+                <View style={{padding: 10, width: windowWidth}}>
                   <TitleLine title={atitle} />
                   <DetailButtonLine
                     author={ainfoSub.author}
-                    onPress={() => setDetailLineVisible(true)}
+                    onPress={() => setDetailSheetVisible(true)}
                   />
                   <ListTitleLine
                     title={'播放列表'}
                     buttonText={`共${asources.length}个播放列表 >`}
+                    onPress={() => setSourcesVisible(!sourcesVisible)}
                   />
-                  <ListLine data={asources} onPress={handlePressSource} />
+                  {sourcesVisible?<ListLine data={asources} onPress={handlePressSource} />:<></>}
                   <ListTitleLine
                     title={'选集'}
                     buttonText={`${ainfoSub?.state} >`}
+                    onPress={() => setAnthologySheetVisible(true)}
                   />
                   {relatives.length == 0 ? null : (
                     <RelaviteLine data={relatives} />
@@ -172,7 +172,7 @@ const VideoPage = () => {
         <TabView.Item></TabView.Item>
       </TabView>
 
-      <DetailLine
+      <DetailSheet
         top={videoHeight}
         height={windowHeight - videoHeight - StatusBar.currentHeight!}
         title={atitle}
@@ -181,7 +181,20 @@ const VideoPage = () => {
         info={ainfo}
         visible={detailLineVisible}
         onPress={() => {
-          setDetailLineVisible(false);
+          setDetailSheetVisible(false);
+        }}
+      />
+
+      <AnthologySheet
+        top={videoHeight}
+        height={windowHeight - videoHeight - StatusBar.currentHeight!}
+        playList={aplayList!}
+        sources={asources}
+        state={ainfoSub.state}
+        visible={anthologySheetVisible}
+        defaultActive={0}
+        onPress={() => {
+          setAnthologySheetVisible(false);
         }}
       />
     </>

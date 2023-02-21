@@ -1,7 +1,13 @@
 import {Button, Text} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
 
-const ListTitleLine = ({title, buttonText}: any) => {
+type listTitleLineProps = {
+  title: string;
+  buttonText: string;
+  onPress: (event: any) => void;
+};
+
+const ListTitleLine = ({title, buttonText, onPress}: listTitleLineProps) => {
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
@@ -25,9 +31,10 @@ const ListTitleLine = ({title, buttonText}: any) => {
       <Button
         type="clear"
         titleStyle={styles.buttonTitle}
-        containerStyle={styles.buttonContainer}>
-        {buttonText}
-      </Button>
+        containerStyle={styles.buttonContainer}
+        onPress={onPress}
+        title={buttonText}
+      />
     </View>
   );
 };

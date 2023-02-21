@@ -2,7 +2,7 @@ import {InfoSub} from '../../type/InfoSub';
 import {Button, Text, Image, BottomSheet, AirbnbRating} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
 
-type detailLineProps = {
+type detailSheetProps = {
   height: number;
   top: number;
   title: string;
@@ -13,7 +13,7 @@ type detailLineProps = {
   onPress: (event: any) => void;
 };
 
-const DetailLine = ({
+const DetailSheet = ({
   height,
   top,
   title,
@@ -22,7 +22,7 @@ const DetailLine = ({
   info,
   visible,
   onPress,
-}: detailLineProps) => {
+}: detailSheetProps) => {
   const styles = StyleSheet.create({
     container: {
       backgroundColor: 'white',
@@ -151,5 +151,4 @@ const DetailLine = ({
   );
 };
 
-export {DetailLine};
-export type {detailLineProps};
+export {DetailSheet};
