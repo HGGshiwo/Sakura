@@ -5,6 +5,8 @@ class Agent {
     afterLoadInfo(callback: Function): void
     afterLoadInfoSub(callback: Function): void
     afterLoadPlayList(callback: Function): void
+    afterLoadRelatives(callback: Function): void
+    afterLoadRecommands(callback: Function): void
 }
 
 export { Agent }

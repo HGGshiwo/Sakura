@@ -22,6 +22,13 @@ class Agent {
     this._afterLoadPlayList = callback
   }
 
+  afterLoadRelatives(callback) {
+    this._afterLoadRelatives = callback
+  }
+  afterLoadRecommands(callback) {
+    this._afterLoadRecommands = callback
+  }
+
 
   async __getset_play(_getplay_url, times) {
     console.log(`尝试第${times}次`);
@@ -56,8 +63,8 @@ class Agent {
         let infoSub = {
           author: infoSubDoms[0].innerHTML,
           alias: infoSubDoms[1].innerHTML.split("/"),
-          state: infoSubDoms[2],
-          time: infoSubDoms[3],
+          state: infoSubDoms[2].innerHTML,
+          time: infoSubDoms[3].innerHTML,
           type: infoSubDoms[4].getElementsByTagName('a').map((a)=>{
             return a.innerHTML
           }),
@@ -79,13 +86,17 @@ class Agent {
         let playList = {}
         
         playTabDoms.forEach((playTab, index)=>{
-          playList[playTab.innerHTML] = movurlDoms[index].getElementsByTagName("li").map((liDom)=>{
-            return liDom.innerHTML
+          playList[playTab.innerHTML] = movurlDoms[index].getElementsByTagName("li").map((liDom, index)=>{
+            return {title: liDom.innerHTML.replace(/^\s*|\s*$/g,""), id: index}
           })
         })
         if(this._afterLoadPlayList) {
           this._afterLoadPlayList(playList)
-        } 
+        }
+        
+        let listtits = document.getElementsByClass("listtit")
+        
+        
         // const _getplay_url = __yh_cb_getplay_url(this._url);
         // this._getplay_url = _getplay_url;
         // return _getplay_url;

@@ -1,31 +1,43 @@
 import {Tab, TabView, Button, Text, Image} from '@rneui/themed';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useState, useEffect} from 'react';
-import {StyleSheet, Dimensions, View, FlatList, ScrollView} from 'react-native';
-import Video from 'react-native-video';
+import {
+  StyleSheet,
+  Dimensions,
+  View,
+  FlatList,
+  TouchableHighlight,
+} from 'react-native';
 import {Agent} from '../api/yhdm';
+import {Source} from '../type/Source';
+import {PlayList} from '../type/PlayList';
 
-const Player = ({loading, videoUrl, videoHeight, videoWidth}) => {
+const Video = require('react-native-video');
+
+const Player = ({loading, videoUrl, videoHeight, videoWidth}: any) => {
   var styles = StyleSheet.create({
     video: {
       height: videoHeight,
       width: videoWidth,
       backgroundColor: 'black',
+      justifyContent: "center",
+      alignItems: "center"
     },
     loadingText: {
       color: 'white',
+      fontSize: 18,
     },
   });
 
-  const videoError = err => {
+  const videoError = (err: any) => {
     console.log(err);
   };
 
-  const onBuffer = data => {
+  const onBuffer = (data: any) => {
     console.log(data);
   };
   return loading ? (
-    <View style={{...styles.video, alignContent: 'center'}}>
+    <View style={{...styles.video}}>
       <Text style={styles.loadingText}>加载中...</Text>
     </View>
   ) : (
@@ -41,7 +53,7 @@ const Player = ({loading, videoUrl, videoHeight, videoWidth}) => {
   );
 };
 
-const TitleLine = ({title}) => {
+const TitleLine = ({title}: any) => {
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
@@ -52,9 +64,9 @@ const TitleLine = ({title}) => {
     },
     button: {
       borderRadius: 20,
+      paddingHorizontal: 20,
     },
     buttonContainer: {
-      width: 100,
       height: 38,
     },
     buttonDone: {
@@ -86,9 +98,7 @@ const DetailLine = () => {
       flexDirection: 'row',
     },
     buttonContainer: {
-      width: 150,
       height: 38,
-      paddingLeft: 50,
     },
     buttonTitle: {
       color: 'gray',
@@ -106,14 +116,13 @@ const DetailLine = () => {
   );
 };
 
-const ListTitleLine = ({title, buttonText}) => {
+const ListTitleLine = ({title, buttonText}: any) => {
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
     buttonContainer: {
-      width: 200,
       height: 38,
       paddingLeft: 50,
     },
@@ -138,7 +147,7 @@ const ListTitleLine = ({title, buttonText}) => {
   );
 };
 
-const RelaviteLine = ({data}) => {
+const RelaviteLine = ({data}: any) => {
   const styles = StyleSheet.create({
     title: {
       fontSize: 18,
@@ -146,7 +155,7 @@ const RelaviteLine = ({data}) => {
       fontWeight: 'normal',
     },
   });
-  const renderItem = ({item}) => {
+  const renderItem = ({item}: {item: Source}) => {
     return <Button titleStyle={styles.title} type="clear" title={item.title} />;
   };
   return (
@@ -154,18 +163,20 @@ const RelaviteLine = ({data}) => {
       horizontal={true}
       data={data}
       renderItem={renderItem}
-      keyExtractor={item => item.id}
+      keyExtractor={item => `${item.id}`}
     />
   );
 };
 
-const ListLine = ({data}) => {
+const ListLine = ({data, onPress}: {data: Source[]; onPress?: Function}) => {
+  const [activeIndex, setActiveIndex] = useState(0); //当前活跃的块
+  
   const styles = StyleSheet.create({
     container: {
       marginBottom: 20,
     },
     itemContainer: {
-      backgroundColor: 'lightgray',
+      backgroundColor: 'gainsboro',
       width: 150,
       height: 75,
       marginHorizontal: 10,
@@ -174,26 +185,47 @@ const ListLine = ({data}) => {
     text: {
       fontSize: 20,
     },
+    active: {
+      color: 'deeppink'
+    }
   });
-  const renderItem = ({item}) => {
+
+  const renderItem = ({item, index}: {item: Source, index:number}) => {
+    let textStyle = (index === activeIndex) ? styles.active:{}
+    textStyle = {...textStyle, ...styles.text}
     return (
-      <View style={styles.itemContainer}>
-        <Text style={styles.text}>{item.title}</Text>
-      </View>
+      <TouchableHighlight
+        onPress={() => {
+          if (onPress) onPress(item.id);
+          setActiveIndex(index)
+        }}>
+        <View style={styles.itemContainer}>
+          <Text style={textStyle}>{item.title}</Text>
+        </View>
+      </TouchableHighlight>
     );
   };
-  return (
+
+  console.log(data);
+
+  return data.length != 0 ? (
     <FlatList
       style={styles.container}
       horizontal={true}
       data={data}
       renderItem={renderItem}
-      keyExtractor={item => item.id}
+      keyExtractor={item => `${item.id}`}
     />
+  ) : (
+    <View style={styles.container}>
+      <View style={styles.itemContainer}>
+        <Text style={styles.text}>暂无数据</Text>
+      </View>
+    </View>
   );
 };
 
-const RecommandLine = ({item}) => {
+const RecommandLine = ({item}: any) => {
   const styles = StyleSheet.create({
     itemContainer: {
       flexDirection: 'row',
@@ -228,12 +260,17 @@ const RecommandLine = ({item}) => {
 
 const VideoPlay = () => {
   const url = 'https://m.yhdmp.net/showp/22598.html';
-  const [title, setTitle] = useState('title');
-  const [anthologys, setAnthologys] = useState([]);
+
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [videoHeight, setVideoHeight] = useState(0);
   const [videoWidth, setVideoWidth] = useState(0);
+  const [astate, setAstate] = useState('');
+  const [atitle, setAtitle] = useState('');
+  const [aplayList, setAplayList] = useState<PlayList>(); //完整的播放列表
+  const [arelatives, setArelatives] = useState<Source[]>([]); //同系列列表
+  const [anthologys, setAnthologys] = useState<Source[]>([]); //选集列表
+  const [asources, setAsources] = useState<Source[]>([]); //播放源列表
   const ratio = 0.56; //视频长宽比例
 
   const relatives = [
@@ -258,15 +295,20 @@ const VideoPlay = () => {
 
   useEffect(() => {
     const agent = new Agent(url);
-    agent.afterLoadTitle(setTitle);
-    agent.afterLoadPlayList(playList => {
-      console.log(playList)
-      let anthologys = Object.keys(playList).map((title, id) => {
+    agent.afterLoadTitle(setAtitle);
+    agent.afterLoadPlayList((playList: PlayList) => {
+      console.log(playList);
+      setAplayList(playList);
+      let sources = Object.keys(playList).map((title, id) => {
         return {title, id};
       });
-      setAnthologys(anthologys);
+      setAsources(sources);
+      setAnthologys(playList[sources[0].title as keyof PlayList]);
     });
-
+    agent.afterLoadInfoSub(({state}: {state: string}) => {
+      console.log(state);
+      setAstate(state);
+    });
     setVideoWidth(Dimensions.get('window').width);
     setVideoHeight(Dimensions.get('window').width * ratio);
 
@@ -277,6 +319,12 @@ const VideoPlay = () => {
   var styles = StyleSheet.create({});
 
   const [index, setIndex] = useState(0);
+
+  const handlePressSource = (sourceIndex: number) => {
+    console.log(sourceIndex);
+    setAnthologys(aplayList![asources[sourceIndex].title as keyof PlayList]);
+  };
+
   return (
     <>
       <Player
@@ -299,17 +347,14 @@ const VideoPlay = () => {
             ListHeaderComponent={
               <>
                 <View style={{padding: 10}}>
-                  <TitleLine title={title} />
+                  <TitleLine title={atitle} />
                   <DetailLine />
                   <ListTitleLine
                     title={'播放列表'}
-                    buttonText={`共${anthologys.length}个播放列表 >`}
+                    buttonText={`共${asources.length}个播放列表 >`}
                   />
-                  <ListLine data={anthologys} />
-                  <ListTitleLine
-                    title={'选集'}
-                    buttonText={`已完结，全${12}话 >`}
-                  />
+                  <ListLine data={asources} onPress={handlePressSource} />
+                  <ListTitleLine title={'选集'} buttonText={`${astate} >`} />
                   {relatives.length == 0 ? null : (
                     <RelaviteLine data={relatives} />
                   )}
@@ -319,7 +364,7 @@ const VideoPlay = () => {
             }
             data={recommands}
             renderItem={RecommandLine}
-            keyExtractor={item => item.id}
+            keyExtractor={item => `${item.id}`}
           />
         </TabView.Item>
         <TabView.Item></TabView.Item>
