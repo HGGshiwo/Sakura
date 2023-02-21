@@ -11,7 +11,7 @@ class Agent {
   }
 
   afterLoadInfo(callback) {
-    this._afterLoadinfo = callback
+    this._afterLoadInfo = callback
   }
 
   afterLoadInfoSub(callback) {
@@ -25,10 +25,14 @@ class Agent {
   afterLoadRelatives(callback) {
     this._afterLoadRelatives = callback
   }
+  
   afterLoadRecommands(callback) {
     this._afterLoadRecommands = callback
   }
 
+  afterLoadSrc(callback) {
+    this._afterLoadSrc = callback
+  }
 
   async __getset_play(_getplay_url, times) {
     console.log(`尝试第${times}次`);
@@ -55,9 +59,12 @@ class Agent {
         let title = show.getElementsByTagName('h1')[0]
         if(this._afterLoadTitle) {
           this._afterLoadTitle(title.innerHTML)
-          console.log(title.innerHTML)
         }
         
+        let img = show.getElementsByTagName('img')[0]
+        if(this._afterLoadSrc) {
+          this._afterLoadSrc(`https:${img.src}`)
+        } 
         
         let infoSubDoms = show.getElementsByClass('info-sub')[0].getElementsByTagName("p")
         let infoSub = {
@@ -68,15 +75,15 @@ class Agent {
           type: infoSubDoms[4].getElementsByTagName('a').map((a)=>{
             return a.innerHTML
           }),
-          produce: infoSubDoms[5] 
+          produce: infoSubDoms[5].innerHTML 
         }
         if(this._afterLoadInfoSub) {
           this._afterLoadInfoSub(infoSub)
         }
-        
+        debugger;
 
         let infoDom = document.getElementsByClass("info")[0]
-        if(this._afterLoadIn) {
+        if(this._afterLoadInfo) {
           this._afterLoadInfo(infoDom.innerHTML)
         }
 
@@ -93,6 +100,7 @@ class Agent {
         if(this._afterLoadPlayList) {
           this._afterLoadPlayList(playList)
         }
+        
         
         let listtits = document.getElementsByClass("listtit")
         
