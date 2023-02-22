@@ -1,9 +1,9 @@
 import {Text} from '@rneui/themed';
 import {useState} from 'react';
 import {StyleSheet, View, FlatList, TouchableHighlight} from 'react-native';
-import {Source} from '../../type/Source';
+import {ListItemInfo} from '../../type/ListItemInfo';
 
-type listLineProps = {data: Source[]; onPress?: Function};
+type listLineProps = {data: ListItemInfo[]; onPress?: Function};
 const ListLine = ({data, onPress}: listLineProps) => {
   const [activeIndex, setActiveIndex] = useState(0); //当前活跃的块
 
@@ -26,7 +26,7 @@ const ListLine = ({data, onPress}: listLineProps) => {
     },
   });
 
-  const renderItem = ({item, index}: {item: Source; index: number}) => {
+  const renderItem = ({item, index}: {item: ListItemInfo; index: number}) => {
     let textStyle = index === activeIndex ? styles.active : {};
     textStyle = {...textStyle, ...styles.text};
     return (

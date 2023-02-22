@@ -1,36 +1,59 @@
-import {Text, Image} from '@rneui/themed';
+import {Text, Image, Divider} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
+import {RecommandInfo} from '../../type/RecommandInfo';
 
-const RecommandLine = ({item}: any) => {
+type recommandLineProps = {
+  item: RecommandInfo;
+};
+
+const RecommandLine = ({item}: recommandLineProps) => {
   const styles = StyleSheet.create({
     itemContainer: {
       flexDirection: 'row',
-      height: 200,
       width: '100%',
     },
     image: {
-      flex: 2,
+      flex: 3,
+      height: 100,
+      margin: 5,
+      borderRadius: 10,
     },
     infoContainer: {
+      justifyContent: 'space-between',
       flex: 3,
+      padding: 10,
     },
     rateContainer: {
       flex: 1,
+      padding: 10,
+    },
+    text: {
+      fontSize: 18,
+    },
+    text2: {
+      fontSize: 16,
+      color: 'grey',
+    },
+    rateTitle: {
+      color: 'orange',
+      fontSize: 20,
+      fontWeight: 'bold',
     },
   });
   return (
-    <View style={styles.itemContainer}>
-      <Image containerStyle={styles.image} source={{uri: item.src}} />
-      <View style={styles.infoContainer}>
-        <Text>{item.title}</Text>
-        <Text>{item.detail}</Text>
-      </View>
-      <View style={styles.rateContainer}>
-        <View>
-          <Text>9.7分</Text>
+    <>
+      <Divider></Divider>
+      <View style={styles.itemContainer}>
+        <Image containerStyle={styles.image} source={{uri: item.img}} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.text}>{item.title}</Text>
+          <Text>{item.state}</Text>
+        </View>
+        <View style={styles.rateContainer}>
+          <Text style={styles.rateTitle}>9.7分</Text>
         </View>
       </View>
-    </View>
+    </>
   );
 };
 

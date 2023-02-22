@@ -7,31 +7,31 @@ class Agent {
   }
 
   afterLoadTitle(callback) {
-    this._afterLoadTitle = callback
+    this._afterLoadTitle = callback;
   }
 
   afterLoadInfo(callback) {
-    this._afterLoadInfo = callback
+    this._afterLoadInfo = callback;
   }
 
   afterLoadInfoSub(callback) {
-    this._afterLoadInfoSub = callback
+    this._afterLoadInfoSub = callback;
   }
 
   afterLoadPlayList(callback) {
-    this._afterLoadPlayList = callback
+    this._afterLoadPlayList = callback;
   }
 
   afterLoadRelatives(callback) {
-    this._afterLoadRelatives = callback
+    this._afterLoadRelatives = callback;
   }
-  
+
   afterLoadRecommands(callback) {
-    this._afterLoadRecommands = callback
+    this._afterLoadRecommands = callback;
   }
 
   afterLoadSrc(callback) {
-    this._afterLoadSrc = callback
+    this._afterLoadSrc = callback;
   }
 
   async __getset_play(_getplay_url, times) {
@@ -55,99 +55,141 @@ class Agent {
       .then(response => response.text())
       .then(responseText => {
         const document = getDomFromString(responseText);
-        let show = document.getElementsByClass('show')[0]
-        let title = show.getElementsByTagName('h1')[0]
-        if(this._afterLoadTitle) {
-          this._afterLoadTitle(title.innerHTML)
+        let show = document.getElementsByClass('show')[0];
+        let title = show.getElementsByTagName('h1')[0];
+        if (this._afterLoadTitle) {
+          this._afterLoadTitle(title.innerHTML);
         }
-        
-        let img = show.getElementsByTagName('img')[0]
-        if(this._afterLoadSrc) {
-          this._afterLoadSrc(`https:${img.src}`)
-        } 
-        
-        let infoSubDoms = show.getElementsByClass('info-sub')[0].getElementsByTagName("p")
+
+        let img = show.getElementsByTagName('img')[0];
+        if (this._afterLoadSrc) {
+          this._afterLoadSrc(`https:${img.src}`);
+        }
+
+        let infoSubDoms = show
+          .getElementsByClass('info-sub')[0]
+          .getElementsByTagName('p');
         let infoSub = {
           author: infoSubDoms[0].innerHTML,
-          alias: infoSubDoms[1].innerHTML.split("/"),
+          alias: infoSubDoms[1].innerHTML.split('/'),
           state: infoSubDoms[2].innerHTML,
           time: infoSubDoms[3].innerHTML,
-          type: infoSubDoms[4].getElementsByTagName('a').map((a)=>{
-            return a.innerHTML
+          type: infoSubDoms[4].getElementsByTagName('a').map(a => {
+            return a.innerHTML;
           }),
-          produce: infoSubDoms[5].innerHTML 
-        }
-        if(this._afterLoadInfoSub) {
-          this._afterLoadInfoSub(infoSub)
+          produce: infoSubDoms[5].innerHTML,
+        };
+        if (this._afterLoadInfoSub) {
+          this._afterLoadInfoSub(infoSub);
         }
         debugger;
 
-        let infoDom = document.getElementsByClass("info")[0]
-        if(this._afterLoadInfo) {
-          this._afterLoadInfo(infoDom.innerHTML)
+        let infoDom = document.getElementsByClass('info')[0];
+        if (this._afterLoadInfo) {
+          this._afterLoadInfo(infoDom.innerHTML);
         }
 
-        let playTabDoms = document.getElementById("play_tabs").getElementById("menu0").getElementsByTagName("li")
-        console.log(playTabDoms)
-        let movurlDoms = document.getElementsByClass("movurl")
-        let playList = {}
-        
-        playTabDoms.forEach((playTab, index)=>{
-          playList[playTab.innerHTML] = movurlDoms[index].getElementsByTagName("li").map((liDom, index)=>{
-            return {title: liDom.innerHTML.replace(/^\s*|\s*$/g,""), id: index}
-          })
-        })
-        if(this._afterLoadPlayList) {
-          this._afterLoadPlayList(playList)
+        //播放列表
+        let playTabDoms = document
+          .getElementById('play_tabs')
+          .getElementById('menu0')
+          .getElementsByTagName('li');
+        let movurlDoms = document.getElementsByClass('movurl');
+        let playList = {};
+
+        playTabDoms.forEach((playTab, index) => {
+          movurlDoms[index]
+            .getElementsByTagName('li')
+            .forEach((liDom, index) => {
+              const a = liDom.getElementsByTagName('a')[0];
+              let key = a.innerHTML;
+              playList[key] = playList[key]
+                ? [...playList[key], a.href]
+                : [a.href];
+            });
+        });
+        if (this._afterLoadPlayList) {
+          this._afterLoadPlayList(playList);
         }
-        
-        
-        let listtits = document.getElementsByClass("listtit")
-        
-        
+
+        //相关系列
+        let listDoms = document.getElementsByClass('list');
+        let relatives = listDoms[1].getElementsByTagName('li').map(liDom => {
+          return {
+            data: liDom.getElementsByTagName('a')[0].href,
+            title: liDom.getElementsByClass('itemtext')[0].innerHTML,
+            id: index,
+          };
+        });
+        if (this._afterLoadRelatives) {
+          this._afterLoadRelatives(relatives);
+        }
+        //相关推荐
+        let recommands = listDoms[2]
+          .getElementsByTagName('li')
+          .map((liDom, index) => {
+            let style = liDom.getElementsByClass('imgblock')[0].style;
+            let src = /(?<=background-image:url\(').*?(?='\))/.exec(style)[0];
+            console.log(src)
+            if (!src.includes("http")) {
+              src = "https:"+src
+            }
+            return {
+              id: index,
+              href: liDom.getElementsByTagName('a')[0].href,
+              img: src,
+              title: liDom.getElementsByClass('itemtext')[0].innerHTML,
+              state: liDom.getElementsByClass('itemimgtext')[0].innerHTML,
+            };
+          });
+        debugger;
+        if (this._afterLoadRecommands) {
+          this._afterLoadRecommands(recommands);
+        }
+
         // const _getplay_url = __yh_cb_getplay_url(this._url);
         // this._getplay_url = _getplay_url;
         // return _getplay_url;
-      })
-      // .then(() => {
-      //   return this.__getset_play(this._getplay_url, 1);
-      // })
-      // .then(_json_text => {
-      //   console.log(_json_text);
-      //   if (_json_text.includes('ipchk:操')) {
-      //     if (callback) {
-      //       callback();
-      //     }
-      //     return;
-      //   }
-      //   var _json_obj = JSON.parse(_json_text);
-      //   var _purl = __getplay_rev_data(_json_obj['purl']);
-      //   var _vurl = __getplay_rev_data(_json_obj['vurl']);
-      //   var _play_ex = _json_obj['ex'];
-      //   var vlt_lr = __get_vlt_lr(_play_ex);
-      //   var _vurlp2_getplay_url =
-      //     '&getplay_url=' + encodeURIComponent(this._getplay_url);
-      //   var src = ___make_url_vlt_param(
-      //     _purl + _vurl + _vurlp2_getplay_url,
-      //     vlt_lr,
-      //   );
-      //   return src;
-      // })
-      // .then(src => {
-      //   //内嵌播放器的url
-      //   var url = this._url.replace(/\/vp\/(\d+?)-(\d+?)-(\d+?)\.html.*/, src);
-      //   this.src = GetVUrl(url);
-      //   console.log(this.src);
-      // })
-      // .then(() => {
-      //   console.log('use callback');
-      //   if (callback) {
-      //     callback();
-      //   }
-      // })
-      // .catch(err => {
-      //   console.log('load err', err);
-      // });
+      });
+    // .then(() => {
+    //   return this.__getset_play(this._getplay_url, 1);
+    // })
+    // .then(_json_text => {
+    //   console.log(_json_text);
+    //   if (_json_text.includes('ipchk:操')) {
+    //     if (callback) {
+    //       callback();
+    //     }
+    //     return;
+    //   }
+    //   var _json_obj = JSON.parse(_json_text);
+    //   var _purl = __getplay_rev_data(_json_obj['purl']);
+    //   var _vurl = __getplay_rev_data(_json_obj['vurl']);
+    //   var _play_ex = _json_obj['ex'];
+    //   var vlt_lr = __get_vlt_lr(_play_ex);
+    //   var _vurlp2_getplay_url =
+    //     '&getplay_url=' + encodeURIComponent(this._getplay_url);
+    //   var src = ___make_url_vlt_param(
+    //     _purl + _vurl + _vurlp2_getplay_url,
+    //     vlt_lr,
+    //   );
+    //   return src;
+    // })
+    // .then(src => {
+    //   //内嵌播放器的url
+    //   var url = this._url.replace(/\/vp\/(\d+?)-(\d+?)-(\d+?)\.html.*/, src);
+    //   this.src = GetVUrl(url);
+    //   console.log(this.src);
+    // })
+    // .then(() => {
+    //   console.log('use callback');
+    //   if (callback) {
+    //     callback();
+    //   }
+    // })
+    // .catch(err => {
+    //   console.log('load err', err);
+    // });
   }
 }
 function __yh_cb_getplay_url(_url) {

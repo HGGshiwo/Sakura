@@ -2,7 +2,7 @@ import {Tab, TabView} from '@rneui/themed';
 import {useState, useEffect} from 'react';
 import {StyleSheet, Dimensions, View, FlatList, StatusBar} from 'react-native';
 import {Agent} from '../../api/yhdm';
-import {Source} from '../../type/Source';
+import {ListItemInfo} from '../../type/ListItemInfo';
 import {PlayList} from '../../type/PlayList';
 import {InfoSub} from '../../type/InfoSub';
 import {DetailSheet} from './DetailSheet';
@@ -14,6 +14,7 @@ import {Player} from './Player';
 import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
+import { RecommandInfo } from '../../type/RecommandInfo';
 
 const VideoPage = () => {
   const url = 'https://m.yhdmp.net/showp/22598.html';
@@ -42,34 +43,14 @@ const VideoPage = () => {
   const [ainfoSub, setAinfoSub] = useState<InfoSub>(emptyInfoSub);
   const [ainfo, setAinfo] = useState('');
   const [aplayList, setAplayList] = useState<PlayList>(); //完整的播放列表
-  const [arelatives, setArelatives] = useState<Source[]>([]); //同系列列表
-  const [anthologys, setAnthologys] = useState<Source[]>([]); //选集列表
-  const [asources, setAsources] = useState<Source[]>([]); //播放源列表
+  const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
+  const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
+  const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
 
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
-  const [sourcesVisible, setSourcesVisible] = useState(false)
   const ratio = 0.56; //视频长宽比例
 
-  const relatives = [
-    {title: '第一季', id: 0},
-    {title: '第二季', id: 1},
-  ];
-
-  const recommands = [
-    {
-      title: '飙速宅男',
-      id: 0,
-      detail: '全11话',
-      src: 'https://lz.sinaimg.cn/large/008kBpBlgy1h0j7utzk1xj305i07njrp.jpg',
-    },
-    {
-      title: '飙速宅男',
-      id: 1,
-      detail: '全11话',
-      src: 'https://lz.sinaimg.cn/large/008kBpBlgy1h0j7utzk1xj305i07njrp.jpg',
-    },
-  ];
 
   useEffect(() => {
     const height = Dimensions.get('window').height;
@@ -84,27 +65,32 @@ const VideoPage = () => {
 
     agent.afterLoadPlayList((playList: PlayList) => {
       setAplayList(playList);
-      let sources = Object.keys(playList).map((title, id) => {
-        return {title, id};
-      });
-      setAsources(sources);
-      setAnthologys(playList[sources[0].title as keyof PlayList]);
+      setAnthologys(
+        Object.keys(playList).map((key, index) => {
+          return {title:key, id:index, data:key};
+        }),
+      );
     });
 
     agent.afterLoadInfoSub((infoSub: InfoSub) => {
       setAinfoSub(infoSub);
-      console.log(infoSub);
     });
 
     agent.afterLoadInfo((info: string) => {
-      console.log(info);
       setAinfo(info);
     });
 
     agent.afterLoadSrc((src: string) => {
-      console.log(src);
       setAsrc(src);
     });
+
+    agent.afterLoadRelatives((relatives: ListItemInfo[])=>{
+      setArelatives(relatives)
+    })
+
+    agent.afterLoadRecommands((recommands: RecommandInfo[])=>{
+      setArecommands(recommands)
+    })
 
     agent.load();
   }, []);
@@ -116,10 +102,6 @@ const VideoPage = () => {
       marginLeft: 10,
     },
   });
-
-  const handlePressSource = (sourceIndex: number) => {
-    setAnthologys(aplayList![asources[sourceIndex].title as keyof PlayList]);
-  };
 
   return (
     <>
@@ -147,24 +129,18 @@ const VideoPage = () => {
                     onPress={() => setDetailSheetVisible(true)}
                   />
                   <ListTitleLine
-                    title={'播放列表'}
-                    buttonText={`共${asources.length}个播放列表 >`}
-                    onPress={() => setSourcesVisible(!sourcesVisible)}
-                  />
-                  {sourcesVisible?<ListLine data={asources} onPress={handlePressSource} />:<></>}
-                  <ListTitleLine
                     title={'选集'}
                     buttonText={`${ainfoSub?.state} >`}
                     onPress={() => setAnthologySheetVisible(true)}
                   />
-                  {relatives.length == 0 ? null : (
-                    <RelaviteLine data={relatives} />
+                  {arelatives.length == 0 ? null : (
+                    <RelaviteLine relatives={arelatives} />
                   )}
                   <ListLine data={anthologys} />
                 </View>
               </>
             }
-            data={recommands}
+            data={arecommands}
             renderItem={RecommandLine}
             keyExtractor={item => `${item.id}`}
           />
@@ -188,11 +164,9 @@ const VideoPage = () => {
       <AnthologySheet
         top={videoHeight}
         height={windowHeight - videoHeight - StatusBar.currentHeight!}
-        playList={aplayList!}
-        sources={asources}
+        anthologys={anthologys}
         state={ainfoSub.state}
         visible={anthologySheetVisible}
-        defaultActive={0}
         onPress={() => {
           setAnthologySheetVisible(false);
         }}

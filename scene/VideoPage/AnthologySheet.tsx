@@ -1,32 +1,24 @@
-import {Button, Text, BottomSheet, Tab, TabView} from '@rneui/themed';
+import {Button, Text, BottomSheet} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
-import {useState} from 'react';
-import {PlayList} from '../../type/PlayList';
-import {Source} from '../../type/Source';
+import {ListItemInfo} from '../../type/ListItemInfo';
 
 type anthologySheetProps = {
   height: number;
   top: number;
-  playList: PlayList;
-  sources: Source[];
+  anthologys: ListItemInfo[];
   state: string;
   visible: boolean;
-  defaultActive: number;
   onPress: (event: any) => void;
 };
 
 const AnthologySheet = ({
   height,
   top,
-  playList,
-  sources,
+  anthologys,
   state,
   visible,
-  defaultActive,
   onPress,
 }: anthologySheetProps) => {
-  const [index, setIndex] = useState(defaultActive);
-
   const styles = StyleSheet.create({
     container: {
       backgroundColor: 'white',
@@ -45,11 +37,11 @@ const AnthologySheet = ({
       paddingTop: 10,
       paddingHorizontal: 10,
     },
-    stateRow:{
-      padding: 10
+    stateRow: {
+      padding: 10,
     },
-    emptyRow:{
-      padding: 20
+    emptyRow: {
+      padding: 20,
     },
     rowContainer: {
       paddingBottom: 50,
@@ -77,60 +69,40 @@ const AnthologySheet = ({
           <Text style={styles.text}>详情</Text>
           <Button type="clear" title={`x`} onPress={onPress} />
         </View>
-        <Tab scrollable value={index} onChange={setIndex}>
-          {sources.map(source => {
-            return <Tab.Item title={source.title} key={source.id} />;
-          })}
-        </Tab>
         <View style={styles.stateRow}>
           <Text style={styles.text2}>{state}</Text>
         </View>
-        <TabView value={index} onChange={setIndex}>
-          {sources.map(source => {
-            return (
-              <TabView.Item key={source.id}>
-                <ScrollView>
-                  <View style={styles.rowContainer}>
-                    {playList[source.title as keyof PlayList].length == 0 ? (
-                      <View style={styles.emptyRow}>
-                        <Text>暂无数据</Text>
+        <ScrollView>
+          <View style={styles.rowContainer}>
+            {anthologys.length == 0 ? (
+              <View style={styles.emptyRow}>
+                <Text>暂无数据</Text>
+              </View>
+            ) : (
+              anthologys.map((anthology, index) => {
+                return index % 2 == 0 ? (
+                  <View style={styles.boxRow} key={anthology.id}>
+                    <View style={styles.itemContainer}>
+                      <Text>{anthology.title}</Text>
+                    </View>
+                    {index + 1 < anthologys.length ? (
+                      <View style={styles.itemContainer}>
+                        <Text>{anthologys[index + 1].title}</Text>
                       </View>
                     ) : (
-                      playList[source.title as keyof PlayList].map(
-                        (as, index) => {
-                          return index % 2 == 0 ? (
-                            <View style={styles.boxRow}>
-                              <View style={styles.itemContainer}>
-                                <Text>{as.title}</Text>
-                              </View>
-                              {index + 1 <=
-                              playList[source.title as keyof PlayList]
-                                .length ? (
-                                <View style={styles.itemContainer}>
-                                  <Text>
-                                    {
-                                      playList[source.title as keyof PlayList][
-                                        index + 1
-                                      ].title
-                                    }
-                                  </Text>
-                                </View>
-                              ) : (
-                                <></>
-                              )}
-                            </View>
-                          ) : (
-                            <></>
-                          );
-                        },
-                      )
+                      <View
+                        style={{
+                          ...styles.itemContainer,
+                          backgroundColor: 'white',
+                        }}
+                      />
                     )}
                   </View>
-                </ScrollView>
-              </TabView.Item>
-            );
-          })}
-        </TabView>
+                ) : null;
+              })
+            )}
+          </View>
+        </ScrollView>
       </View>
     </BottomSheet>
   );

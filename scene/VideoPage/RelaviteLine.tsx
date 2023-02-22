@@ -1,8 +1,12 @@
 import {Button} from '@rneui/themed';
 import {StyleSheet, FlatList} from 'react-native';
-import {Source} from '../../type/Source';
+import {ListItemInfo} from '../../type/ListItemInfo';
 
-const RelaviteLine = ({data}: any) => {
+type relaviteLineProps = {
+  relatives :ListItemInfo[]
+}
+
+const RelaviteLine = ({relatives}: relaviteLineProps) => {
   const styles = StyleSheet.create({
     title: {
       fontSize: 18,
@@ -10,13 +14,13 @@ const RelaviteLine = ({data}: any) => {
       fontWeight: 'normal',
     },
   });
-  const renderItem = ({item}: {item: Source}) => {
+  const renderItem = ({item}: {item: ListItemInfo}) => {
     return <Button titleStyle={styles.title} type="clear" title={item.title} />;
   };
   return (
     <FlatList
       horizontal={true}
-      data={data}
+      data={relatives}
       renderItem={renderItem}
       keyExtractor={item => `${item.id}`}
     />

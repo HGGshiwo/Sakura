@@ -1,7 +1,5 @@
-import { Source } from "./source"
-
 declare type PlayList = {
-    key: Source[]
+    key: string[]
 }
 
 export {PlayList}
