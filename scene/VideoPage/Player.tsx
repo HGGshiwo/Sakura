@@ -1,10 +1,15 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
+import Video from 'react-native-video'
 
-const Video = require('react-native-video');
-
-const Player = ({loading, videoUrl, videoHeight, videoWidth}: any) => {
-
+type playerProps = {
+  loading: boolean;
+  videoUrl: string;
+  videoHeight: number;
+  videoWidth: number;
+};
+const Player = ({loading, videoUrl, videoHeight, videoWidth}: playerProps) => {
+  console.log(loading, videoUrl);
 
   var styles = StyleSheet.create({
     video: {

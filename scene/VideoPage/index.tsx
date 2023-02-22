@@ -38,7 +38,7 @@ const VideoPage = () => {
   const [videoWidth, setVideoWidth] = useState(0);
 
   const [atitle, setAtitle] = useState('');
-  const [asrc, setAsrc] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
 
   const [ainfoSub, setAinfoSub] = useState<InfoSub>(emptyInfoSub);
   const [ainfo, setAinfo] = useState('');
@@ -80,8 +80,8 @@ const VideoPage = () => {
       setAinfo(info);
     });
 
-    agent.afterLoadSrc((src: string) => {
-      setAsrc(src);
+    agent.afterLoadImgSrc((src: string) => {
+      setImgUrl(src);
     });
 
     agent.afterLoadRelatives((relatives: ListItemInfo[])=>{
@@ -90,6 +90,14 @@ const VideoPage = () => {
 
     agent.afterLoadRecommands((recommands: RecommandInfo[])=>{
       setArecommands(recommands)
+    })
+
+    agent.loadVideoSrc('https://m.yhdmp.net/vp/22598-1-0.html', (state: boolean, src: string)=>{
+      if(state) {
+        console.log(src)
+        setVideoUrl(src)
+        setLoading(false)
+      }
     })
 
     agent.load();
@@ -152,7 +160,7 @@ const VideoPage = () => {
         top={videoHeight}
         height={windowHeight - videoHeight - StatusBar.currentHeight!}
         title={atitle}
-        src={asrc}
+        src={imgUrl}
         infoSub={ainfoSub}
         info={ainfo}
         visible={detailLineVisible}
