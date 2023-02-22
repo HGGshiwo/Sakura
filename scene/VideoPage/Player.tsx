@@ -1,14 +1,21 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
-import Video from 'react-native-video'
+import Video from 'react-native-video';
 
 type playerProps = {
   loading: boolean;
   videoUrl: string;
   videoHeight: number;
   videoWidth: number;
+  onVideoErr: Function;
 };
-const Player = ({loading, videoUrl, videoHeight, videoWidth}: playerProps) => {
+const Player = ({
+  loading,
+  videoUrl,
+  videoHeight,
+  videoWidth,
+  onVideoErr,
+}: playerProps) => {
   console.log(loading, videoUrl);
 
   var styles = StyleSheet.create({
@@ -27,6 +34,7 @@ const Player = ({loading, videoUrl, videoHeight, videoWidth}: playerProps) => {
 
   const videoError = (err: any) => {
     console.log(err);
+    onVideoErr();
   };
 
   const onBuffer = (data: any) => {

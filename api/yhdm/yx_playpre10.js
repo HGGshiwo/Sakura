@@ -1,8 +1,8 @@
-import {__getplay_pck } from './yx_runtimelib';
-import {__getplay_pck2} from './yx_dett'
+import {__getplay_pck} from './yx_runtimelib';
+import {__getplay_pck2} from './yx_dett';
 export {__getset_play};
 
-const document = {'cookie':''};
+const document = {cookie: ''};
 ////////////////////////////
 
 function __qpic_chkvurl_converting(_in_vurl) {
@@ -271,10 +271,12 @@ function __getset_play(_url, callback, cb_cnt) {
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
       },
     })
-      .then(response => {console.log(response); return response.text()})
+      .then(response => {
+        console.log(response);
+        return response.text();
+      })
       .then(function (_in_data) {
-        
-        console.log(_in_data)
+        console.log(_in_data);
         debugger;
         if ('err:timeout' == _in_data) {
           if (cb_cnt > 0) {
@@ -340,7 +342,10 @@ function __getset_play(_url, callback, cb_cnt) {
         //
         return true;
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        callback(false, err);
+      });
   }
 
   //

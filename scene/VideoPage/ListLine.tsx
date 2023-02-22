@@ -32,7 +32,7 @@ const ListLine = ({data, onPress}: listLineProps) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          if (onPress) onPress(item.id);
+          if (onPress) onPress(item);
           setActiveIndex(index);
         }}>
         <View style={styles.itemContainer}>

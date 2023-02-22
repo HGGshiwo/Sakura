@@ -14,11 +14,11 @@ import {Player} from './Player';
 import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
-import { RecommandInfo } from '../../type/RecommandInfo';
+import {RecommandInfo} from '../../type/RecommandInfo';
 
 const VideoPage = () => {
   const url = 'https://m.yhdmp.net/showp/22598.html';
-
+  const href = 'https://m.yhdmp.net/';
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -50,7 +50,9 @@ const VideoPage = () => {
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const ratio = 0.56; //视频长宽比例
-
+  const agent = new Agent(url);
+  let curSourceIndex = 0; //当前的source源
+  let curSources: string[] = []; //当前可用的源
 
   useEffect(() => {
     const height = Dimensions.get('window').height;
@@ -60,14 +62,12 @@ const VideoPage = () => {
     setVideoWidth(width);
     setVideoHeight(width * ratio);
 
-    const agent = new Agent(url);
     agent.afterLoadTitle(setAtitle);
-
     agent.afterLoadPlayList((playList: PlayList) => {
       setAplayList(playList);
       setAnthologys(
         Object.keys(playList).map((key, index) => {
-          return {title:key, id:index, data:key};
+          return {title: key, id: index, data: key};
         }),
       );
     });
@@ -84,24 +84,65 @@ const VideoPage = () => {
       setImgUrl(src);
     });
 
-    agent.afterLoadRelatives((relatives: ListItemInfo[])=>{
-      setArelatives(relatives)
-    })
+    agent.afterLoadRelatives((relatives: ListItemInfo[]) => {
+      setArelatives(relatives);
+    });
 
-    agent.afterLoadRecommands((recommands: RecommandInfo[])=>{
-      setArecommands(recommands)
-    })
-
-    agent.loadVideoSrc('https://m.yhdmp.net/vp/22598-1-0.html', (state: boolean, src: string)=>{
-      if(state) {
-        console.log(src)
-        setVideoUrl(src)
-        setLoading(false)
-      }
-    })
-
+    agent.afterLoadRecommands((recommands: RecommandInfo[]) => {
+      setArecommands(recommands);
+    });
     agent.load();
+    agent.loadVideoSrc(
+      'https://m.yhdmp.net/vp/22598-1-0.html',
+      (state: boolean, src: string) => {
+        if (state) {
+          console.log(src);
+          setVideoUrl(src);
+          setLoading(false);
+        }
+        else {
+          switchVideoSrc()
+        }
+      },
+    );
   }, []);
+
+  //切换视频选集
+  const changeAnthology = (item: ListItemInfo) => {
+    setLoading(true);
+    curSourceIndex = 0;
+    curSources = aplayList![item.data as keyof PlayList];
+    const vUrl = href + curSources[curSourceIndex];
+    agent.loadVideoSrc(vUrl, (state: boolean, src: string) => {
+      if (state) {
+        console.log(src);
+        setVideoUrl(src);
+        setLoading(false);
+      }
+    });
+  };
+
+  const switchVideoSrc = () => {
+    //视频播放错误，切换源
+    console.log('切换视频源.')
+    curSourceIndex += 1;
+    if (curSourceIndex < curSources.length) {
+      console.log(`尝试切换源: ${curSourceIndex + 1}/${curSources.length}`);
+      setLoading(true);
+      const vUrl = href + curSources[curSourceIndex];
+      agent.loadVideoSrc(vUrl, (state: boolean, src: string) => {
+        if (state) {
+          console.log(src);
+          setVideoUrl(src);
+          setLoading(false);
+        } else {
+          switchVideoSrc();
+        }
+      });
+    } else {
+      console.log('所有视频源都不可用')
+    }
+  };
 
   // Later on in your styles..
   var styles = StyleSheet.create({
@@ -118,6 +159,7 @@ const VideoPage = () => {
         videoWidth={videoWidth}
         videoUrl={videoUrl}
         loading={loading}
+        onVideoErr={switchVideoSrc}
       />
 
       <Tab value={index} onChange={setIndex} dense style={styles.tabContainer}>
@@ -144,7 +186,7 @@ const VideoPage = () => {
                   {arelatives.length == 0 ? null : (
                     <RelaviteLine relatives={arelatives} />
                   )}
-                  <ListLine data={anthologys} />
+                  <ListLine data={anthologys} onPress={changeAnthology} />
                 </View>
               </>
             }
