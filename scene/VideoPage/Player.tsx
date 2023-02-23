@@ -5,6 +5,7 @@ import Video from 'react-native-video';
 type playerProps = {
   loading: boolean;
   videoUrl: string;
+  videoType: string;
   videoHeight: number;
   videoWidth: number;
   onVideoErr: Function;
@@ -12,11 +13,11 @@ type playerProps = {
 const Player = ({
   loading,
   videoUrl,
+  videoType,
   videoHeight,
   videoWidth,
   onVideoErr,
 }: playerProps) => {
-  console.log(loading, videoUrl);
 
   var styles = StyleSheet.create({
     video: {
@@ -48,7 +49,7 @@ const Player = ({
     <Video
       source={{
         uri: videoUrl,
-        type: 'm3u8',
+        type: videoType,
       }}
       onBuffer={onBuffer} // Callback when remote video is buffering
       onError={videoError} // Callback when video cannot be loaded

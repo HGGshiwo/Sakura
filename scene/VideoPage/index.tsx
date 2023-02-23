@@ -1,7 +1,7 @@
 import {Tab, TabView} from '@rneui/themed';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {StyleSheet, Dimensions, View, FlatList, StatusBar} from 'react-native';
-import {Agent} from '../../api/yhdm';
+import {Agent} from '../../api/yinghuacd';
 import {ListItemInfo} from '../../type/ListItemInfo';
 import {PlayList} from '../../type/PlayList';
 import {InfoSub} from '../../type/InfoSub';
@@ -17,8 +17,8 @@ import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 
 const VideoPage = () => {
-  const url = 'https://m.yhdmp.net/showp/22598.html';
-  const href = 'https://m.yhdmp.net/';
+  const url = '/show/5786.html';
+
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -33,9 +33,10 @@ const VideoPage = () => {
   const [windowWidth, setWindowWidth] = useState(0);
 
   const [videoUrl, setVideoUrl] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [videoType, setVideoType] = useState('');
   const [videoHeight, setVideoHeight] = useState(0);
   const [videoWidth, setVideoWidth] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const [atitle, setAtitle] = useState('');
   const [imgUrl, setImgUrl] = useState('');
@@ -50,9 +51,11 @@ const VideoPage = () => {
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const ratio = 0.56; //视频长宽比例
+
   const agent = new Agent(url);
-  let curSourceIndex = 0; //当前的source源
-  let curSources: string[] = []; //当前可用的源
+  const curSourceIndex = useRef(0); //当前的source源
+  const curSources = useRef<string[]>([]); //当前可用的源
+  const videoSolved = useRef(false) //视频是否可以播放，不能使用useState
 
   useEffect(() => {
     const height = Dimensions.get('window').height;
@@ -66,10 +69,17 @@ const VideoPage = () => {
     agent.afterLoadPlayList((playList: PlayList) => {
       setAplayList(playList);
       setAnthologys(
-        Object.keys(playList).map((key, index) => {
+        Object.keys(playList).sort().map((key, index) => {
           return {title: key, id: index, data: key};
         }),
       );
+      //切换到第一集
+      let data = Object.keys(playList).sort()[0];
+      setLoading(true);
+      videoSolved.current = false
+      curSourceIndex.current = 0;
+      curSources.current = playList[data as keyof PlayList];
+      switchVideoSrc();
     });
 
     agent.afterLoadInfoSub((infoSub: InfoSub) => {
@@ -92,55 +102,43 @@ const VideoPage = () => {
       setArecommands(recommands);
     });
     agent.load();
-    agent.loadVideoSrc(
-      'https://m.yhdmp.net/vp/22598-1-0.html',
-      (state: boolean, src: string) => {
-        if (state) {
-          console.log(src);
-          setVideoUrl(src);
-          setLoading(false);
-        }
-        else {
-          switchVideoSrc()
-        }
-      },
-    );
   }, []);
 
   //切换视频选集
   const changeAnthology = (item: ListItemInfo) => {
     setLoading(true);
-    curSourceIndex = 0;
-    curSources = aplayList![item.data as keyof PlayList];
-    const vUrl = href + curSources[curSourceIndex];
-    agent.loadVideoSrc(vUrl, (state: boolean, src: string) => {
-      if (state) {
-        console.log(src);
-        setVideoUrl(src);
-        setLoading(false);
-      }
-    });
+    videoSolved.current = false
+    curSourceIndex.current = 0;
+    curSources.current = aplayList![item.data as keyof PlayList];
+    switchVideoSrc();
   };
 
   const switchVideoSrc = () => {
-    //视频播放错误，切换源
-    console.log('切换视频源.')
-    curSourceIndex += 1;
-    if (curSourceIndex < curSources.length) {
-      console.log(`尝试切换源: ${curSourceIndex + 1}/${curSources.length}`);
-      setLoading(true);
-      const vUrl = href + curSources[curSourceIndex];
-      agent.loadVideoSrc(vUrl, (state: boolean, src: string) => {
+    //设置视频播放源
+    if (curSourceIndex.current < curSources.current.length) {
+      console.log(
+        `尝试源: ${curSourceIndex.current + 1}/${curSources.current.length}`,
+      );
+      const vUrl = curSources.current[curSourceIndex.current];
+      curSourceIndex.current += 1;
+      agent.loadVideoSrc(vUrl, (state: boolean, src: string, type: string) => {
+        if (videoSolved.current) return;
+        console.log(state, src, type);
         if (state) {
-          console.log(src);
           setVideoUrl(src);
+          setVideoType(type);
           setLoading(false);
+          videoSolved.current = true
         } else {
           switchVideoSrc();
         }
       });
     } else {
-      console.log('所有视频源都不可用')
+      console.log(
+        curSourceIndex.current,
+        curSources.current.length,
+        '所有视频源都不可用',
+      );
     }
   };
 
@@ -158,11 +156,16 @@ const VideoPage = () => {
         videoHeight={videoHeight}
         videoWidth={videoWidth}
         videoUrl={videoUrl}
+        c={videoType}
         loading={loading}
         onVideoErr={switchVideoSrc}
       />
 
-      <Tab value={index} onChange={setIndex} dense style={styles.tabContainer}>
+      <Tab
+        value={index}
+        onChange={setIndex}
+        dense
+        style={styles.tabContainer}>
         <Tab.Item>简介</Tab.Item>
         <Tab.Item>评论</Tab.Item>
       </Tab>

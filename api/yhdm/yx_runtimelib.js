@@ -2,7 +2,7 @@ export {__getplay_pck }
 
 var _$_ad1c = ["\x74\x6F\x4C\x6F\x77\x65\x72\x43\x61\x73\x65", "\x61\x62\x63", "\x39\x30\x30\x31\x35\x30\x39\x38\x33\x63\x64\x32\x34\x66\x62\x30\x64\x36\x39\x36\x33\x66\x37\x64\x32\x38\x65\x31\x37\x66\x37\x32", "\x6C\x65\x6E\x67\x74\x68", "\x63\x6F\x6E\x63\x61\x74", "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", "", "\x63\x68\x61\x72\x43\x6F\x64\x65\x41\x74", "\x63\x68\x61\x72\x41\x74", "\x66\x72\x6F\x6D\x43\x68\x61\x72\x43\x6F\x64\x65", "\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4A\x4B\x4C\x4D\x4E\x4F\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5A\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6A\x6B\x6C\x6D\x6E\x6F\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7A\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x2B\x2F", "\x3D\x3D", "\x3D"];
 
-function __getplay_pck(document) {
+function __getplay_pck(_this) {
     ;var encode_version = 'sojson.v5'
       , yqpcz = '__0x6d4a1'
       , __0x6d4a1 = ['wq4mw7/CmF4=', 'w6XDrMOmwprCgg==', 'eRfDo8OoZQ==', 'IUnCmSzDgyfDjw==', 'S0pEJ8KxUMOSwqlq', 'asOow5tBwqk=', '5Lqc6ICk5Yi16ZuCw7A4wqEAwqHCisKHwr0/', 'TjpSwqZ3WMOmG8Oz', 'MhvDm8OOwqk=', 'XsKOwrAgwrFzwoU=', 'UyHCmcOyREsv', 'N2DDnXUC', 'BcOIwowrdgc=', 'GcOwNxbDqg==', 'JcKMw4ZORw==', 'Jm/ChVfDhw==', 'w7U3w4PCksKm', 'w7jDnHDCpcOF', 'wrgOw5PDlcO7', 'w4HDkMODYcK/D8O0PMKjShFZcw==', 'F8KFT8Ktwp3Ckw/CqXI=', 'M8O0dUFY', 'e1zDtMOGZg==', 'w6LChsKLCBo=', 'EMKJXSbDjQ==', 'T8KPWMK2wp3ChA==', 'wpRjw5BEZQ==', 'JHsWwq3DoQ==', 'HsKKUAvDqw==', 'wopnw5BzZA3DgQ==', 'wqAkw5PCpmw=', 'w68MBSvDow==', 'MljDsVQq', 'FMKIw6xETQ=='];
@@ -104,7 +104,7 @@ function __getplay_pck(document) {
                     var _0x355c8f = 0x1e;
                     var _0x36f590 = new Date();
                     _0x36f590['setTime'](_0x3df411['DUWem'](_0x36f590[_0x15f5('0x3', 'wmgi')](), _0x3df411[_0x15f5('0x4', 'Put*')](_0x3df411['chgqL'](_0x3df411['chgqL'](_0x355c8f, 0x18), 0x3c) * 0x3c, 0x3e8)));
-                    document[_0x15f5('0x5', '(m&I')] = _0x3df411['DUWem'](_0x3df411[_0x15f5('0x6', 'PIK)')](_0x3df411['FyVON'](_0x3df411['rImkg'](_0x3df411[_0x15f5('0x7', 'MDzc')](_0x369589, '='), escape(_0x22305e)), _0x3df411[_0x15f5('0x8', 'bDPL')]), _0x36f590['toGMTString']()), _0x3df411[_0x15f5('0x9', 'Doro')]);
+                    _this.cookie = _0x3df411['DUWem'](_0x3df411[_0x15f5('0x6', 'PIK)')](_0x3df411['FyVON'](_0x3df411['rImkg'](_0x3df411[_0x15f5('0x7', 'MDzc')](_0x369589, '='), escape(_0x22305e)), _0x3df411[_0x15f5('0x8', 'bDPL')]), _0x36f590['toGMTString']()), _0x3df411[_0x15f5('0x9', 'Doro')]);
                 }
                 ;
                 continue;
@@ -141,14 +141,14 @@ function __getplay_pck(document) {
                         'QNctg': _0x15f5('0xd', 'KvKZ')
                     };
                     var _0x583897, _0x3a66ce = new RegExp(_0x2061a3[_0x15f5('0xe', 'Ox#l')](_0x2061a3[_0x15f5('0xf', 'v78#')](_0x2061a3[_0x15f5('0x10', '7jQL')], _0x30755b), _0x2061a3[_0x15f5('0x11', '6O7p')]));
-                    if (_0x583897 = document[_0x15f5('0x12', 'KvKZ')][_0x15f5('0x13', 'Z@&Q')](_0x3a66ce)) {
+                    if (_0x583897 = _this.cookie[_0x15f5('0x13', 'Z@&Q')](_0x3a66ce)) {
                         return _0x2061a3[_0x15f5('0x14', 'g#CQ')](unescape, _0x583897[0x2]);
                     } else {
                         if (_0x2061a3['tNCZl'] !== _0x2061a3[_0x15f5('0x15', '6O7p')]) {
                             var _0x2856c4 = 0x1e;
                             var _0x412bd3 = new Date();
                             _0x412bd3[_0x15f5('0x16', 'Z@&Q')](_0x2061a3[_0x15f5('0x17', '0USv')](_0x412bd3['getTime'](), _0x2061a3['BbKyG'](_0x2061a3[_0x15f5('0x18', 'x]l]')](_0x2856c4, 0x18) * 0x3c * 0x3c, 0x3e8)));
-                            document['cookie'] = _0x2061a3[_0x15f5('0x19', 'Put*')](_0x2061a3['fPKPd'](_0x2061a3[_0x15f5('0x1a', 'MDzc')](_0x2061a3[_0x15f5('0x1b', '0USv')](_0x30755b + '=', _0x2061a3[_0x15f5('0x1c', 'd$Fs')](escape, value)), _0x2061a3[_0x15f5('0x1d', 's1ve')]), _0x412bd3['toGMTString']()), ';path=/');
+                            _this.cookie = _0x2061a3[_0x15f5('0x19', 'Put*')](_0x2061a3['fPKPd'](_0x2061a3[_0x15f5('0x1a', 'MDzc')](_0x2061a3[_0x15f5('0x1b', '0USv')](_0x30755b + '=', _0x2061a3[_0x15f5('0x1c', 'd$Fs')](escape, value)), _0x2061a3[_0x15f5('0x1d', 's1ve')]), _0x412bd3['toGMTString']()), ';path=/');
                         } else {
                             return null;
                         }

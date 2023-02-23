@@ -3,9 +3,15 @@ import {getDomFromString} from '../../public/Dom';
 import { GetUrlQuery } from './ckplayer4';
 import {__getset_play} from './yx_playpre10';
 
+const url = 'https://m.yhdmp.net/showp/22598.html';
+const href = 'https://m.yhdmp.net';
+
 class Agent {
   constructor(_url) {
+    this.resultQue = []
+    this.handling = false
     this._url = _url;
+    this.cookie = ''
   }
 
   afterLoadTitle(callback) {
@@ -68,7 +74,6 @@ class Agent {
         if (this._afterLoadInfoSub) {
           this._afterLoadInfoSub(infoSub);
         }
-        debugger;
 
         let infoDom = document.getElementsByClass('info')[0];
         if (this._afterLoadInfo) {
@@ -90,8 +95,8 @@ class Agent {
               const a = liDom.getElementsByTagName('a')[0];
               let key = a.innerHTML;
               playList[key] = playList[key]
-                ? [...playList[key], a.href]
-                : [a.href];
+                ? [...playList[key], href+a.href]
+                : [href+a.href];
             });
         });
         if (this._afterLoadPlayList) {
@@ -133,16 +138,37 @@ class Agent {
       });
   }
 
-  loadVideoSrc(url, afterLoadVideoSrc) {
-    const _afterLoadVideoSrc = (state, src) => {
+  handleQue (afterLoadVideoSrc) {
+    debugger;
+    if(this.resultQue.length != 0) {
+      let {state, src} = this.resultQue.shift()
       if (state) {
         src = GetUrlQuery(src, "url");
         console.log(src)
-        debugger;
+        afterLoadVideoSrc(state, src);
+        this.resultQue = []
+        this.handling = false
       }
-      afterLoadVideoSrc(state, src);
+      else {
+        this.handleQue(afterLoadVideoSrc)
+      }
+    }
+    else {
+      //处理所有请求，但是没有获取到src
+      this.handling = false
+      afterLoadVideoSrc(false, '')
+    }
+  }
+
+  loadVideoSrc(url, afterLoadVideoSrc) {
+    const _afterLoadVideoSrc = (state, src) => {
+      this.resultQue.push({state, src})
+      if(!this.handling) {
+        this.handling = true
+        this.handleQue(afterLoadVideoSrc)
+      }
     };
-    __getset_play(url, _afterLoadVideoSrc, 3);
+    __getset_play(this, url, _afterLoadVideoSrc, 3);
   }
 }
 

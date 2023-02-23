@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {__getplay_pck} from './yx_runtimelib';
 import {__getplay_pck2} from './yx_dett';
 export {__getset_play};
@@ -243,8 +244,7 @@ function __yx_purl_rev(_href, _purl) {
 }
 
 var GETSET_PLAY_CNT = 0;
-function __getset_play(_url, callback, cb_cnt) {
-  debugger;
+function __getset_play(_this, _url, callback, cb_cnt) {
   //
   function cb_getplay_url() {
     //
@@ -259,44 +259,45 @@ function __getset_play(_url, callback, cb_cnt) {
     return _getplay_url;
   }
   const _getplay_url = cb_getplay_url();
+  console.log(_getplay_url);
   if (dettchk()) {
-    fetch(_getplay_url, {
-      headers: {
-        accept: '*/*',
-        'accept-encoding': 'gzip, deflate, br',
-        'accept-language': 'zh,zh-TW;q=0.9,zh-CN;q=0.8',
-        cookie: document['cookie'],
-        referer: _url,
-        'user-agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-      },
-    })
-      .then(response => {
-        console.log(response);
-        return response.text();
+    console.log('cookie: '+_this.cookie)
+    axios
+      .get(_getplay_url, {
+        headers: {
+          accept: '*/*',
+          'accept-encoding': 'gzip, deflate, br',
+          'accept-language': 'zh,zh-TW;q=0.9,zh-CN;q=0.8',
+          cookie: _this.cookie,
+          referer: _url,
+          'user-agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+        },
       })
-      .then(function (_in_data) {
+      .then(function (response) {
+        let _in_data = response.data;
         console.log(_in_data);
-        debugger;
-        if ('err:timeout' == _in_data) {
-          if (cb_cnt > 0) {
-            __getplay_pck(document);
-            // __getplay_pck2(document);
-            return __getset_play(_url, callback, cb_cnt - 1);
-          } else {
-            callback(false, 'err:timeout');
+        if (typeof _in_data == 'string') {
+          if ('err:timeout' == _in_data) {
+            if (cb_cnt > 0) {
+              __getplay_pck(_this);
+              // __getplay_pck2(document);
+              return __getset_play(_this, _url, callback, cb_cnt - 1);
+            } else {
+              callback(false, 'err:timeout');
+              return false;
+            }
+          }
+
+          //
+          if (__ipchk_getplay(_in_data)) {
+            callback(false, _in_data);
             return false;
           }
         }
 
         //
-        if (__ipchk_getplay(_in_data)) {
-          callback(false, _in_data);
-          return false;
-        }
-
-        //
-        var _json_obj = JSON.parse(_in_data);
+        var _json_obj = _in_data //JSON.parse(_in_data);
         var _purl = __getplay_rev_data(_json_obj['purl']);
         var _purl_mp4 = _json_obj['purl_mp4'];
         var _vurl = __getplay_rev_data(_json_obj['vurl']);
@@ -326,7 +327,7 @@ function __getset_play(_url, callback, cb_cnt) {
         if (!_vurl || '1' == _play_inv) {
           if (++GETSET_PLAY_CNT < 4) {
             setTimeout(function () {
-              return __getset_play(_url, callback, cb_cnt);
+              return __getset_play(_this, _url, callback, cb_cnt);
             }, 4000);
             callback(false, '');
             return false;
@@ -338,6 +339,7 @@ function __getset_play(_url, callback, cb_cnt) {
           _purl + _vurl + _vurlp2_getplay_url,
           vlt_lr,
         );
+        console.log(src);
         callback(true, src);
         //
         return true;
