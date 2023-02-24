@@ -62,6 +62,7 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
         }}
         data={carousels}
         renderItem={({item}: renderItemProps) => {
+          console.log(item.img)
           return <SBItem pretty item={item} />;
         }}
       />
@@ -126,7 +127,7 @@ const PaginationItem: React.FC<{
   return (
     <View
       style={{
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(0,0,0,0.1)',
         width,
         height: width,
         borderRadius: 50,
