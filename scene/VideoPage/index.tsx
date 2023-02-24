@@ -1,7 +1,7 @@
 import {Tab, TabView} from '@rneui/themed';
 import {useState, useEffect, useRef} from 'react';
 import {StyleSheet, Dimensions, View, FlatList, StatusBar} from 'react-native';
-import {Agent} from '../../api/yinghuacd';
+import {Agent} from '../../api/yinghuacd/VideoAgent';
 import {ListItemInfo} from '../../type/ListItemInfo';
 import {PlayList} from '../../type/PlayList';
 import {InfoSub} from '../../type/InfoSub';
@@ -60,8 +60,7 @@ const VideoPage = ({route, navigation}) => {
   const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
 
   useEffect(() => {
-    const height = Dimensions.get('window').height;
-    const width = Dimensions.get('window').width;
+    const {height, width} = Dimensions.get('window');
     setWindowHeight(height);
     setWindowWidth(width);
     setVideoWidth(width);
