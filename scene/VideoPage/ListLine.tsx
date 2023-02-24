@@ -1,12 +1,15 @@
+import {faVideo} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Text} from '@rneui/themed';
-import {useState} from 'react';
 import {StyleSheet, View, FlatList, TouchableHighlight} from 'react-native';
 import {ListItemInfo} from '../../type/ListItemInfo';
 
-type listLineProps = {data: ListItemInfo[]; onPress?: Function};
-const ListLine = ({data, onPress}: listLineProps) => {
-  const [activeIndex, setActiveIndex] = useState(0); //当前活跃的块
-
+type listLineProps = {
+  data: ListItemInfo[];
+  onPress?: Function;
+  activeIndex: number;
+};
+const ListLine = ({data, onPress, activeIndex}: listLineProps) => {
   const styles = StyleSheet.create({
     container: {
       marginBottom: 20,
@@ -17,6 +20,7 @@ const ListLine = ({data, onPress}: listLineProps) => {
       height: 75,
       marginHorizontal: 10,
       padding: 10,
+      justifyContent: 'space-between',
     },
     text: {
       fontSize: 20,
@@ -33,7 +37,6 @@ const ListLine = ({data, onPress}: listLineProps) => {
       <TouchableHighlight
         onPress={() => {
           if (onPress) onPress(item);
-          setActiveIndex(index);
         }}>
         <View style={styles.itemContainer}>
           <Text style={textStyle}>{item.title}</Text>

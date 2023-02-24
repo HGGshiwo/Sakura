@@ -1,6 +1,10 @@
-import {Button, Text, BottomSheet} from '@rneui/themed';
+import {Text} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {ListItemInfo} from '../../type/ListItemInfo';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {Pressable} from 'react-native';
+import {faVideo, faXmark} from '@fortawesome/free-solid-svg-icons';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 type anthologySheetProps = {
   height: number;
@@ -8,7 +12,9 @@ type anthologySheetProps = {
   anthologys: ListItemInfo[];
   state: string;
   visible: boolean;
-  onPress: (event: any) => void;
+  onPress: (item: ListItemInfo) => void;
+  onClose: () => void;
+  activeIndex: number;
 };
 
 const AnthologySheet = ({
@@ -17,12 +23,17 @@ const AnthologySheet = ({
   anthologys,
   state,
   visible,
+  activeIndex,
+  onClose,
   onPress,
 }: anthologySheetProps) => {
   const styles = StyleSheet.create({
     container: {
       backgroundColor: 'white',
-      height,
+      height: height,
+      top: top,
+      position: 'absolute',
+      elevation: 1,
     },
     headerRow: {
       flexDirection: 'row',
@@ -52,6 +63,8 @@ const AnthologySheet = ({
       height: 75,
       marginHorizontal: 10,
       padding: 10,
+      borderRadius: 10,
+      justifyContent:'space-between'
     },
     text: {
       fontSize: 18,
@@ -60,51 +73,79 @@ const AnthologySheet = ({
       fontSize: 16,
       color: 'gray',
     },
+    active: {
+      color: 'deeppink',
+    },
   });
 
-  return (
-    <BottomSheet isVisible={visible}>
-      <View style={styles.container}>
-        <View style={styles.headerRow}>
-          <Text style={styles.text}>详情</Text>
-          <Button type="clear" title={`x`} onPress={onPress} />
+  type ItemBoxProps = {
+    index: number;
+    anthology: ListItemInfo;
+  };
+
+  const ItemBox = ({index, anthology}: ItemBoxProps) => {
+    let textStyle = index === activeIndex ? {...styles.active} : {};
+    return (
+      <Pressable
+        style={{flex: 1}}
+        onPress={() => {
+          onPress(anthology);
+        }}>
+        <View style={styles.itemContainer}>
+          <Text style={{...styles.text, ...textStyle}}>{anthology.title}</Text>
         </View>
-        <View style={styles.stateRow}>
-          <Text style={styles.text2}>{state}</Text>
-        </View>
-        <ScrollView>
-          <View style={styles.rowContainer}>
-            {anthologys.length == 0 ? (
-              <View style={styles.emptyRow}>
-                <Text>暂无数据</Text>
-              </View>
-            ) : (
-              anthologys.map((anthology, index) => {
-                return index % 2 == 0 ? (
-                  <View style={styles.boxRow} key={anthology.id}>
-                    <View style={styles.itemContainer}>
-                      <Text>{anthology.title}</Text>
-                    </View>
-                    {index + 1 < anthologys.length ? (
-                      <View style={styles.itemContainer}>
-                        <Text>{anthologys[index + 1].title}</Text>
-                      </View>
-                    ) : (
-                      <View
-                        style={{
-                          ...styles.itemContainer,
-                          backgroundColor: 'white',
-                        }}
-                      />
-                    )}
-                  </View>
-                ) : null;
-              })
-            )}
-          </View>
-        </ScrollView>
+      </Pressable>
+    );
+  };
+
+  return !visible ? (
+    <></>
+  ) : (
+    <View style={styles.container}>
+      <View style={styles.headerRow}>
+        <Text style={styles.text}>详情</Text>
+        <Pressable
+          onPress={() => {
+            console.log('press');
+            onClose();
+          }}>
+          <FontAwesomeIcon icon={faXmark} />
+        </Pressable>
       </View>
-    </BottomSheet>
+      <View style={styles.stateRow}>
+        <Text style={styles.text2}>{state}</Text>
+      </View>
+      <ScrollView>
+        <View style={styles.rowContainer}>
+          {anthologys.length == 0 ? (
+            <View style={styles.emptyRow}>
+              <Text>暂无数据</Text>
+            </View>
+          ) : (
+            anthologys.map((anthology, index) => {
+              return index % 2 == 0 ? (
+                <View style={styles.boxRow} key={anthology.id}>
+                  <ItemBox index={index} anthology={anthology} />
+                  {index + 1 < anthologys.length ? (
+                    <ItemBox
+                      index={index + 1}
+                      anthology={anthologys[index + 1]}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        ...styles.itemContainer,
+                        backgroundColor: 'white',
+                      }}
+                    />
+                  )}
+                </View>
+              ) : null;
+            })
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

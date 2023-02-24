@@ -1,6 +1,8 @@
 import {InfoSub} from '../../type/InfoSub';
 import {Button, Text, Image, BottomSheet, AirbnbRating} from '@rneui/themed';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import {StyleSheet, View, ScrollView, Pressable, Modal} from 'react-native';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faXmark} from '@fortawesome/free-solid-svg-icons';
 
 type detailSheetProps = {
   height: number;
@@ -26,7 +28,10 @@ const DetailSheet = ({
   const styles = StyleSheet.create({
     container: {
       backgroundColor: 'white',
-      height,
+      height: height,
+      top: top,
+      position: 'absolute',
+      elevation: 1,
     },
     headerRow: {
       flexDirection: 'row',
@@ -46,13 +51,13 @@ const DetailSheet = ({
       flexDirection: 'row',
       margin: 10,
     },
-		produceRow: {
-			margin: 10,
-		},
-		infoRow: {
-			margin: 10,
+    produceRow: {
+      margin: 10,
+    },
+    infoRow: {
+      margin: 10,
       paddingBottom: 30,
-		},
+    },
     imageContainer: {
       flex: 2,
       height: 180,
@@ -81,29 +86,33 @@ const DetailSheet = ({
     },
     text2: {
       fontSize: 16,
-			color: 'gray'
+      color: 'gray',
     },
-		produceTitle: {
-			marginVertical: 10
-		},
-		infoTitle: {
-			marginVertical: 10
-		},
-		rateTitle:{
-			color: 'orange',
-			fontSize: 25,
-			fontWeight:'bold'
-		}
+    produceTitle: {
+      marginVertical: 10,
+    },
+    infoTitle: {
+      marginVertical: 10,
+    },
+    rateTitle: {
+      color: 'orange',
+      fontSize: 25,
+      fontWeight: 'bold',
+    },
   });
 
-  return (
-    <BottomSheet isVisible={visible}>
-      <View style={styles.container}>
-        <View style={styles.headerRow}>
-          <Text style={styles.text}>详情</Text>
-          <Button type="clear" title={`x`} onPress={onPress} />
-        </View>
-				<ScrollView>
+  return !visible ? (
+    <></>
+  ) : (
+    // <Modal>
+    <View style={styles.container}>
+      <View style={styles.headerRow}>
+        <Text style={styles.text}>详情</Text>
+        <Pressable onPress={onPress}>
+          <FontAwesomeIcon icon={faXmark} />
+        </Pressable>
+      </View>
+      <ScrollView>
         <View style={styles.imageRow}>
           <Image containerStyle={styles.imageContainer} source={{uri: src}} />
           <View style={styles.titleContainer}>
@@ -115,7 +124,7 @@ const DetailSheet = ({
           </View>
           <View style={styles.rateContainer}>
             <Text style={styles.rateTitle}>9.7</Text>
-						<AirbnbRating size={10}  showRating={false}/>
+            <AirbnbRating size={10} showRating={false} />
           </View>
         </View>
         <View style={styles.nameRow}>
@@ -131,23 +140,27 @@ const DetailSheet = ({
                   containerStyle={styles.buttonContainer}
                   title={type}
                   key={index}
-									size='sm'
+                  size="sm"
                 />
               );
             })}
           </View>
         </View>
-				<View style={styles.produceRow}>
-					<Text style={styles.produceTitle} h4>制作信息</Text>
+        <View style={styles.produceRow}>
+          <Text style={styles.produceTitle} h4>
+            制作信息
+          </Text>
           <Text>{infoSub.author}</Text>
         </View>
         <View style={styles.infoRow}>
-					<Text style={styles.produceTitle} h4>简介</Text>
+          <Text style={styles.produceTitle} h4>
+            简介
+          </Text>
           <Text>{info}</Text>
         </View>
-				</ScrollView>
-      </View>
-    </BottomSheet>
+      </ScrollView>
+    </View>
+    // </Modal>
   );
 };
 

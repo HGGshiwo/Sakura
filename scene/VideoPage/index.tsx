@@ -47,7 +47,8 @@ const VideoPage = () => {
   const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
-
+  
+  const [anthologyIndex, setAnthologyIndex] = useState(0)
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const ratio = 0.56; //视频长宽比例
@@ -76,6 +77,7 @@ const VideoPage = () => {
       //切换到第一集
       let data = Object.keys(playList).sort()[0];
       setLoading(true);
+      setAnthologyIndex(0) //当前播放第一集
       videoSolved.current = false
       curSourceIndex.current = 0;
       curSources.current = playList[data as keyof PlayList];
@@ -106,6 +108,7 @@ const VideoPage = () => {
 
   //切换视频选集
   const changeAnthology = (item: ListItemInfo) => {
+    setAnthologyIndex(item.id)
     setLoading(true);
     videoSolved.current = false
     curSourceIndex.current = 0;
@@ -156,8 +159,8 @@ const VideoPage = () => {
         videoHeight={videoHeight}
         videoWidth={videoWidth}
         videoUrl={videoUrl}
-        c={videoType}
-        loading={loading}
+        videoType={videoType}
+        videoUrlAvaliable={!loading}
         onVideoErr={switchVideoSrc}
       />
 
@@ -189,7 +192,7 @@ const VideoPage = () => {
                   {arelatives.length == 0 ? null : (
                     <RelaviteLine relatives={arelatives} />
                   )}
-                  <ListLine data={anthologys} onPress={changeAnthology} />
+                  <ListLine data={anthologys} onPress={changeAnthology} activeIndex={anthologyIndex}/>
                 </View>
               </>
             }
@@ -218,11 +221,14 @@ const VideoPage = () => {
         top={videoHeight}
         height={windowHeight - videoHeight - StatusBar.currentHeight!}
         anthologys={anthologys}
+        activeIndex = {anthologyIndex}
         state={ainfoSub.state}
         visible={anthologySheetVisible}
-        onPress={() => {
+        onClose={() => {
+          console.log('close')
           setAnthologySheetVisible(false);
         }}
+        onPress={changeAnthology}
       />
     </>
   );
