@@ -8,7 +8,8 @@ const TitleLine = ({title}: any) => {
       justifyContent: 'space-between',
     },
     text: {
-      width: '50%',
+      width: '70%',
+      overflow: 'hidden'
     },
     button: {
       borderRadius: 20,

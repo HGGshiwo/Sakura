@@ -4,7 +4,7 @@ import {ListItemInfo} from '../../type/ListItemInfo';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
 import {faVideo, faXmark} from '@fortawesome/free-solid-svg-icons';
-import { faYoutube } from '@fortawesome/free-brands-svg-icons';
+import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 
 type anthologySheetProps = {
   height: number;
@@ -64,7 +64,7 @@ const AnthologySheet = ({
       marginHorizontal: 10,
       padding: 10,
       borderRadius: 10,
-      justifyContent:'space-between'
+      justifyContent: 'space-between',
     },
     text: {
       fontSize: 18,

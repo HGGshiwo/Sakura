@@ -16,8 +16,7 @@ import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 
-const VideoPage = () => {
-  const url = '/show/5786.html';
+const VideoPage = ({route, navigation}) => {
 
   const emptyInfoSub = {
     author: '未知',
@@ -27,6 +26,8 @@ const VideoPage = () => {
     type: [],
     produce: '',
   };
+
+  const { url } = route.params;
 
   const [index, setIndex] = useState(0);
   const [windowHeight, setWindowHeight] = useState(0);
@@ -47,8 +48,8 @@ const VideoPage = () => {
   const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
-  
-  const [anthologyIndex, setAnthologyIndex] = useState(0)
+
+  const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const ratio = 0.56; //视频长宽比例
@@ -56,7 +57,7 @@ const VideoPage = () => {
   const agent = new Agent(url);
   const curSourceIndex = useRef(0); //当前的source源
   const curSources = useRef<string[]>([]); //当前可用的源
-  const videoSolved = useRef(false) //视频是否可以播放，不能使用useState
+  const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
 
   useEffect(() => {
     const height = Dimensions.get('window').height;
@@ -70,15 +71,17 @@ const VideoPage = () => {
     agent.afterLoadPlayList((playList: PlayList) => {
       setAplayList(playList);
       setAnthologys(
-        Object.keys(playList).sort().map((key, index) => {
-          return {title: key, id: index, data: key};
-        }),
+        Object.keys(playList)
+          .sort()
+          .map((key, index) => {
+            return {title: key, id: index, data: key};
+          }),
       );
       //切换到第一集
       let data = Object.keys(playList).sort()[0];
       setLoading(true);
-      setAnthologyIndex(0) //当前播放第一集
-      videoSolved.current = false
+      setAnthologyIndex(0); //当前播放第一集
+      videoSolved.current = false;
       curSourceIndex.current = 0;
       curSources.current = playList[data as keyof PlayList];
       switchVideoSrc();
@@ -108,9 +111,9 @@ const VideoPage = () => {
 
   //切换视频选集
   const changeAnthology = (item: ListItemInfo) => {
-    setAnthologyIndex(item.id)
+    setAnthologyIndex(item.id);
     setLoading(true);
-    videoSolved.current = false
+    videoSolved.current = false;
     curSourceIndex.current = 0;
     curSources.current = aplayList![item.data as keyof PlayList];
     switchVideoSrc();
@@ -131,7 +134,7 @@ const VideoPage = () => {
           setVideoUrl(src);
           setVideoType(type);
           setLoading(false);
-          videoSolved.current = true
+          videoSolved.current = true;
         } else {
           switchVideoSrc();
         }
@@ -143,6 +146,10 @@ const VideoPage = () => {
         '所有视频源都不可用',
       );
     }
+  };
+
+  const onPressRecommand = (item: RecommandInfo) => {
+    navigation.push('video', {url: item.href});
   };
 
   // Later on in your styles..
@@ -164,11 +171,7 @@ const VideoPage = () => {
         onVideoErr={switchVideoSrc}
       />
 
-      <Tab
-        value={index}
-        onChange={setIndex}
-        dense
-        style={styles.tabContainer}>
+      <Tab value={index} onChange={setIndex} dense style={styles.tabContainer}>
         <Tab.Item>简介</Tab.Item>
         <Tab.Item>评论</Tab.Item>
       </Tab>
@@ -192,12 +195,18 @@ const VideoPage = () => {
                   {arelatives.length == 0 ? null : (
                     <RelaviteLine relatives={arelatives} />
                   )}
-                  <ListLine data={anthologys} onPress={changeAnthology} activeIndex={anthologyIndex}/>
+                  <ListLine
+                    data={anthologys}
+                    onPress={changeAnthology}
+                    activeIndex={anthologyIndex}
+                  />
                 </View>
               </>
             }
             data={arecommands}
-            renderItem={RecommandLine}
+            renderItem={({item}) => {
+              return <RecommandLine item={item} onPress={onPressRecommand} />;
+            }}
             keyExtractor={item => `${item.id}`}
           />
         </TabView.Item>
@@ -221,11 +230,11 @@ const VideoPage = () => {
         top={videoHeight}
         height={windowHeight - videoHeight - StatusBar.currentHeight!}
         anthologys={anthologys}
-        activeIndex = {anthologyIndex}
+        activeIndex={anthologyIndex}
         state={ainfoSub.state}
         visible={anthologySheetVisible}
         onClose={() => {
-          console.log('close')
+          console.log('close');
           setAnthologySheetVisible(false);
         }}
         onPress={changeAnthology}

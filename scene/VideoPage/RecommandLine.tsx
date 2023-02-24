@@ -1,12 +1,13 @@
 import {Text, Image, Divider} from '@rneui/themed';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Pressable} from 'react-native';
 import {RecommandInfo} from '../../type/RecommandInfo';
 
 type recommandLineProps = {
   item: RecommandInfo;
+  onPress: (item: RecommandInfo)=>void;
 };
 
-const RecommandLine = ({item}: recommandLineProps) => {
+const RecommandLine = ({item, onPress}: recommandLineProps) => {
   const styles = StyleSheet.create({
     itemContainer: {
       flexDirection: 'row',
@@ -43,6 +44,7 @@ const RecommandLine = ({item}: recommandLineProps) => {
   return (
     <>
       <Divider></Divider>
+      <Pressable onPress={()=>{onPress(item)}}>
       <View style={styles.itemContainer}>
         <Image containerStyle={styles.image} source={{uri: item.img}} />
         <View style={styles.infoContainer}>
@@ -53,6 +55,7 @@ const RecommandLine = ({item}: recommandLineProps) => {
           <Text style={styles.rateTitle}>9.7分</Text>
         </View>
       </View>
+      </Pressable>
     </>
   );
 };
