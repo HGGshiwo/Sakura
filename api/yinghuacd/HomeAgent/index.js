@@ -41,7 +41,6 @@ class Agent {
 					let heros = document.getElementsByClass("heros")
 					let i = 0
 					let carousels = heros.map((hero) => {
-						console.log(hero.getElementsByTagName('li'))
 						return hero.getElementsByTagName('li').map((liDom) => {
 							let id = i
 							i += 1

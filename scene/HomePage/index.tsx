@@ -42,6 +42,7 @@ const HomePage: React.FC<Props> = ({navigation}) => {
       />
       <ParallaxCarousel carousels={carousels} />
       <Bar navigation={navigation} />
+      <Button onPress={()=>{navigation.push('video', {url: '/show/5786.html'})}}></Button>
     </View>
   );
 };

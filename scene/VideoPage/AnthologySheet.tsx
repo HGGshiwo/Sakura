@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
 import {faVideo, faXmark} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
+import { SubTitle } from '../../component/Text';
 
 type anthologySheetProps = {
   height: number;
@@ -27,56 +28,7 @@ const AnthologySheet = ({
   onClose,
   onPress,
 }: anthologySheetProps) => {
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: 'white',
-      height: height,
-      top: top,
-      position: 'absolute',
-      elevation: 1,
-    },
-    headerRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingTop: 10,
-      paddingHorizontal: 10,
-    },
-    boxRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      paddingTop: 10,
-      paddingHorizontal: 10,
-    },
-    stateRow: {
-      padding: 10,
-    },
-    emptyRow: {
-      padding: 20,
-    },
-    rowContainer: {
-      paddingBottom: 50,
-    },
-    itemContainer: {
-      backgroundColor: 'gainsboro',
-      flex: 1,
-      height: 75,
-      marginHorizontal: 10,
-      padding: 10,
-      borderRadius: 10,
-      justifyContent: 'space-between',
-    },
-    text: {
-      fontSize: 18,
-    },
-    text2: {
-      fontSize: 16,
-      color: 'gray',
-    },
-    active: {
-      color: 'deeppink',
-    },
-  });
+
 
   type ItemBoxProps = {
     index: number;
@@ -84,7 +36,6 @@ const AnthologySheet = ({
   };
 
   const ItemBox = ({index, anthology}: ItemBoxProps) => {
-    let textStyle = index === activeIndex ? {...styles.active} : {};
     return (
       <Pressable
         style={{flex: 1}}
@@ -92,7 +43,7 @@ const AnthologySheet = ({
           onPress(anthology);
         }}>
         <View style={styles.itemContainer}>
-          <Text style={{...styles.text, ...textStyle}}>{anthology.title}</Text>
+          <SubTitle title={anthology.title} active={index === activeIndex}/>
         </View>
       </Pressable>
     );
@@ -101,14 +52,11 @@ const AnthologySheet = ({
   return !visible ? (
     <></>
   ) : (
-    <View style={styles.container}>
+    <View style={{...styles.container, height, top}}>
       <View style={styles.headerRow}>
         <Text style={styles.text}>详情</Text>
         <Pressable
-          onPress={() => {
-            console.log('press');
-            onClose();
-          }}>
+          onPress={onClose}>
           <FontAwesomeIcon icon={faXmark} />
         </Pressable>
       </View>
@@ -148,5 +96,54 @@ const AnthologySheet = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    position: 'absolute',
+    elevation: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  boxRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  stateRow: {
+    padding: 10,
+  },
+  emptyRow: {
+    padding: 20,
+  },
+  rowContainer: {
+    paddingBottom: 50,
+  },
+  itemContainer: {
+    backgroundColor: '#e7e8e9',
+    flex: 1,
+    height: 75,
+    marginHorizontal: 10,
+    padding: 10,
+    borderRadius: 10,
+    justifyContent: 'space-between',
+  },
+  text: {
+    fontSize: 18,
+  },
+  text2: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  active: {
+    color: 'deeppink',
+  },
+});
 
 export {AnthologySheet};

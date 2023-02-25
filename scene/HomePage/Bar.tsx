@@ -29,8 +29,8 @@ const Bar:React.FC<Props> = ({navigation}) => {
       renderItem={({item}) => {
         return (
           <View style={styles.itemContainer}>
-            <FontAwesomeIcon color="deeppink" size={30} icon={item.icon} />
-            <Text style={{fontSize: 14, paddingTop: 5}}>{`${item.title}`}</Text>
+            <FontAwesomeIcon color="deeppink" size={25} icon={item.icon} />
+            <Text style={{fontSize: 12, paddingTop: 5}}>{`${item.title}`}</Text>
           </View>
         );
       }}
@@ -43,7 +43,7 @@ const Bar:React.FC<Props> = ({navigation}) => {
       paddingHorizontal: 40,
       justifyContent: 'space-between',
       flexDirection: 'row',
-      marginTop: 20,
+      marginTop: 10,
     },
     itemContainer: {
       alignItems:'center',

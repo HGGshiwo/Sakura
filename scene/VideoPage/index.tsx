@@ -17,7 +17,6 @@ import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 
 const VideoPage = ({route, navigation}) => {
-
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -27,7 +26,8 @@ const VideoPage = ({route, navigation}) => {
     produce: '',
   };
 
-  const { url } = route.params;
+  const {url} = route.params;
+  console.log(666, url);
 
   const [index, setIndex] = useState(0);
   const [windowHeight, setWindowHeight] = useState(0);
@@ -48,6 +48,7 @@ const VideoPage = ({route, navigation}) => {
   const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
+  const [followed, setFollowed] = useState(false)
 
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
@@ -66,8 +67,13 @@ const VideoPage = ({route, navigation}) => {
     setVideoWidth(width);
     setVideoHeight(width * ratio);
 
-    agent.afterLoadTitle(setAtitle);
+    agent.afterLoadTitle((title: string) => {
+      console.log(title)
+      setAtitle(title);
+    });
+
     agent.afterLoadPlayList((playList: PlayList) => {
+      console.log(777)
       setAplayList(playList);
       setAnthologys(
         Object.keys(playList)
@@ -78,6 +84,7 @@ const VideoPage = ({route, navigation}) => {
       );
       //切换到第一集
       let data = Object.keys(playList).sort()[0];
+
       setLoading(true);
       setAnthologyIndex(0); //当前播放第一集
       videoSolved.current = false;
@@ -181,14 +188,14 @@ const VideoPage = ({route, navigation}) => {
             ListHeaderComponent={
               <>
                 <View style={{padding: 10, width: windowWidth}}>
-                  <TitleLine title={atitle} />
+                  <TitleLine title={atitle} onPress={setFollowed} followed={followed} />
                   <DetailButtonLine
                     author={ainfoSub.author}
                     onPress={() => setDetailSheetVisible(true)}
                   />
                   <ListTitleLine
                     title={'选集'}
-                    buttonText={`${ainfoSub?.state} >`}
+                    buttonText={ainfoSub?.state}
                     onPress={() => setAnthologySheetVisible(true)}
                   />
                   {arelatives.length == 0 ? null : (
@@ -214,7 +221,7 @@ const VideoPage = ({route, navigation}) => {
 
       <DetailSheet
         top={videoHeight}
-        height={windowHeight - videoHeight - StatusBar.currentHeight!}
+        height={windowHeight - videoHeight}
         title={atitle}
         src={imgUrl}
         infoSub={ainfoSub}
@@ -227,7 +234,7 @@ const VideoPage = ({route, navigation}) => {
 
       <AnthologySheet
         top={videoHeight}
-        height={windowHeight - videoHeight - StatusBar.currentHeight!}
+        height={windowHeight - videoHeight}
         anthologys={anthologys}
         activeIndex={anthologyIndex}
         state={ainfoSub.state}

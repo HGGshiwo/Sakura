@@ -38,6 +38,7 @@ class Agent {
   }
 
   load() {
+    console.log('fetch')
     fetch(this._url)
       .then(response => response.text())
       .then((responseText) => {
@@ -45,6 +46,7 @@ class Agent {
         let thumb_l = document.getElementsByClass('thumb l')[0];
         let title = thumb_l.getElementsByTagName('a')[0];
         if (this._afterLoadTitle) {
+          console.log(title.innerHTML)
           this._afterLoadTitle(title.innerHTML);
         }
 
@@ -132,7 +134,7 @@ class Agent {
   }
 
   loadVideoSrc(url, callback) {
-    debugger;
+    // debugger;
     this._loadVideoSrc(url, callback, 3)
   }
 }

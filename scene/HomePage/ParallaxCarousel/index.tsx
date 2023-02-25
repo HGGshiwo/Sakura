@@ -62,7 +62,6 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
         }}
         data={carousels}
         renderItem={({item}: renderItemProps) => {
-          console.log(item.img)
           return <SBItem pretty item={item} />;
         }}
       />

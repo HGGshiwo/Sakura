@@ -1,10 +1,14 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
 import Scrubber from './Scrubber';
-import Video, {OnLoadData, OnProgressData, OnSeekData} from 'react-native-video';
+import Video, {
+  OnLoadData,
+  OnProgressData,
+  OnSeekData,
+} from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlay} from '@fortawesome/free-solid-svg-icons/faPlay';
-import {TouchableNativeFeedback} from 'react-native-gesture-handler'
+import {TouchableNativeFeedback} from 'react-native-gesture-handler';
 
 import {
   faChevronLeft,
@@ -39,8 +43,8 @@ const Player = ({
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [cache, setCache] = useState(0);
-  const [seeking, setSeeking] = useState(false)  //是否在加载
-  const seekingRef = useRef(false) 
+  const [seeking, setSeeking] = useState(false); //是否在加载
+  const seekingRef = useRef(false);
 
   const [fmtDuration, setFmtDuration] = useState('00:00');
   const [fmtProgress, setFmtProgress] = useState('00:00');
@@ -60,79 +64,30 @@ const Player = ({
   const onProgress = (data: OnProgressData) => {
     setFmtProgress(sec_to_time(data.currentTime));
     setCache(data.playableDuration);
-    if(!seekingRef.current) { //当seek时由video更新progress
+    if (!seekingRef.current) {
+      //当seek时由video更新progress
       setProgress(data.currentTime);
     }
   };
 
   const onSlidingComplete = (data: number) => {
-    console.log(data)
-    setProgress(data) //当seek时，由slide自己更新
+    console.log(data);
+    setProgress(data); //当seek时，由slide自己更新
     videoRef.current?.seek(data);
   };
 
-  const onSlidingStart = ()=>{
-    seekingRef.current = true
-    setSeeking(true)
-  }
+  const onSlidingStart = () => {
+    seekingRef.current = true;
+    setSeeking(true);
+  };
 
-  const onSeek = (data: OnSeekData)=>{
-    setSeeking(false)
-    seekingRef.current = false
-  }
-
-  var styles = StyleSheet.create({
-    container: {
-      overflow: 'hidden',
-      height: videoHeight,
-      width: videoWidth,
-      backgroundColor: 'black',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    video: {
-      overflow: 'hidden',
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-    },
-    loadingText: {
-      color: 'white',
-      fontSize: 18,
-      elevation: 1,
-    },
-    bar: {
-      width: '100%',
-      height: 30,
-      position: 'absolute',
-      flexDirection: 'row',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      alignItems: 'center',
-      paddingHorizontal: 10,
-      justifyContent: 'space-between',
-    },
-    topBar: {
-      top: 0,
-      left: 0,
-    },
-    bottomBar: {
-      bottom: 0,
-      left: 0,
-    },
-    slider: {
-      flex: 1,
-      marginHorizontal: 15,
-    },
-    text: {
-      color: 'white',
-      marginRight: 10,
-    },
-  });
+  const onSeek = (data: OnSeekData) => {
+    setSeeking(false);
+    seekingRef.current = false;
+  };
 
   return (
-    <View style={{...styles.container}}>
+    <View style={[styles.container, {height: videoHeight, width: videoWidth}]}>
       {!videoUrlAvaliable ? (
         <Text style={styles.loadingText}>加载播放地址中...</Text>
       ) : (
@@ -147,7 +102,7 @@ const Player = ({
             paused={paused}
             onProgress={onProgress}
           />
-          <View style={{...styles.topBar, ...styles.bar}}>
+          <View style={[styles.topBar, styles.bar]}>
             <FontAwesomeIcon color="white" icon={faChevronLeft} />
           </View>
           {loading || seeking ? (
@@ -155,12 +110,16 @@ const Player = ({
           ) : (
             <></>
           )}
-          <View style={{...styles.bottomBar, ...styles.bar}}>
-            <TouchableNativeFeedback onPress={() => {console.log('presss'); setPaused(!paused)}}>
+          <View style={[styles.bottomBar, styles.bar]}>
+            <TouchableNativeFeedback
+              onPress={() => {
+                console.log('presss');
+                setPaused(!paused);
+              }}>
               {paused ? (
-                <FontAwesomeIcon color="white" icon={faPlay} />
+                <FontAwesomeIcon color="white" size={20} icon={faPlay} />
               ) : (
-                <FontAwesomeIcon color="white" icon={faPause} />
+                <FontAwesomeIcon color="white" size={20} icon={faPause} />
               )}
             </TouchableNativeFeedback>
             <View style={styles.slider}>
@@ -177,12 +136,60 @@ const Player = ({
             </View>
 
             <Text style={styles.text}>{`${fmtProgress}/${fmtDuration}`}</Text>
-            <FontAwesomeIcon color="white" icon={faExpand} />
+            <FontAwesomeIcon color="white" size={20} icon={faExpand} />
           </View>
         </>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  video: {
+    overflow: 'hidden',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  loadingText: {
+    color: 'white',
+    fontSize: 18,
+    elevation: 1,
+  },
+  bar: {
+    width: '100%',
+    height: 30,
+    position: 'absolute',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    justifyContent: 'space-between',
+  },
+  topBar: {
+    top: 0,
+    left: 0,
+  },
+  bottomBar: {
+    bottom: 0,
+    left: 0,
+  },
+  slider: {
+    flex: 1,
+    marginHorizontal: 15,
+  },
+  text: {
+    color: 'white',
+    marginRight: 10,
+  },
+});
 
 export {Player};

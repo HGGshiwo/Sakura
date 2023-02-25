@@ -1,6 +1,7 @@
-import { Text } from '@rneui/base';
+import {Text} from '@rneui/base';
 import {Button} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
+import {TextButton} from '../../component/TextButton';
 
 type detailButtonLineProps = {
   onPress: (event: any) => void;
@@ -11,32 +12,18 @@ const DetailButtonLine = ({onPress, author}: detailButtonLineProps) => {
   const styles = StyleSheet.create({
     container: {
       justifyContent: 'space-between',
+      alignItems:'center',
       flexDirection: 'row',
     },
-    buttonContainer: {
-      height: 38,
-    },
-    buttonTitle: {
-      color: 'gray',
-    },
     text: {
-      paddingTop:2,
+      paddingTop: 2,
       color: 'gray',
-      fontSize: 16
-    }
+    },
   });
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
-        {author}
-      </Text>
-      <Button
-        type="clear"
-        containerStyle={styles.buttonContainer}
-        titleStyle={styles.buttonTitle}
-        onPress={onPress}>
-        {'详情 >'}
-      </Button>
+      <Text style={styles.text}>{author}</Text>
+      <TextButton title={'详情'} onPress={onPress} />
     </View>
   );
 };

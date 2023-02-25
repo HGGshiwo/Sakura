@@ -2,6 +2,7 @@ import {faVideo} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Text} from '@rneui/themed';
 import {StyleSheet, View, FlatList, TouchableHighlight} from 'react-native';
+import {SubTitle} from '../../component/Text';
 import {ListItemInfo} from '../../type/ListItemInfo';
 
 type listLineProps = {
@@ -10,36 +11,14 @@ type listLineProps = {
   activeIndex: number;
 };
 const ListLine = ({data, onPress, activeIndex}: listLineProps) => {
-  const styles = StyleSheet.create({
-    container: {
-      marginBottom: 20,
-    },
-    itemContainer: {
-      backgroundColor: 'gainsboro',
-      width: 150,
-      height: 75,
-      marginHorizontal: 10,
-      padding: 10,
-      justifyContent: 'space-between',
-    },
-    text: {
-      fontSize: 20,
-    },
-    active: {
-      color: 'deeppink',
-    },
-  });
-
   const renderItem = ({item, index}: {item: ListItemInfo; index: number}) => {
-    let textStyle = index === activeIndex ? styles.active : {};
-    textStyle = {...textStyle, ...styles.text};
     return (
       <TouchableHighlight
         onPress={() => {
           if (onPress) onPress(item);
         }}>
         <View style={styles.itemContainer}>
-          <Text style={textStyle}>{item.title}</Text>
+          <SubTitle title={item.title} active={activeIndex === index} />
         </View>
       </TouchableHighlight>
     );
@@ -56,10 +35,24 @@ const ListLine = ({data, onPress, activeIndex}: listLineProps) => {
   ) : (
     <View style={styles.container}>
       <View style={styles.itemContainer}>
-        <Text style={styles.text}>暂无数据</Text>
+        <Text>暂无数据</Text>
       </View>
     </View>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  itemContainer: {
+    backgroundColor: '#e7e8e9',
+    width: 150,
+    height: 60,
+    marginHorizontal: 10,
+    padding: 10,
+    borderRadius: 10,
+    justifyContent: 'space-between',
+  },
+});
 export {ListLine};

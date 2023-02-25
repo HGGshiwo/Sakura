@@ -3,6 +3,7 @@ import {Button, Text, Image, BottomSheet, AirbnbRating} from '@rneui/themed';
 import {StyleSheet, View, ScrollView, Pressable, Modal} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faXmark} from '@fortawesome/free-solid-svg-icons';
+import {InfoText, RateText, SubTitleBold, Title} from '../../component/Text';
 
 type detailSheetProps = {
   height: number;
@@ -25,89 +26,12 @@ const DetailSheet = ({
   visible,
   onPress,
 }: detailSheetProps) => {
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: 'white',
-      height: height,
-      top: top,
-      position: 'absolute',
-      elevation: 1,
-    },
-    headerRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingTop: 10,
-      paddingHorizontal: 10,
-    },
-    imageRow: {
-      flexDirection: 'row',
-      margin: 10,
-    },
-    typeRow: {
-      flexDirection: 'row',
-      margin: 10,
-    },
-    nameRow: {
-      flexDirection: 'row',
-      margin: 10,
-    },
-    produceRow: {
-      margin: 10,
-    },
-    infoRow: {
-      margin: 10,
-      paddingBottom: 30,
-    },
-    imageContainer: {
-      flex: 2,
-      height: 180,
-      margin: 5,
-    },
-    titleContainer: {
-      flex: 3,
-      margin: 5,
-      justifyContent: 'space-between',
-    },
-    rateContainer: {
-      flex: 1,
-    },
-    nameRowText: {
-      width: 100,
-    },
-    typeContainer: {
-      flexDirection: 'row',
-      flex: 1,
-    },
-    buttonContainer: {
-      marginHorizontal: 5,
-    },
-    text: {
-      fontSize: 18,
-    },
-    text2: {
-      fontSize: 16,
-      color: 'gray',
-    },
-    produceTitle: {
-      marginVertical: 10,
-    },
-    infoTitle: {
-      marginVertical: 10,
-    },
-    rateTitle: {
-      color: 'orange',
-      fontSize: 25,
-      fontWeight: 'bold',
-    },
-  });
-
   return !visible ? (
     <></>
   ) : (
-    // <Modal>
-    <View style={styles.container}>
+    <View style={[styles.container, {height: height, top: top}]}>
       <View style={styles.headerRow}>
-        <Text style={styles.text}>详情</Text>
+        <SubTitleBold title="详情" />
         <Pressable onPress={onPress}>
           <FontAwesomeIcon icon={faXmark} />
         </Pressable>
@@ -116,15 +40,14 @@ const DetailSheet = ({
         <View style={styles.imageRow}>
           <Image containerStyle={styles.imageContainer} source={{uri: src}} />
           <View style={styles.titleContainer}>
-            <Text h4>{title}</Text>
+            <Title title={title}/>
             <View>
-              <Text style={styles.text2}>{infoSub.produce}</Text>
-              <Text style={styles.text2}>{infoSub.state}</Text>
+              <InfoText title={infoSub.produce}/>
+              <InfoText title={infoSub.state}/>
             </View>
           </View>
           <View style={styles.rateContainer}>
-            <Text style={styles.rateTitle}>9.7</Text>
-            <AirbnbRating size={10} showRating={false} />
+            <RateText title='9.7'/>
           </View>
         </View>
         <View style={styles.nameRow}>
@@ -160,8 +83,78 @@ const DetailSheet = ({
         </View>
       </ScrollView>
     </View>
-    // </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    position: 'absolute',
+    elevation: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  imageRow: {
+    flexDirection: 'row',
+    margin: 10,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    margin: 10,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    margin: 10,
+  },
+  produceRow: {
+    margin: 10,
+  },
+  infoRow: {
+    margin: 10,
+    paddingBottom: 30,
+  },
+  imageContainer: {
+    flex: 2,
+    height: 180,
+    padding: 5,
+    borderRadius: 10,
+  },
+  titleContainer: {
+    flex: 3,
+    paddingHorizontal: 5,
+    justifyContent: 'space-between',
+  },
+  rateContainer: {
+    flex: 1,
+    padding: 2,
+  },
+  nameRowText: {
+    width: 100,
+  },
+  typeContainer: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  buttonContainer: {
+    marginHorizontal: 5,
+  },
+  text: {
+    fontSize: 18,
+  },
+  text2: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  produceTitle: {
+    marginVertical: 10,
+  },
+  infoTitle: {
+    marginVertical: 10,
+  },
+});
 
 export {DetailSheet};
