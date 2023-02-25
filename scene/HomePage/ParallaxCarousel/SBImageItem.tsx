@@ -20,7 +20,6 @@ const SBImageItem: React.FC<Props> = ({style, item, showIndex = true}) => {
           position: 'absolute',
           color: 'white',
           bottom: 5,
-          fontSize: 20,
           backgroundColor: 'rgba(0,0,0,0.5)',
           borderRadius: 5,
           overflow: 'hidden',

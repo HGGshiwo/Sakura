@@ -5,27 +5,37 @@ import {RecommandInfo} from '../../type/RecommandInfo';
 import {ParallaxCarousel} from './ParallaxCarousel';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
-import {faBusinessTime, faClock, faClockRotateLeft, faRankingStar} from '@fortawesome/free-solid-svg-icons';
-
+import {
+  faBusinessTime,
+  faCarrot,
+  faClock,
+  faClockRotateLeft,
+  faHeart,
+  faLemon,
+  faRankingStar,
+} from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
-  navigation: any
+  navigation: any;
 }
 
-const Bar:React.FC<Props> = ({navigation}) => {
-
-
+const NavBar: React.FC<Props> = ({navigation}) => {
   const data = [
     {title: '全部内容', icon: faYoutube},
     {title: '时间表', icon: faBusinessTime},
     {title: '排行榜', icon: faRankingStar},
     {title: '历史记录', icon: faClockRotateLeft},
+    {title: '国创', icon: faCarrot},
+    {title: '日漫', icon: faLemon},
+    {title: '我的追番', icon: faHeart}
   ];
 
   return (
     <FlatList
+      horizontal
       contentContainerStyle={styles.container}
       data={data}
+      ItemSeparatorComponent={() => <View style={{width: 30}} />}
       renderItem={({item}) => {
         return (
           <View style={styles.itemContainer}>
@@ -38,17 +48,17 @@ const Bar:React.FC<Props> = ({navigation}) => {
   );
 };
 
-  const styles = StyleSheet.create({
-    container: {
-      paddingHorizontal: 40,
-      justifyContent: 'space-between',
-      flexDirection: 'row',
-      marginTop: 10,
-    },
-    itemContainer: {
-      alignItems:'center',
-      justifyContent: 'space-between',
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+    marginVertical: 10,
+    justifyContent:'flex-start'
+  },
+  itemContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+});
 
-export {Bar};
+export {NavBar};

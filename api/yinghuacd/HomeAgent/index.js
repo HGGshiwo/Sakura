@@ -11,17 +11,8 @@ class Agent {
 		this._afterLoadCarousels = callback;
 	}
 
-	afterLoadRecent(callback) {
-		this._afterLoadRecent = callback
-	}
-	afterLoadJapan(callback) {
-		this._afterLoadJapan = callback
-	}
-	afterLoadHome(callback) {
-		this._afterLoadHome = callback
-	}
-	afterLoadAmerica(callback) {
-		this._afterLoadAmerica = callback
+	afterLoadSections(callback) {
+		this._afterLoadSections = callback
 	}
 	afterLoadDailys(callback) {
 		this._afterLoadDailys = callback
@@ -57,26 +48,30 @@ class Agent {
 					this._afterLoadCarousels(carousels);
 				}
 				//获取最近更新/日本动漫/国产动漫/美国动漫/动漫电影
-				let funcs = [this._afterLoadRecent, this._afterLoadJapan, this._afterLoadHome, this._afterLoadAmerica]
 				let first_l = document.getElementsByClass('firs l')[0]
 				let imgs = first_l.getElementsByClass('img')
-
-				funcs.forEach((fun, index) => {
-					if (fun) {
-						const datas = imgs[index].getElementsByTagName('li')
-							.map((liDom, index) => {
-								return {
-									id: index,
-									href: liDom.getElementsByTagName('a')[0].href,
-									img: liDom.getElementsByTagName('img')[0].src,
-									title: liDom.getElementsByTagName('p')[0].getElementsByTagName('a')[0].innerHTML,
-									state: liDom.getElementsByTagName('p')[1].getElementsByTagName('a')[0].innerHTML,
-								}
-							})
-						fun(datas)
-					}
-				})
-
+				const sections = ["最近更新", "日本动漫", "国产动漫", "美国动漫", "动漫电影"]
+					.map((title, index) => {
+						return {
+							title: title,
+							data: imgs[index].getElementsByTagName('li')
+								.map((liDom, index) => {
+									let aDoms = liDom.getElementsByTagName('p')[1].getElementsByTagName('a')
+									let state = aDoms.length === 0 ? '' : aDoms[0].innerHTML
+									return {
+										id: index,
+										href: liDom.getElementsByTagName('a')[0].href,
+										img: liDom.getElementsByTagName('img')[0].src,
+										title: liDom.getElementsByTagName('p')[0].getElementsByTagName('a')[0].innerHTML,
+										state
+									}
+								})
+						}
+					})
+				if (this._afterLoadSections) {
+					console.log(sections)
+					this._afterLoadSections(sections)
+				}
 
 				//获取每日更新列表
 				if (this._afterLoadDailys) {
