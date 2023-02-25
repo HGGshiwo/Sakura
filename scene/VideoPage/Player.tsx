@@ -9,17 +9,17 @@ import Video, {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlay} from '@fortawesome/free-solid-svg-icons/faPlay';
 import {TouchableNativeFeedback} from 'react-native-gesture-handler';
-
+import {TouchableWithoutFeedback} from 'react-native';
 import {
   faChevronLeft,
   faExpand,
   faPause,
 } from '@fortawesome/free-solid-svg-icons';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import sec_to_time from '../../public/sec_to_time';
 
 type playerProps = {
-  videoUrlAvaliable: boolean;
+  videoUrlAvaliable: boolean; //video源是否解析成功
   videoUrl: string;
   videoType: string;
   videoHeight: number;
@@ -39,6 +39,7 @@ const Player = ({
 
   const [paused, setPaused] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('视频加载中...'); //video源不可用时的提示信息
 
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -49,8 +50,16 @@ const Player = ({
   const [fmtDuration, setFmtDuration] = useState('00:00');
   const [fmtProgress, setFmtProgress] = useState('00:00');
 
+  const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
+  const visiblePeriod = useRef(0); //control可显示的时间
+
+  useEffect(() => {
+    closeControl();
+  }, []);
+
   const videoError = (err: any) => {
     console.log(err);
+    setLoadingText('视频加载失败');
     onVideoErr();
   };
 
@@ -74,6 +83,7 @@ const Player = ({
     console.log(data);
     setProgress(data); //当seek时，由slide自己更新
     videoRef.current?.seek(data);
+    closeControl();
   };
 
   const onSlidingStart = () => {
@@ -86,10 +96,47 @@ const Player = ({
     seekingRef.current = false;
   };
 
+  //等待control消失的计时器
+  const closeControl = () => {
+    setTimeout(() => {
+      visiblePeriod.current -= 1;
+      if (seekingRef.current) {
+        return;
+      }
+      if (visiblePeriod.current > 0) {
+        closeControl();
+      } else {
+        setControlVisible(false);
+      }
+    }, 1000);
+  };
+
+  const openControl = () => {
+    setControlVisible(true);
+    visiblePeriod.current = 5;
+    closeControl();
+  };
+
+  //点击了视频
+  const handlePressVideo = () => {
+    console.log('press');
+    if (controlVisible) {
+      //立即关闭control
+      setControlVisible(false);
+      visiblePeriod.current = -1;
+    } else {
+      openControl();
+    }
+  };
+
+  const handlePressPlay = () => {
+    setPaused(!paused);
+  };
+
   return (
     <View style={[styles.container, {height: videoHeight, width: videoWidth}]}>
       {!videoUrlAvaliable ? (
-        <Text style={styles.loadingText}>加载播放地址中...</Text>
+        <Text style={styles.loadingText}>解析视频地址中...</Text>
       ) : (
         <>
           <Video
@@ -102,24 +149,35 @@ const Player = ({
             paused={paused}
             onProgress={onProgress}
           />
-          <View style={[styles.topBar, styles.bar]}>
-            <FontAwesomeIcon color="white" icon={faChevronLeft} />
-          </View>
+          <TouchableWithoutFeedback
+            style={{height: '100%'}}
+            onPress={handlePressVideo}>
+            <View style={styles.touchable}></View>
+          </TouchableWithoutFeedback>
           {loading || seeking ? (
-            <Text style={styles.loadingText}>加载视频中...</Text>
+            <Text style={styles.loadingText}>{loadingText}</Text>
           ) : (
             <></>
           )}
-          <View style={[styles.bottomBar, styles.bar]}>
-            <TouchableNativeFeedback
-              onPress={() => {
-                console.log('presss');
-                setPaused(!paused);
-              }}>
+          <View
+            style={[
+              styles.topBar,
+              styles.bar,
+              {display: controlVisible ? 'flex' : 'none'},
+            ]}>
+            <FontAwesomeIcon color="white" icon={faChevronLeft} />
+          </View>
+          <View
+            style={[
+              styles.bottomBar,
+              styles.bar,
+              {display: controlVisible ? 'flex' : 'none'},
+            ]}>
+            <TouchableNativeFeedback onPress={handlePressPlay}>
               {paused ? (
-                <FontAwesomeIcon color="white" size={20} icon={faPlay} />
+                <FontAwesomeIcon color="white" size={24} icon={faPlay} />
               ) : (
-                <FontAwesomeIcon color="white" size={20} icon={faPause} />
+                <FontAwesomeIcon color="white" size={24} icon={faPause} />
               )}
             </TouchableNativeFeedback>
             <View style={styles.slider}>
@@ -134,7 +192,6 @@ const Player = ({
                 displayValues={false}
               />
             </View>
-
             <Text style={styles.text}>{`${fmtProgress}/${fmtDuration}`}</Text>
             <FontAwesomeIcon color="white" size={20} icon={faExpand} />
           </View>
@@ -166,7 +223,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     width: '100%',
-    height: 30,
+    height: 40,
     position: 'absolute',
     flexDirection: 'row',
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -189,6 +246,12 @@ const styles = StyleSheet.create({
   text: {
     color: 'white',
     marginRight: 10,
+  },
+  touchable: {
+    position: 'absolute',
+    width: '100%',
+    top: 40,
+    bottom: 40,
   },
 });
 

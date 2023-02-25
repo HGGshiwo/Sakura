@@ -1,5 +1,5 @@
 import {Tab, TabView} from '@rneui/themed';
-import {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, Dimensions, View, FlatList, StatusBar} from 'react-native';
 import {Agent} from '../../api/yinghuacd/VideoAgent';
 import {ListItemInfo} from '../../type/ListItemInfo';
@@ -16,7 +16,13 @@ import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 
-const VideoPage = ({route, navigation}) => {
+interface Props {
+  route: any;
+  navigation: any;
+}
+
+const VideoPage :React.FC<Props> = ({route, navigation}) => {
+  
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -33,33 +39,32 @@ const VideoPage = ({route, navigation}) => {
   const [windowHeight, setWindowHeight] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
 
+  //视频播放相关
   const [videoUrl, setVideoUrl] = useState('');
   const [videoType, setVideoType] = useState('');
   const [videoHeight, setVideoHeight] = useState(0);
   const [videoWidth, setVideoWidth] = useState(0);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(true); //url是否准备好
+  const curSourceIndex = useRef(0); //当前的source源
+  const curSources = useRef<string[]>([]); //当前可用的源
+  const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
+  
+  //页面显示相关
   const [atitle, setAtitle] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-
   const [ainfoSub, setAinfoSub] = useState<InfoSub>(emptyInfoSub);
   const [ainfo, setAinfo] = useState('');
   const [aplayList, setAplayList] = useState<PlayList>(); //完整的播放列表
   const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
-  const [followed, setFollowed] = useState(false)
-
+  const [followed, setFollowed] = useState(false) //是否是追番
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const ratio = 0.56; //视频长宽比例
 
-  const agent = new Agent(url);
-  const curSourceIndex = useRef(0); //当前的source源
-  const curSources = useRef<string[]>([]); //当前可用的源
-  const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
-
+  const agent = useRef(new Agent(url));
   useEffect(() => {
     const {height, width} = Dimensions.get('window');
     setWindowHeight(height);
@@ -67,12 +72,12 @@ const VideoPage = ({route, navigation}) => {
     setVideoWidth(width);
     setVideoHeight(width * ratio);
 
-    agent.afterLoadTitle((title: string) => {
+    agent.current.afterLoadTitle((title: string) => {
       console.log(title)
       setAtitle(title);
     });
 
-    agent.afterLoadPlayList((playList: PlayList) => {
+    agent.current.afterLoadPlayList((playList: PlayList) => {
       console.log(777)
       setAplayList(playList);
       setAnthologys(
@@ -93,26 +98,26 @@ const VideoPage = ({route, navigation}) => {
       switchVideoSrc();
     });
 
-    agent.afterLoadInfoSub((infoSub: InfoSub) => {
+    agent.current.afterLoadInfoSub((infoSub: InfoSub) => {
       setAinfoSub(infoSub);
     });
 
-    agent.afterLoadInfo((info: string) => {
+    agent.current.afterLoadInfo((info: string) => {
       setAinfo(info);
     });
 
-    agent.afterLoadImgSrc((src: string) => {
+    agent.current.afterLoadImgSrc((src: string) => {
       setImgUrl(src);
     });
 
-    agent.afterLoadRelatives((relatives: ListItemInfo[]) => {
+    agent.current.afterLoadRelatives((relatives: ListItemInfo[]) => {
       setArelatives(relatives);
     });
 
-    agent.afterLoadRecommands((recommands: RecommandInfo[]) => {
+    agent.current.afterLoadRecommands((recommands: RecommandInfo[]) => {
       setArecommands(recommands);
     });
-    agent.load();
+    agent.current.load();
   }, []);
 
   //切换视频选集
@@ -133,7 +138,7 @@ const VideoPage = ({route, navigation}) => {
       );
       const vUrl = curSources.current[curSourceIndex.current];
       curSourceIndex.current += 1;
-      agent.loadVideoSrc(vUrl, (state: boolean, src: string, type: string) => {
+      agent.current.loadVideoSrc(vUrl, (state: boolean, src: string, type: string) => {
         if (videoSolved.current) return;
         console.log(state, src, type);
         if (state) {
@@ -145,12 +150,6 @@ const VideoPage = ({route, navigation}) => {
           switchVideoSrc();
         }
       });
-    } else {
-      console.log(
-        curSourceIndex.current,
-        curSources.current.length,
-        '所有视频源都不可用',
-      );
     }
   };
 
