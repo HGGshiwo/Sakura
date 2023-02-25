@@ -53,9 +53,9 @@ const Player = ({
   const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
   const visiblePeriod = useRef(0); //control可显示的时间
 
-  useEffect(() => {
-    closeControl();
-  }, []);
+  useEffect(()=>{
+    setControlVisible(true)
+  }, [videoUrl])
 
   const videoError = (err: any) => {
     console.log(err);
@@ -64,10 +64,10 @@ const Player = ({
   };
 
   const onLoad = (data: OnLoadData) => {
-    console.log(data);
-    setLoading(!data.canPlaySlowForward);
+    setLoading(false);
     setFmtDuration(sec_to_time(data.duration));
     setDuration(data.duration);
+    waitCloseControl();
   };
 
   const onProgress = (data: OnProgressData) => {
@@ -80,10 +80,9 @@ const Player = ({
   };
 
   const onSlidingComplete = (data: number) => {
-    console.log(data);
     setProgress(data); //当seek时，由slide自己更新
     videoRef.current?.seek(data);
-    closeControl();
+    waitCloseControl();
   };
 
   const onSlidingStart = () => {
@@ -97,24 +96,25 @@ const Player = ({
   };
 
   //等待control消失的计时器
-  const closeControl = () => {
+  const waitCloseControl: Function = () => {
     setTimeout(() => {
       visiblePeriod.current -= 1;
       if (seekingRef.current) {
         return;
       }
       if (visiblePeriod.current > 0) {
-        closeControl();
+        waitCloseControl();
       } else {
         setControlVisible(false);
       }
     }, 1000);
   };
 
+  //打开control并在一段时间之后关闭
   const openControl = () => {
     setControlVisible(true);
     visiblePeriod.current = 5;
-    closeControl();
+    waitCloseControl();
   };
 
   //点击了视频
