@@ -112,7 +112,7 @@ const HomePage: React.FC<Props> = ({navigation}) => {
             <ParallaxCarousel carousels={carousels} />
             <NavBar navigation={navigation} />
             <ListTitleLine title='最近在看' buttonText='更多' onPress={()=>{}}/>
-            <FlatList horizontal data={sections[0].data} renderItem={WatchHistoryItem}/>
+            <FlatList horizontal data={sections[0]?sections[0].data:[]} renderItem={WatchHistoryItem}/>
           </>
         }
         sections={sections}

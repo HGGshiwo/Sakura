@@ -1,7 +1,8 @@
-import {Text} from '@rneui/themed';
-import {StyleSheet, View} from 'react-native';
+import {FAB, Text} from '@rneui/themed';
+import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import Scrubber from './Scrubber';
 import Video, {
+  OnBandwidthUpdateData,
   OnLoadData,
   OnProgressData,
   OnSeekData,
@@ -17,49 +18,55 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect, useRef, useState} from 'react';
 import sec_to_time from '../../public/sec_to_time';
+import Orientation from 'react-native-orientation-locker';
 
-type playerProps = {
+interface playerProps {
   videoUrlAvaliable: boolean; //video源是否解析成功
   videoUrl: string;
-  videoType: string;
-  videoHeight: number;
-  videoWidth: number;
+  title: string;
   onVideoErr: Function;
-};
+  onBack: () => void;
+}
 
-const Player = ({
+const Player: React.FC<playerProps> = ({
   videoUrlAvaliable,
   videoUrl,
-  videoType,
-  videoHeight,
-  videoWidth,
+  title,
   onVideoErr,
-}: playerProps) => {
+  onBack,
+}) => {
   const videoRef = useRef<Video | null>(null);
 
-  const [paused, setPaused] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [loadingText, setLoadingText] = useState('视频加载中...'); //video源不可用时的提示信息
-
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [cache, setCache] = useState(0);
-  const [seeking, setSeeking] = useState(false); //是否在加载
-  const seekingRef = useRef(false);
-
-  const [fmtDuration, setFmtDuration] = useState('00:00');
-  const [fmtProgress, setFmtProgress] = useState('00:00');
-
+  const [fullscreen, setFullscreen] = useState(false); //视频是否全屏
+  const [paused, setPaused] = useState(true); //视频是否暂停
+  const [loading, setLoading] = useState(true); //视频是否在加载中
+  const [erring, setErring] = useState(false); //视频是否播放错误
+  const [progress, setProgress] = useState(0); //当前视频播放进度
+  const [duration, setDuration] = useState(0); //当前视频总时长
+  const [cache, setCache] = useState(0); //当前视频缓存位置
+  const seekingRef = useRef(false); //是否在加载
+  const [fmtDuration, setFmtDuration] = useState('00:00'); //格式化后的视频位置
+  const [fmtProgress, setFmtProgress] = useState('00:00'); //格式化后的视频时长
   const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
-  const visiblePeriod = useRef(0); //control可显示的时间
+  const controlTimer = useRef(-1)
+  const [bitrateText, setBitrateText] = useState(''); //带宽
 
-  useEffect(()=>{
-    setControlVisible(true)
-  }, [videoUrl])
+  useEffect(() => {
+    setControlVisible(true);
+  }, [videoUrl]);
+
+  useEffect(() => {
+    // This would be inside componentDidMount()
+    Orientation.addOrientationListener(handleOrientation);
+    return () => {
+      // This would be inside componentWillUnmount()
+      Orientation.removeOrientationListener(handleOrientation);
+    };
+  }, []);
 
   const videoError = (err: any) => {
     console.log(err);
-    setLoadingText('视频加载失败');
+    setErring(true);
     onVideoErr();
   };
 
@@ -67,6 +74,7 @@ const Player = ({
     setLoading(false);
     setFmtDuration(sec_to_time(data.duration));
     setDuration(data.duration);
+    setPaused(false);
     waitCloseControl();
   };
 
@@ -87,85 +95,112 @@ const Player = ({
 
   const onSlidingStart = () => {
     seekingRef.current = true;
-    setSeeking(true);
   };
 
   const onSeek = (data: OnSeekData) => {
-    setSeeking(false);
     seekingRef.current = false;
   };
 
   //等待control消失的计时器
   const waitCloseControl: Function = () => {
-    setTimeout(() => {
-      visiblePeriod.current -= 1;
-      if (seekingRef.current) {
-        return;
-      }
-      if (visiblePeriod.current > 0) {
-        waitCloseControl();
-      } else {
+    if(controlTimer.current !== -1) {
+      clearTimeout(controlTimer.current)
+      controlTimer.current = -1
+    }
+    controlTimer.current = setTimeout(() => {
+      if(!seekingRef.current) {
         setControlVisible(false);
       }
-    }, 1000);
+    }, 3000);
   };
 
   //打开control并在一段时间之后关闭
   const openControl = () => {
     setControlVisible(true);
-    visiblePeriod.current = 5;
     waitCloseControl();
   };
 
-  //点击了视频
+  //点击了视频空白区域
   const handlePressVideo = () => {
-    console.log('press');
-    if (controlVisible) {
-      //立即关闭control
-      setControlVisible(false);
-      visiblePeriod.current = -1;
-    } else {
-      openControl();
-    }
+    controlVisible ? setControlVisible(false):openControl()
   };
 
-  const handlePressPlay = () => {
+  const handlePlay = () => {
     setPaused(!paused);
   };
 
+  function handleOrientation(orientation: string) {
+    orientation === 'LANDSCAPE-LEFT' || orientation === 'LANDSCAPE-RIGHT'
+      ? (setFullscreen(true), StatusBar.setHidden(true))
+      : (setFullscreen(false), StatusBar.setHidden(false));
+  }
+
+  const handleFullscreen = () => {
+    fullscreen
+      ? Orientation.lockToPortrait()
+      : Orientation.lockToLandscapeLeft();
+  };
+
+  //显示带宽
+  const onBandwithUpdate = ({bitrate}: OnBandwidthUpdateData) => {
+    const M = 1 << 20;
+    const K = 1 << 10;
+    let text =
+      bitrate > M
+        ? `${(bitrate / M).toFixed(2)}Mb/s`
+        : bitrate > K
+        ? `${(bitrate / K).toFixed(2)}Kb/s`
+        : `${bitrate}b/s`;
+    setBitrateText(text);
+  };
+
   return (
-    <View style={[styles.container, {height: videoHeight, width: videoWidth}]}>
+    <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvaliable ? (
         <Text style={styles.loadingText}>解析视频地址中...</Text>
       ) : (
         <>
           <Video
             ref={videoRef}
-            source={{uri: videoUrl, type: videoType}}
+            source={{
+              uri: videoUrl,
+              type: 'm3u8',
+            }}
             onLoad={onLoad} // Callback when remote video is buffering
             onError={videoError} // Callback when video cannot be loaded
             onSeek={onSeek}
             style={styles.video}
             paused={paused}
             onProgress={onProgress}
+            reportBandwidth={loading}
+            onBandwidthUpdate={onBandwithUpdate}
           />
           <TouchableWithoutFeedback
             style={{height: '100%'}}
             onPress={handlePressVideo}>
             <View style={styles.touchable}></View>
           </TouchableWithoutFeedback>
-          {loading || seeking ? (
-            <Text style={styles.loadingText}>{loadingText}</Text>
-          ) : (
-            <></>
-          )}
+          {erring ? <Text>视频源不可用...</Text> : null}
+          {!erring && loading ? (
+            <>
+              <FAB color="black" loading size="small" />
+              <Text style={styles.loadingText}>{bitrateText}</Text>
+            </>
+          ) : null}
           <View
             style={[
               styles.topBar,
               styles.bar,
               {display: controlVisible ? 'flex' : 'none'},
             ]}>
-            <FontAwesomeIcon color="white" icon={faChevronLeft} />
+            <View style={{alignItems: 'center', flexDirection: 'row'}}>
+              <TouchableNativeFeedback onPress={onBack}>
+                <FontAwesomeIcon color="white" icon={faChevronLeft} />
+              </TouchableNativeFeedback>
+              <Text style={[styles.loadingText, {paddingLeft: 10}]}>
+                {title}
+              </Text>
+            </View>
           </View>
           <View
             style={[
@@ -173,7 +208,7 @@ const Player = ({
               styles.bar,
               {display: controlVisible ? 'flex' : 'none'},
             ]}>
-            <TouchableNativeFeedback onPress={handlePressPlay}>
+            <TouchableNativeFeedback onPress={handlePlay}>
               {paused ? (
                 <FontAwesomeIcon color="white" size={24} icon={faPlay} />
               ) : (
@@ -193,7 +228,9 @@ const Player = ({
               />
             </View>
             <Text style={styles.text}>{`${fmtProgress}/${fmtDuration}`}</Text>
-            <FontAwesomeIcon color="white" size={20} icon={faExpand} />
+            <TouchableNativeFeedback onPress={handleFullscreen}>
+              <FontAwesomeIcon color="white" size={24} icon={faExpand} />
+            </TouchableNativeFeedback>
           </View>
         </>
       )}
@@ -203,7 +240,16 @@ const Player = ({
 
 const styles = StyleSheet.create({
   container: {
+    height: Dimensions.get('window').width * (9 / 16),
+    width: Dimensions.get('window').width,
     overflow: 'hidden',
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenContaner: {
+    height: Dimensions.get('window').width,
+    width: Dimensions.get('window').height,
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
@@ -218,7 +264,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: 'white',
-    fontSize: 18,
     elevation: 1,
   },
   bar: {

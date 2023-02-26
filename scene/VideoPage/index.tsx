@@ -15,13 +15,10 @@ import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
+import { VideoPageProps } from '../../App';
 
-interface Props {
-  route: any;
-  navigation: any;
-}
 
-const VideoPage: React.FC<Props> = ({route, navigation}) => {
+const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -42,7 +39,6 @@ const VideoPage: React.FC<Props> = ({route, navigation}) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoType, setVideoType] = useState('');
   const [videoHeight, setVideoHeight] = useState(0);
-  const [videoWidth, setVideoWidth] = useState(0);
   const [loading, setLoading] = useState(true); //url是否准备好
   const curSourceIndex = useRef(0); //当前的source源
   const curSources = useRef<string[]>([]); //当前可用的源
@@ -68,7 +64,6 @@ const VideoPage: React.FC<Props> = ({route, navigation}) => {
     const {height, width} = Dimensions.get('window');
     setWindowHeight(height);
     setWindowWidth(width);
-    setVideoWidth(width);
     setVideoHeight(width * ratio);
 
     agent.current.afterLoadTitle((title: string) => {
@@ -162,10 +157,9 @@ const VideoPage: React.FC<Props> = ({route, navigation}) => {
   return (
     <>
       <Player
-        videoHeight={videoHeight}
-        videoWidth={videoWidth}
+        title={atitle}
+        onBack={()=>{navigation.navigate('home')}}
         videoUrl={videoUrl}
-        videoType={videoType}
         videoUrlAvaliable={!loading}
         onVideoErr={switchVideoSrc}
       />

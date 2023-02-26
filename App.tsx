@@ -11,7 +11,7 @@ import {StatusBar, useColorScheme, Text} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigation/native-stack';
 import VideoPage from './scene/VideoPage';
 import HomePage from './scene/HomePage';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -86,7 +86,8 @@ function App(): JSX.Element {
     return <></>;
   };
   const Stack = createNativeStackNavigator();
-
+  
+  
   return (
     <SafeAreaProvider style={backgroundStyle}>
       <StatusBar
@@ -106,5 +107,12 @@ function App(): JSX.Element {
     </SafeAreaProvider>
   );
 }
+type RootStackParamList = {
+  home: undefined;
+  video: { url: string };
+};
 
+type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'video'>;
+export type { VideoPageProps }
 export default App;
+
