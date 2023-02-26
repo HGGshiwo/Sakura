@@ -17,7 +17,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faClose, faSearch} from '@fortawesome/free-solid-svg-icons';
 import {InfoText, SubTitleBold} from '../../component/Text';
 import {TextButton} from '../../component/TextButton';
-import {width} from '@fortawesome/free-solid-svg-icons/faPlay';
+import { DualItemRow } from '../../component/DualListItem';
 
 interface Props {
   navigation: any;
@@ -35,23 +35,9 @@ const HomePage: React.FC<Props> = ({navigation}) => {
     agent.afterLoadSections(setSections);
     agent.load();
   }, []);
-
-  interface ItemProps {
-    recent: RecommandInfo;
-    index: number;
-    section: any;
-  }
-
-  interface SubItemProps {
-    recent: RecommandInfo;
-    index: number;
-  }
-
-  const Item: React.FC<ItemProps> = ({recent, index, section}) => {
-    console.log(index);
-    if (index % 2 === 1) return <></>;
-
-    const SubItem: React.FC<SubItemProps> = ({index, recent}) => {
+    
+  const SubItem = (index: number, recent: RecommandInfo) => {
+    console.log(index, recent)
       return (
         <View style={styles.infoContainer}>
           <Pressable
@@ -62,29 +48,15 @@ const HomePage: React.FC<Props> = ({navigation}) => {
             <ImageBackground
               style={styles.imgContainer}
               imageStyle={styles.image}
-              source={{uri: recent.img}}>
+              source={{uri: recent.img}}
+              resizeMode='cover'
+              >
               <InfoText style={styles.imgText} title={recent.state} />
             </ImageBackground>
           </Pressable>
           <InfoText title={recent.title} />
         </View>
       );
-    };
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <SubItem index={index} recent={recent} />
-        {index + 1 === section.data.length ? (
-          <View style={styles.infoContainer}></View>
-        ) : (
-          <SubItem index={index + 1} recent={section.data[index + 1]} />
-        )}
-      </View>
-    );
   };
 
   return (
@@ -103,6 +75,7 @@ const HomePage: React.FC<Props> = ({navigation}) => {
         cancelButtonProps={{color: 'deeppink'}}
       />
       <SectionList
+        contentContainerStyle={{ paddingBottom: 40 }}
         ListHeaderComponent={
           <>
             <ParallaxCarousel carousels={carousels} />
@@ -112,7 +85,7 @@ const HomePage: React.FC<Props> = ({navigation}) => {
         sections={sections}
         keyExtractor={(item, index) => item + index}
         renderItem={({item, index, section}) => (
-          <Item recent={item} index={index} section={section} />
+          <DualItemRow children={SubItem} index={index} datas={section.data}/>
         )}
         renderSectionHeader={({section: {title}}) => (
           <View style={styles.titleRow}>
@@ -144,7 +117,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     margin: 10,
-    height: 140,
+    height: 120,
     justifyContent: 'flex-start',
     // backgroundColor: 'green',
   },
@@ -166,6 +139,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 20,
     paddingHorizontal: 10,
   },
   image: {

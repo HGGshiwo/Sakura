@@ -5,7 +5,10 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
 import {faVideo, faXmark} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
-import { SubTitle } from '../../component/Text';
+import {SubTitle} from '../../component/Text';
+import {DualItemRow} from '../../component/DualListItem';
+import {FlatList} from 'react-native-gesture-handler';
+import {Image} from 'react-native-svg';
 
 type anthologySheetProps = {
   height: number;
@@ -28,14 +31,7 @@ const AnthologySheet = ({
   onClose,
   onPress,
 }: anthologySheetProps) => {
-
-
-  type ItemBoxProps = {
-    index: number;
-    anthology: ListItemInfo;
-  };
-
-  const ItemBox = ({index, anthology}: ItemBoxProps) => {
+  const ItemBox = (index: number, anthology: ListItemInfo) => {
     return (
       <Pressable
         style={{flex: 1}}
@@ -43,7 +39,7 @@ const AnthologySheet = ({
           onPress(anthology);
         }}>
         <View style={styles.itemContainer}>
-          <SubTitle title={anthology.title} active={index === activeIndex}/>
+          <SubTitle title={anthology.title} active={index === activeIndex} />
         </View>
       </Pressable>
     );
@@ -55,44 +51,20 @@ const AnthologySheet = ({
     <View style={{...styles.container, height, top}}>
       <View style={styles.headerRow}>
         <Text style={styles.text}>详情</Text>
-        <Pressable
-          onPress={onClose}>
+        <Pressable onPress={onClose}>
           <FontAwesomeIcon icon={faXmark} />
         </Pressable>
       </View>
       <View style={styles.stateRow}>
         <Text style={styles.text2}>{state}</Text>
       </View>
-      <ScrollView>
-        <View style={styles.rowContainer}>
-          {anthologys.length == 0 ? (
-            <View style={styles.emptyRow}>
-              <Text>暂无数据</Text>
-            </View>
-          ) : (
-            anthologys.map((anthology, index) => {
-              return index % 2 == 0 ? (
-                <View style={styles.boxRow} key={anthology.id}>
-                  <ItemBox index={index} anthology={anthology} />
-                  {index + 1 < anthologys.length ? (
-                    <ItemBox
-                      index={index + 1}
-                      anthology={anthologys[index + 1]}
-                    />
-                  ) : (
-                    <View
-                      style={{
-                        ...styles.itemContainer,
-                        backgroundColor: 'white',
-                      }}
-                    />
-                  )}
-                </View>
-              ) : null;
-            })
-          )}
-        </View>
-      </ScrollView>
+      <FlatList
+        contentContainerStyle={styles.rowContainer}
+        data={anthologys}
+        renderItem={({item, index}) => (
+          <DualItemRow children={ItemBox} index={index} datas={anthologys} />
+        )}
+      />
     </View>
   );
 };
@@ -102,6 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     position: 'absolute',
     elevation: 1,
+    width: '100%'
   },
   headerRow: {
     flexDirection: 'row',
@@ -129,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e7e8e9',
     flex: 1,
     height: 75,
-    marginHorizontal: 10,
+    margin: 10,
     padding: 10,
     borderRadius: 10,
     justifyContent: 'space-between',
