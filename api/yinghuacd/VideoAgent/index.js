@@ -21,8 +21,8 @@ class Agent {
     this._afterLoadInfoSub = callback;
   }
 
-  afterLoadPlayList(callback) {
-    this._afterLoadPlayList = callback;
+  afterLoadSources(callback) {
+    this._afterLoadSources = callback;
   }
 
   afterLoadRelatives(callback) {
@@ -89,8 +89,12 @@ class Agent {
               : [href + a.href];
           });
 
-        if (this._afterLoadPlayList) {
-          this._afterLoadPlayList(playList);
+          const _sources = Object.keys(playList).map((key)=>{
+            return {key: key, data: playList[key]}
+          })
+
+        if (this._afterLoadSources) {
+          this._afterLoadSources(_sources);
         }
 
         //相关系列

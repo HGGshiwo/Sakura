@@ -14,11 +14,13 @@ import {TouchableWithoutFeedback} from 'react-native';
 import {
   faChevronLeft,
   faExpand,
+  faForwardStep,
   faPause,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect, useRef, useState} from 'react';
 import sec_to_time from '../../public/sec_to_time';
 import Orientation from 'react-native-orientation-locker';
+import {TextStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 interface playerProps {
   videoUrlAvaliable: boolean; //video源是否解析成功
@@ -26,6 +28,7 @@ interface playerProps {
   title: string;
   onVideoErr: Function;
   onBack: () => void;
+  toNextVideo:() => void;
 }
 
 const Player: React.FC<playerProps> = ({
@@ -34,6 +37,7 @@ const Player: React.FC<playerProps> = ({
   title,
   onVideoErr,
   onBack,
+  toNextVideo,
 }) => {
   const videoRef = useRef<Video | null>(null);
 
@@ -48,7 +52,7 @@ const Player: React.FC<playerProps> = ({
   const [fmtDuration, setFmtDuration] = useState('00:00'); //格式化后的视频位置
   const [fmtProgress, setFmtProgress] = useState('00:00'); //格式化后的视频时长
   const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
-  const controlTimer = useRef(-1)
+  const controlTimer = useRef(-1);
   const [bitrateText, setBitrateText] = useState(''); //带宽
 
   useEffect(() => {
@@ -103,12 +107,12 @@ const Player: React.FC<playerProps> = ({
 
   //等待control消失的计时器
   const waitCloseControl: Function = () => {
-    if(controlTimer.current !== -1) {
-      clearTimeout(controlTimer.current)
-      controlTimer.current = -1
+    if (controlTimer.current !== -1) {
+      clearTimeout(controlTimer.current);
+      controlTimer.current = -1;
     }
     controlTimer.current = setTimeout(() => {
-      if(!seekingRef.current) {
+      if (!seekingRef.current) {
         setControlVisible(false);
       }
     }, 3000);
@@ -122,7 +126,7 @@ const Player: React.FC<playerProps> = ({
 
   //点击了视频空白区域
   const handlePressVideo = () => {
-    controlVisible ? setControlVisible(false):openControl()
+    controlVisible ? setControlVisible(false) : openControl();
   };
 
   const handlePlay = () => {
@@ -135,6 +139,7 @@ const Player: React.FC<playerProps> = ({
       : (setFullscreen(false), StatusBar.setHidden(false));
   }
 
+  //切换是否全屏
   const handleFullscreen = () => {
     fullscreen
       ? Orientation.lockToPortrait()
@@ -152,6 +157,25 @@ const Player: React.FC<playerProps> = ({
         ? `${(bitrate / K).toFixed(2)}Kb/s`
         : `${bitrate}b/s`;
     setBitrateText(text);
+  };
+
+  const PlayButton = () => {
+    return (
+      <TouchableNativeFeedback onPress={handlePlay}>
+        {paused ? (
+          <FontAwesomeIcon color="white" size={24} icon={faPlay} />
+        ) : (
+          <FontAwesomeIcon color="white" size={24} icon={faPause} />
+        )}
+      </TouchableNativeFeedback>
+    );
+  };
+
+  const LoadingText: React.FC<{title: string; style?: TextStyle}> = ({
+    title,
+    style,
+  }) => {
+    return <Text style={[styles.loadingText, style]}>{title}</Text>;
   };
 
   return (
@@ -180,7 +204,7 @@ const Player: React.FC<playerProps> = ({
             onPress={handlePressVideo}>
             <View style={styles.touchable}></View>
           </TouchableWithoutFeedback>
-          {erring ? <Text>视频源不可用...</Text> : null}
+          {erring ? <LoadingText title="视频源不可用..." /> : null}
           {!erring && loading ? (
             <>
               <FAB color="black" loading size="small" />
@@ -194,27 +218,22 @@ const Player: React.FC<playerProps> = ({
               {display: controlVisible ? 'flex' : 'none'},
             ]}>
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
-              <TouchableNativeFeedback onPress={onBack}>
+              <TouchableNativeFeedback
+                onPress={() => {
+                  fullscreen ? handleFullscreen() : onBack();
+                }}>
                 <FontAwesomeIcon color="white" icon={faChevronLeft} />
               </TouchableNativeFeedback>
-              <Text style={[styles.loadingText, {paddingLeft: 10}]}>
-                {title}
-              </Text>
+              <LoadingText title={title} style={{paddingLeft: 10}} />
             </View>
           </View>
           <View
             style={[
               styles.bottomBar,
               styles.bar,
-              {display: controlVisible ? 'flex' : 'none'},
+              {display: controlVisible && !fullscreen ? 'flex' : 'none'},
             ]}>
-            <TouchableNativeFeedback onPress={handlePlay}>
-              {paused ? (
-                <FontAwesomeIcon color="white" size={24} icon={faPlay} />
-              ) : (
-                <FontAwesomeIcon color="white" size={24} icon={faPause} />
-              )}
-            </TouchableNativeFeedback>
+            <PlayButton />
             <View style={styles.slider}>
               <Scrubber
                 value={progress}
@@ -227,10 +246,53 @@ const Player: React.FC<playerProps> = ({
                 displayValues={false}
               />
             </View>
-            <Text style={styles.text}>{`${fmtProgress}/${fmtDuration}`}</Text>
+            <LoadingText
+              title={`${fmtProgress}/${fmtDuration}`}
+              style={{marginRight: 10}}
+            />
             <TouchableNativeFeedback onPress={handleFullscreen}>
               <FontAwesomeIcon color="white" size={24} icon={faExpand} />
             </TouchableNativeFeedback>
+          </View>
+          <View
+            style={[
+              styles.bottomBar,
+              styles.fullscreenBottomBar,
+              {
+                display: controlVisible && fullscreen ? 'flex' : 'none',
+              },
+            ]}>
+            <View style={styles.bottomBarRow}>
+              <LoadingText title={fmtProgress} />
+              <View style={styles.slider}>
+                <Scrubber
+                  value={progress}
+                  bufferedValue={cache}
+                  onSlidingStart={onSlidingStart}
+                  onSlidingComplete={onSlidingComplete}
+                  totalDuration={duration}
+                  trackColor="deeppink"
+                  scrubbedColor="deeppink"
+                  displayValues={false}
+                />
+              </View>
+
+              <LoadingText title={fmtDuration} />
+            </View>
+            <View style={styles.bottomBarRow}>
+              <View style={{alignItems: 'center', flexDirection: 'row'}}>
+                <PlayButton />
+                <TouchableNativeFeedback onPress={toNextVideo}>
+                  <FontAwesomeIcon
+                    style={{marginLeft: 20}}
+                    size={20}
+                    icon={faForwardStep}
+                    color="white"
+                  />
+                </TouchableNativeFeedback>
+              </View>
+              <LoadingText title="倍速" />
+            </View>
           </View>
         </>
       )}
@@ -284,13 +346,27 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
   },
+  fullscreenBottomBar: {
+    width: '100%',
+    height: 80,
+    position: 'absolute',
+    flexDirection: 'column',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    justifyContent: 'space-around',
+  },
+  bottomBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingTop: 10,
+    justifyContent: 'space-between',
+  },
   slider: {
     flex: 1,
     marginHorizontal: 15,
-  },
-  text: {
-    color: 'white',
-    marginRight: 10,
   },
   touchable: {
     position: 'absolute',

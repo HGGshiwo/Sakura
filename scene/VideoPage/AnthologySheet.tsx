@@ -14,7 +14,7 @@ type anthologySheetProps = {
   anthologys: ListItemInfo[];
   state: string;
   visible: boolean;
-  onPress: (item: ListItemInfo) => void;
+  onPress: (index: number) => void;
   onClose: () => void;
   activeIndex: number;
 };
@@ -34,7 +34,7 @@ const AnthologySheet = ({
       <Pressable
         style={{flex: 1}}
         onPress={() => {
-          onPress(anthology);
+          onPress(index);
         }}>
         <View style={styles.itemContainer}>
           <SubTitle title={anthology.title} active={index === activeIndex} />

@@ -3,7 +3,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, Dimensions, View, FlatList, StatusBar} from 'react-native';
 import {Agent} from '../../api/yinghuacd/VideoAgent';
 import {ListItemInfo} from '../../type/ListItemInfo';
-import {PlayList} from '../../type/PlayList';
+import {Source} from '../../type/Source';
 import {InfoSub} from '../../type/InfoSub';
 import {DetailSheet} from './DetailSheet';
 import {RecommandLine} from './RecommandLine';
@@ -37,7 +37,6 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
   //视频播放相关
   const [videoUrl, setVideoUrl] = useState('');
-  const [videoType, setVideoType] = useState('');
   const [videoHeight, setVideoHeight] = useState(0);
   const [loading, setLoading] = useState(true); //url是否准备好
   const curSourceIndex = useRef(0); //当前的source源
@@ -45,14 +44,14 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
 
   //页面显示相关
-  const [atitle, setAtitle] = useState('');
+  const [title, setTitle] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-  const [ainfoSub, setAinfoSub] = useState<InfoSub>(emptyInfoSub);
-  const [ainfo, setAinfo] = useState('');
-  const [aplayList, setAplayList] = useState<PlayList>(); //完整的播放列表
-  const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
+  const [infoSub, setInfoSub] = useState<InfoSub>(emptyInfoSub);
+  const [info, setInfo] = useState('');
+  const [sources, setSources] = useState<Source[]>([]); //完整的播放列表
+  const [relatives, setRelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
-  const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
+  const [recommands, setRecommands] = useState<RecommandInfo[]>([]); //同系列列表
   const [followed, setFollowed] = useState(false); //是否是追番
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
@@ -66,63 +65,60 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
     setWindowWidth(width);
     setVideoHeight(width * ratio);
 
-    agent.current.afterLoadTitle((title: string) => {
-      console.log(title);
-      setAtitle(title);
+    agent.current.afterLoadTitle((_title: string) => {
+      setTitle(_title);
     });
 
-    agent.current.afterLoadPlayList((playList: PlayList) => {
-      console.log(777);
-      setAplayList(playList);
-      setAnthologys(
-        Object.keys(playList)
-          .sort()
-          .map((key, index) => {
-            return {title: key, id: index, data: key};
-          }),
-      );
+    agent.current.afterLoadSources((_sources: Source[]) => {
+      setSources(_sources);
+      const _anthologys = _sources.map((_source, index)=>{
+        return {id: index, data:index, title: _source.key}
+      })
+      setAnthologys(_anthologys);
       //切换到第一集
-      let data = Object.keys(playList).sort()[0];
-
       setLoading(true);
       setAnthologyIndex(0); //当前播放第一集
       videoSolved.current = false;
       curSourceIndex.current = 0;
-      curSources.current = playList[data as keyof PlayList];
+      curSources.current = _sources[0].data;
       switchVideoSrc();
     });
 
-    agent.current.afterLoadInfoSub((infoSub: InfoSub) => {
-      setAinfoSub(infoSub);
+    agent.current.afterLoadInfoSub((_infoSub: InfoSub) => {
+      setInfoSub(_infoSub);
     });
 
-    agent.current.afterLoadInfo((info: string) => {
-      setAinfo(info);
+    agent.current.afterLoadInfo((_info: string) => {
+      setInfo(_info);
     });
 
     agent.current.afterLoadImgSrc((src: string) => {
       setImgUrl(src);
     });
 
-    agent.current.afterLoadRelatives((relatives: ListItemInfo[]) => {
-      setArelatives(relatives);
+    agent.current.afterLoadRelatives((_relatives: ListItemInfo[]) => {
+      setRelatives(_relatives);
     });
 
-    agent.current.afterLoadRecommands((recommands: RecommandInfo[]) => {
-      setArecommands(recommands);
+    agent.current.afterLoadRecommands((_recommands: RecommandInfo[]) => {
+      setRecommands(_recommands);
     });
     agent.current.load();
   }, []);
 
   //切换视频选集
-  const changeAnthology = (item: ListItemInfo) => {
-    setAnthologyIndex(item.id);
+  const changeAnthology = (index: number) => {
+    setAnthologyIndex(index);
     setLoading(true);
     videoSolved.current = false;
     curSourceIndex.current = 0;
-    curSources.current = aplayList![item.data as keyof PlayList];
+    curSources.current = sources[index].data;
     switchVideoSrc();
   };
+
+  const toNextVideo = () => {
+
+  }
 
   const switchVideoSrc = () => {
     //设置视频播放源
@@ -139,7 +135,6 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
           console.log(state, src, type);
           if (state) {
             setVideoUrl(src);
-            setVideoType(type);
             setLoading(false);
             videoSolved.current = true;
           } else {
@@ -156,12 +151,13 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
   return (
     <>
-      <Player
-        title={atitle}
+      <Player  
+        title={title}
         onBack={()=>{navigation.navigate('home')}}
         videoUrl={videoUrl}
         videoUrlAvaliable={!loading}
         onVideoErr={switchVideoSrc}
+        toNextVideo={toNextVideo}
       />
 
       <Tab value={index} onChange={setIndex} dense style={styles.tabContainer}>
@@ -176,21 +172,21 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
               <>
                 <View style={{padding: 10, width: windowWidth}}>
                   <TitleLine
-                    title={atitle}
+                    title={title}
                     onPress={setFollowed}
                     followed={followed}
                   />
                   <DetailButtonLine
-                    author={ainfoSub.author}
+                    author={infoSub.author}
                     onPress={() => setDetailSheetVisible(true)}
                   />
                   <ListTitleLine
                     title={'选集'}
-                    buttonText={ainfoSub?.state}
+                    buttonText={infoSub?.state}
                     onPress={() => setAnthologySheetVisible(true)}
                   />
-                  {arelatives.length == 0 ? null : (
-                    <RelaviteLine relatives={arelatives} />
+                  {relatives.length == 0 ? null : (
+                    <RelaviteLine relatives={relatives} />
                   )}
                   <ListLine
                     data={anthologys}
@@ -200,7 +196,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
                 </View>
               </>
             }
-            data={arecommands}
+            data={recommands}
             renderItem={({item}) => {
               return <RecommandLine item={item} onPress={onPressRecommand} />;
             }}
@@ -213,10 +209,10 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
       <DetailSheet
         top={videoHeight}
         height={windowHeight - videoHeight}
-        title={atitle}
+        title={title}
         src={imgUrl}
-        infoSub={ainfoSub}
-        info={ainfo}
+        infoSub={infoSub}
+        info={info}
         visible={detailLineVisible}
         onPress={() => {
           setDetailSheetVisible(false);
@@ -228,7 +224,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         height={windowHeight - videoHeight}
         anthologys={anthologys}
         activeIndex={anthologyIndex}
-        state={ainfoSub.state}
+        state={infoSub.state}
         visible={anthologySheetVisible}
         onClose={() => {
           console.log('close');
