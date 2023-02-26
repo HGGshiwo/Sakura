@@ -39,6 +39,7 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
       style={{
         alignItems: 'center',
         padding: 10,
+        // backgroundColor: 'red'
       }}>
       <Carousel
         vertical={false}
@@ -55,7 +56,7 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
         onProgressChange={(_, absoluteProgress) =>
           (progressValue.value = absoluteProgress)
         }
-        mode="parallax"
+        // mode="parallax"
         modeConfig={{
           parallaxScrollingScale: 0.9,
           parallaxScrollingOffset: 50,
@@ -70,13 +71,16 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            width: 200,
+            width: 100,
             alignSelf: 'center',
+            position: 'absolute',
+            bottom: 15,
+            right: 30,
           }}>
           {carousels.map((carousel, index) => {
             return (
               <PaginationItem
-                backgroundColor={colors[index%5]}
+                backgroundColor={'white'}
                 animValue={progressValue}
                 index={index}
                 key={index}
@@ -99,7 +103,7 @@ const PaginationItem: React.FC<{
   isRotate?: boolean;
 }> = props => {
   const {animValue, index, length, backgroundColor, isRotate} = props;
-  const width = 10;
+  const width = 5;
 
   const animStyle = useAnimatedStyle(() => {
     let inputRange = [index - 1, index, index + 1];
@@ -126,7 +130,7 @@ const PaginationItem: React.FC<{
   return (
     <View
       style={{
-        backgroundColor: 'rgba(0,0,0,0.1)',
+        backgroundColor: 'rgba(244,244,244,0.5)',
         width,
         height: width,
         borderRadius: 50,

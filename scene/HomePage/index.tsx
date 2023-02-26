@@ -37,7 +37,6 @@ const HomePage: React.FC<Props> = ({navigation}) => {
   }, []);
     
   const SubItem = (index: number, recent: RecommandInfo) => {
-    console.log(index, recent)
       return (
         <View style={styles.infoContainer}>
           <Pressable
