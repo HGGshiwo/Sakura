@@ -9,7 +9,7 @@ import {DetailSheet} from './DetailSheet';
 import {RecommandLine} from './RecommandLine';
 import {ListLine} from './ListLine';
 import {DetailButtonLine} from './DetailButtonLine';
-import {ListTitleLine} from './ListTitleLine';
+import {ListTitleLine} from '../../component/ListTitleLine';
 import {Player} from './Player';
 import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
@@ -21,8 +21,7 @@ interface Props {
   navigation: any;
 }
 
-const VideoPage :React.FC<Props> = ({route, navigation}) => {
-  
+const VideoPage: React.FC<Props> = ({route, navigation}) => {
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -48,7 +47,7 @@ const VideoPage :React.FC<Props> = ({route, navigation}) => {
   const curSourceIndex = useRef(0); //当前的source源
   const curSources = useRef<string[]>([]); //当前可用的源
   const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
-  
+
   //页面显示相关
   const [atitle, setAtitle] = useState('');
   const [imgUrl, setImgUrl] = useState('');
@@ -58,7 +57,7 @@ const VideoPage :React.FC<Props> = ({route, navigation}) => {
   const [arelatives, setArelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [arecommands, setArecommands] = useState<RecommandInfo[]>([]); //同系列列表
-  const [followed, setFollowed] = useState(false) //是否是追番
+  const [followed, setFollowed] = useState(false); //是否是追番
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
@@ -73,12 +72,12 @@ const VideoPage :React.FC<Props> = ({route, navigation}) => {
     setVideoHeight(width * ratio);
 
     agent.current.afterLoadTitle((title: string) => {
-      console.log(title)
+      console.log(title);
       setAtitle(title);
     });
 
     agent.current.afterLoadPlayList((playList: PlayList) => {
-      console.log(777)
+      console.log(777);
       setAplayList(playList);
       setAnthologys(
         Object.keys(playList)
@@ -138,32 +137,27 @@ const VideoPage :React.FC<Props> = ({route, navigation}) => {
       );
       const vUrl = curSources.current[curSourceIndex.current];
       curSourceIndex.current += 1;
-      agent.current.loadVideoSrc(vUrl, (state: boolean, src: string, type: string) => {
-        if (videoSolved.current) return;
-        console.log(state, src, type);
-        if (state) {
-          setVideoUrl(src);
-          setVideoType(type);
-          setLoading(false);
-          videoSolved.current = true;
-        } else {
-          switchVideoSrc();
-        }
-      });
+      agent.current.loadVideoSrc(
+        vUrl,
+        (state: boolean, src: string, type: string) => {
+          if (videoSolved.current) return;
+          console.log(state, src, type);
+          if (state) {
+            setVideoUrl(src);
+            setVideoType(type);
+            setLoading(false);
+            videoSolved.current = true;
+          } else {
+            switchVideoSrc();
+          }
+        },
+      );
     }
   };
 
   const onPressRecommand = (item: RecommandInfo) => {
     navigation.push('video', {url: item.href});
   };
-
-  // Later on in your styles..
-  var styles = StyleSheet.create({
-    tabContainer: {
-      width: '30%',
-      marginLeft: 10,
-    },
-  });
 
   return (
     <>
@@ -187,7 +181,11 @@ const VideoPage :React.FC<Props> = ({route, navigation}) => {
             ListHeaderComponent={
               <>
                 <View style={{padding: 10, width: windowWidth}}>
-                  <TitleLine title={atitle} onPress={setFollowed} followed={followed} />
+                  <TitleLine
+                    title={atitle}
+                    onPress={setFollowed}
+                    followed={followed}
+                  />
                   <DetailButtonLine
                     author={ainfoSub.author}
                     onPress={() => setDetailSheetVisible(true)}
@@ -247,5 +245,13 @@ const VideoPage :React.FC<Props> = ({route, navigation}) => {
     </>
   );
 };
+
+// Later on in your styles..
+var styles = StyleSheet.create({
+  tabContainer: {
+    width: '30%',
+    marginLeft: 10,
+  },
+});
 
 export default VideoPage;

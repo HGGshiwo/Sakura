@@ -1,6 +1,6 @@
 import {Text, Image, Divider} from '@rneui/themed';
 import {StyleSheet, View, Pressable} from 'react-native';
-import { InfoText, RateText, SubTitle } from '../../component/Text';
+import { InfoText, RateText, SubInfoText, SubTitle } from '../../component/Text';
 import {RecommandInfo} from '../../type/RecommandInfo';
 
 type recommandLineProps = {
@@ -20,7 +20,7 @@ const RecommandLine = ({item, onPress}: recommandLineProps) => {
           <Image containerStyle={styles.image} source={{uri: item.img}} />
           <View style={styles.infoContainer}>
             <SubTitle title={item.title}/>            
-            <InfoText title={item.state}/>
+            <SubInfoText title={item.state}/>
           </View>
           <View style={styles.rateContainer}>
             <RateText title='9.7'/>

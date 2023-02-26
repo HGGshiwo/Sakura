@@ -69,7 +69,6 @@ class Agent {
 						}
 					})
 				if (this._afterLoadSections) {
-					console.log(sections)
 					this._afterLoadSections(sections)
 				}
 

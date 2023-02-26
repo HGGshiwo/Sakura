@@ -1,14 +1,12 @@
 import {Text} from '@rneui/themed';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {ListItemInfo} from '../../type/ListItemInfo';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
-import {faVideo, faXmark} from '@fortawesome/free-solid-svg-icons';
-import {faYoutube} from '@fortawesome/free-brands-svg-icons';
+import {faXmark} from '@fortawesome/free-solid-svg-icons';
 import {SubTitle} from '../../component/Text';
 import {DualItemRow} from '../../component/DualListItem';
 import {FlatList} from 'react-native-gesture-handler';
-import {Image} from 'react-native-svg';
 
 type anthologySheetProps = {
   height: number;

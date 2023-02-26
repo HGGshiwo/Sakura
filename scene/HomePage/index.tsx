@@ -15,9 +15,12 @@ import {ParallaxCarousel} from './ParallaxCarousel';
 import {NavBar} from './NavBar';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faClose, faSearch} from '@fortawesome/free-solid-svg-icons';
-import {InfoText, SubTitleBold} from '../../component/Text';
+import {InfoText, SubInfoText, SubTitleBold} from '../../component/Text';
 import {TextButton} from '../../component/TextButton';
 import { DualItemRow } from '../../component/DualListItem';
+import { TitleLine } from '../VideoPage/TitleLine';
+import { ListTitleLine } from '../../component/ListTitleLine';
+import { FlatList } from 'react-native-gesture-handler';
 
 interface Props {
   navigation: any;
@@ -58,6 +61,34 @@ const HomePage: React.FC<Props> = ({navigation}) => {
       );
   };
 
+  interface ListItemProps {
+    index: number;
+    item: RecommandInfo;
+  }
+
+  const WatchHistoryItem = ({item, index}:ListItemProps) => {
+    return (
+      <View style={styles.infoContainer}>
+        <Pressable
+          onPress={() => {
+            navigation.push('video', {url: item.href});
+          }}
+          key={index}>
+          <ImageBackground
+            style={styles.imgContainer2}
+            imageStyle={styles.image}
+            source={{uri: item.img}}
+            resizeMode='cover'
+            >
+            <InfoText style={styles.imgText} title={item.state} />
+          </ImageBackground>
+        </Pressable>
+        <InfoText style={{width: 120}} title={item.title} />
+        <SubInfoText title={'看到第1话20%'} />
+      </View>
+    );
+};
+
   return (
     <View style={styles.container}>
       <SearchBar
@@ -73,12 +104,15 @@ const HomePage: React.FC<Props> = ({navigation}) => {
         clearIcon={<FontAwesomeIcon icon={faClose} />}
         cancelButtonProps={{color: 'deeppink'}}
       />
+      
       <SectionList
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40 }}
         ListHeaderComponent={
           <>
             <ParallaxCarousel carousels={carousels} />
             <NavBar navigation={navigation} />
+            <ListTitleLine title='最近在看' buttonText='更多' onPress={()=>{}}/>
+            <FlatList horizontal data={sections[0].data} renderItem={WatchHistoryItem}/>
           </>
         }
         sections={sections}
@@ -87,10 +121,7 @@ const HomePage: React.FC<Props> = ({navigation}) => {
           <DualItemRow children={SubItem} index={index} datas={section.data}/>
         )}
         renderSectionHeader={({section: {title}}) => (
-          <View style={styles.titleRow}>
-            <SubTitleBold title={title} />
-            <TextButton title="更多" onPress={() => {}} />
-          </View>
+          <ListTitleLine title={title} buttonText='更多' onPress={()=>{}}/>
         )}
       />
     </View>
@@ -116,15 +147,14 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     margin: 10,
-    height: 120,
+    height: 100,
     justifyContent: 'flex-start',
     // backgroundColor: 'green',
   },
   imgContainer: {
     justifyContent: 'center',
     resizeMode: 'cover',
-    height: 100,
-    // backgroundColor: 'red',
+    height: 80,
   },
   imgText: {
     bottom: 2,
@@ -144,6 +174,12 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: 5,
   },
+  imgContainer2: {
+    justifyContent: 'center',
+    resizeMode: 'cover',
+    height: 60,
+    width: 120,
+  }
 });
 
 export default HomePage;
