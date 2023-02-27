@@ -15,8 +15,7 @@ import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
-import { VideoPageProps } from '../../App';
-
+import {VideoPageProps} from '../../App';
 
 const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const emptyInfoSub = {
@@ -29,7 +28,6 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   };
 
   const {url} = route.params;
-  console.log(666, url);
 
   const [index, setIndex] = useState(0);
   const [windowHeight, setWindowHeight] = useState(0);
@@ -56,6 +54,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
+  const [nextVideoAvailable, setNextVideoAvailable] = useState(false);
+
   const ratio = 0.56; //视频长宽比例
 
   const agent = useRef(new Agent(url));
@@ -71,9 +71,9 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
     agent.current.afterLoadSources((_sources: Source[]) => {
       setSources(_sources);
-      const _anthologys = _sources.map((_source, index)=>{
-        return {id: index, data:index, title: _source.key}
-      })
+      const _anthologys = _sources.map((_source, index) => {
+        return {id: index, data: _source.data, title: _source.key};
+      });
       setAnthologys(_anthologys);
       //切换到第一集
       setLoading(true);
@@ -108,17 +108,19 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
   //切换视频选集
   const changeAnthology = (index: number) => {
+    setNextVideoAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
     setLoading(true);
     videoSolved.current = false;
     curSourceIndex.current = 0;
+    console.log(sources, index);
     curSources.current = sources[index].data;
     switchVideoSrc();
   };
 
   const toNextVideo = () => {
-
-  }
+    changeAnthology(anthologyIndex + 1);
+  };
 
   const switchVideoSrc = () => {
     //设置视频播放源
@@ -151,11 +153,16 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
   return (
     <>
-      <Player  
-        title={title}
-        onBack={()=>{navigation.navigate('home')}}
+      <Player
+        title={`${title} ${
+          anthologys[anthologyIndex] ? anthologys[anthologyIndex].title : ''
+        }`}
+        onBack={() => {
+          navigation.navigate('home');
+        }}
         videoUrl={videoUrl}
-        videoUrlAvaliable={!loading}
+        videoUrlAvailable={!loading}
+        nextVideoAvailable={nextVideoAvailable}
         onVideoErr={switchVideoSrc}
         toNextVideo={toNextVideo}
       />

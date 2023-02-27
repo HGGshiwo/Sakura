@@ -57,7 +57,7 @@ class Agent {
         let sinInfoDom = document.getElementsByClass('sinfo')[0]
         let infoSubDoms = sinInfoDom.getElementsByTagName('span');
         let infoSub = {
-          author: infoSubDoms[4].getElementsByTagName('a').reduce((pre, cur)=>pre+' '+cur.innerHTML,''),
+          author: infoSubDoms[4].getElementsByTagName('a').reduce((pre, cur) => pre + ' ' + cur.innerHTML, ''),
           alias: title.innerHTML,
           state: sinInfoDom.getElementsByTagName('p')[0].innerHTML,
           time: infoSubDoms[0].getElementsByTagName('a')[0].innerHTML,
@@ -84,16 +84,18 @@ class Agent {
           .forEach((liDom, index) => {
             const a = liDom.getElementsByTagName('a')[0];
             let key = a.innerHTML;
-            playList[key] = playList[key]
-              ? [...playList[key], href + a.href]
-              : [href + a.href];
+            if (!playList[key]) {
+              playList[key] = { key, data: [] }
+            }
+            playList[key].data.push(href + a.href)
           });
 
-          const _sources = Object.keys(playList).map((key)=>{
-            return {key: key, data: playList[key]}
-          })
+        const _sources = Object.values(playList).sort((a, b) => {
+          return a.key > b.key ? 1 : -1
+        })
 
         if (this._afterLoadSources) {
+          console.log(_sources)
           this._afterLoadSources(_sources);
         }
 

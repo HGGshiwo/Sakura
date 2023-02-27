@@ -1,26 +1,25 @@
-import {faVideo} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Text} from '@rneui/themed';
-import {StyleSheet, View, FlatList, TouchableHighlight} from 'react-native';
+import {StyleSheet, View, FlatList} from 'react-native';
+import { Pressable } from 'react-native';
 import {SubTitle} from '../../component/Text';
 import {ListItemInfo} from '../../type/ListItemInfo';
 
 type listLineProps = {
   data: ListItemInfo[];
-  onPress?: Function;
+  onPress?: (index: number)=>void;
   activeIndex: number;
 };
 const ListLine = ({data, onPress, activeIndex}: listLineProps) => {
   const renderItem = ({item, index}: {item: ListItemInfo; index: number}) => {
     return (
-      <TouchableHighlight
+      <Pressable
         onPress={() => {
-          if (onPress) onPress(item);
+          if (onPress) onPress(item.id);
         }}>
         <View style={styles.itemContainer}>
           <SubTitle title={item.title} active={activeIndex === index} />
         </View>
-      </TouchableHighlight>
+      </Pressable>
     );
   };
 

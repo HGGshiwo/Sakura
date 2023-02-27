@@ -21,18 +21,21 @@ import {useEffect, useRef, useState} from 'react';
 import sec_to_time from '../../public/sec_to_time';
 import Orientation from 'react-native-orientation-locker';
 import {TextStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+import {Pressable} from 'react-native';
 
 interface playerProps {
-  videoUrlAvaliable: boolean; //video源是否解析成功
+  videoUrlAvailable: boolean; //video源是否解析成功
+  nextVideoAvailable: boolean; //下一个视频是否可用
   videoUrl: string;
   title: string;
   onVideoErr: Function;
   onBack: () => void;
-  toNextVideo:() => void;
+  toNextVideo: () => void;
 }
 
 const Player: React.FC<playerProps> = ({
-  videoUrlAvaliable,
+  videoUrlAvailable,
+  nextVideoAvailable,
   videoUrl,
   title,
   onVideoErr,
@@ -131,6 +134,7 @@ const Player: React.FC<playerProps> = ({
 
   const handlePlay = () => {
     setPaused(!paused);
+    openControl()
   };
 
   function handleOrientation(orientation: string) {
@@ -161,13 +165,15 @@ const Player: React.FC<playerProps> = ({
 
   const PlayButton = () => {
     return (
-      <TouchableNativeFeedback onPress={handlePlay}>
+      <Pressable
+        hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
+        onPress={handlePlay}>
         {paused ? (
           <FontAwesomeIcon color="white" size={24} icon={faPlay} />
         ) : (
           <FontAwesomeIcon color="white" size={24} icon={faPause} />
         )}
-      </TouchableNativeFeedback>
+      </Pressable>
     );
   };
 
@@ -180,7 +186,7 @@ const Player: React.FC<playerProps> = ({
 
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
-      {!videoUrlAvaliable ? (
+      {!videoUrlAvailable ? (
         <Text style={styles.loadingText}>解析视频地址中...</Text>
       ) : (
         <>
@@ -218,12 +224,13 @@ const Player: React.FC<playerProps> = ({
               {display: controlVisible ? 'flex' : 'none'},
             ]}>
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
-              <TouchableNativeFeedback
+              <Pressable
+                hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
                 onPress={() => {
                   fullscreen ? handleFullscreen() : onBack();
                 }}>
                 <FontAwesomeIcon color="white" icon={faChevronLeft} />
-              </TouchableNativeFeedback>
+              </Pressable>
               <LoadingText title={title} style={{paddingLeft: 10}} />
             </View>
           </View>
@@ -250,9 +257,9 @@ const Player: React.FC<playerProps> = ({
               title={`${fmtProgress}/${fmtDuration}`}
               style={{marginRight: 10}}
             />
-            <TouchableNativeFeedback onPress={handleFullscreen}>
+            <Pressable onPress={handleFullscreen}>
               <FontAwesomeIcon color="white" size={24} icon={faExpand} />
-            </TouchableNativeFeedback>
+            </Pressable>
           </View>
           <View
             style={[
@@ -276,18 +283,19 @@ const Player: React.FC<playerProps> = ({
                   displayValues={false}
                 />
               </View>
-
               <LoadingText title={fmtDuration} />
             </View>
             <View style={styles.bottomBarRow}>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
                 <PlayButton />
-                <TouchableNativeFeedback onPress={toNextVideo}>
+                <TouchableNativeFeedback
+                  onPress={toNextVideo}
+                  disabled={!nextVideoAvailable}>
                   <FontAwesomeIcon
                     style={{marginLeft: 20}}
                     size={20}
                     icon={faForwardStep}
-                    color="white"
+                    color={nextVideoAvailable?'white':'grey'}
                   />
                 </TouchableNativeFeedback>
               </View>
