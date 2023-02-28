@@ -1,9 +1,11 @@
 import {InfoSub} from '../../type/InfoSub';
-import {Button, Text, Image, BottomSheet, AirbnbRating} from '@rneui/themed';
-import {StyleSheet, View, ScrollView, Pressable, Modal} from 'react-native';
+import {Text, Image} from '@rneui/themed';
+import {StyleSheet, View, ScrollView, Pressable} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faXmark} from '@fortawesome/free-solid-svg-icons';
 import {InfoText, RateText, SubTitleBold, Title} from '../../component/Text';
+import { Tag } from '../../component/Tag';
+import { CloseButton } from '../../component/CloseButton';
 
 type detailSheetProps = {
   height: number;
@@ -13,7 +15,7 @@ type detailSheetProps = {
   infoSub: InfoSub;
   info: string;
   visible: boolean;
-  onPress: (event: any) => void;
+  onPress: () => void;
 };
 
 const DetailSheet = ({
@@ -32,9 +34,7 @@ const DetailSheet = ({
     <View style={[styles.container, {height: height, top: top}]}>
       <View style={styles.headerRow}>
         <SubTitleBold title="详情" />
-        <Pressable onPress={onPress}>
-          <FontAwesomeIcon icon={faXmark} />
-        </Pressable>
+        <CloseButton onPress={onPress}/>
       </View>
       <ScrollView>
         <View style={styles.imageRow}>
@@ -59,27 +59,18 @@ const DetailSheet = ({
           <View style={styles.typeContainer}>
             {infoSub.type.map((type: string, index: number) => {
               return (
-                <Button
-                  containerStyle={styles.buttonContainer}
-                  title={type}
-                  key={index}
-                  size="sm"
-                />
+                <Tag text={type} key={index} style={styles.buttonContainer}/>
               );
             })}
           </View>
         </View>
         <View style={styles.produceRow}>
-          <Text style={styles.produceTitle} h4>
-            制作信息
-          </Text>
-          <Text>{infoSub.author}</Text>
+          <Title title='制作信息' style={styles.produceTitle}/>
+          <InfoText title={infoSub.author}/>
         </View>
         <View style={styles.infoRow}>
-          <Text style={styles.produceTitle} h4>
-            简介
-          </Text>
-          <Text>{info}</Text>
+        <Title title='简介' style={styles.produceTitle}/>
+          <InfoText numberOfLines={-1} title={info} style={{paddingHorizontal: 10}}/>
         </View>
       </ScrollView>
     </View>
@@ -88,6 +79,7 @@ const DetailSheet = ({
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     backgroundColor: 'white',
     position: 'absolute',
     elevation: 1,
@@ -105,6 +97,7 @@ const styles = StyleSheet.create({
   typeRow: {
     flexDirection: 'row',
     margin: 10,
+    alignItems:'center',
   },
   nameRow: {
     flexDirection: 'row',
@@ -133,11 +126,12 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   nameRowText: {
-    width: 100,
+    width: 50,
   },
   typeContainer: {
     flexDirection: 'row',
     flex: 1,
+    alignItems: 'center',
   },
   buttonContainer: {
     marginHorizontal: 5,

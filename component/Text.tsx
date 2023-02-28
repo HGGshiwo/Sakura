@@ -36,7 +36,7 @@ const Title: React.FC<Props> = ({title, active, style}) => {
   return (
     <Text
       ellipsizeMode="tail"
-      numberOfLines={2}  
+      numberOfLines={2}
       style={[
         {
           fontSize: 20,
@@ -55,7 +55,9 @@ const InfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
   return (
     <Text
       ellipsizeMode="tail"
-      numberOfLines={numberOfLines?numberOfLines:1}
+      numberOfLines={
+        numberOfLines < 0 ? 0 : numberOfLines ? numberOfLines : 1
+      }
       style={[{color: 'black'}, style]}>
       {title}
     </Text>
@@ -66,7 +68,7 @@ const SubInfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
   return (
     <Text
       ellipsizeMode="tail"
-      numberOfLines={numberOfLines?numberOfLines:1}
+      numberOfLines={numberOfLines ? numberOfLines : 1}
       style={[{color: 'gray'}, style]}>
       {title}
     </Text>
@@ -76,9 +78,7 @@ const SubInfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
 const RateText: React.FC<Props> = ({title, style}) => {
   return (
     <View style={[{flexDirection: 'row', alignItems: 'baseline'}, style]}>
-      <Text
-        style={{color: 'darkorange', fontWeight: '500', fontSize: 20}}
-        >
+      <Text style={{color: 'darkorange', fontWeight: '500', fontSize: 20}}>
         {title}
       </Text>
       <Text style={{color: 'darkorange', fontWeight: '300'}}>分</Text>

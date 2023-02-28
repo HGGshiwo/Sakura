@@ -13,18 +13,16 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigation/native-stack';
 import VideoPage from './scene/VideoPage';
-import HomePage from './scene/HomePage';
+import AnimationPage from './scene/AnimationPage';
+import SearchPage from './scene/SearchPage'
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
   faBook,
-  faC,
-  faHouse,
   faPalette,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
-import { Pressable } from 'react-native/Libraries/Components/Pressable/Pressable';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -35,15 +33,14 @@ function App(): JSX.Element {
 
   const Tab = createBottomTabNavigator();
   const icons = {
-    //Animation
-    home: faYoutube,
+    Animation: faYoutube,
     User: faUser,
     Novel: faBook,
     Comic: faPalette,
   };
 
   const texts = {
-    home: '番剧',
+    Animation: '番剧',
     User: '我的',
     Novel: '小说',
     Comic: '漫画',
@@ -74,7 +71,7 @@ function App(): JSX.Element {
             );
           },
         })}>
-        <Tab.Screen name="home" component={HomePage} />
+        <Tab.Screen name="Animation" component={AnimationPage} />
         <Tab.Screen name="Novel" component={UserStackScreen} />
         <Tab.Screen name="Comic" component={UserStackScreen} />
         <Tab.Screen name="User" component={UserStackScreen} />
@@ -99,8 +96,9 @@ function App(): JSX.Element {
           <Stack.Navigator
             initialRouteName="home"
             screenOptions={{headerShown: false}}>
-            <Stack.Screen name="home" component={TabPage} />
-            <Stack.Screen name="video" component={VideoPage} />
+            <Stack.Screen name="Tab" component={TabPage} />
+            <Stack.Screen name="Video" component={VideoPage} />
+            <Stack.Screen name="Search" component={SearchPage} />
           </Stack.Navigator>
         </GestureHandlerRootView>
       </NavigationContainer>
@@ -108,11 +106,12 @@ function App(): JSX.Element {
   );
 }
 type RootStackParamList = {
-  home: undefined;
-  video: { url: string };
+  Animation: undefined;
+  Video: { url: string };
+  Search: undefined;
 };
 
-type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'video'>;
+type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
 export type { VideoPageProps }
 export default App;
 

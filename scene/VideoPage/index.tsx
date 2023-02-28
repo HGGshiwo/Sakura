@@ -35,6 +35,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
   //视频播放相关
   const [videoUrl, setVideoUrl] = useState('');
+  const [videoType, setVideoType] = useState('')
   const [videoHeight, setVideoHeight] = useState(0);
   const [loading, setLoading] = useState(true); //url是否准备好
   const curSourceIndex = useRef(0); //当前的source源
@@ -137,6 +138,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
           console.log(state, src, type);
           if (state) {
             setVideoUrl(src);
+            setVideoType(type)
             setLoading(false);
             videoSolved.current = true;
           } else {
@@ -148,7 +150,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   };
 
   const onPressRecommand = (item: RecommandInfo) => {
-    navigation.push('video', {url: item.href});
+    navigation.push('Video', {url: item.href});
   };
 
   return (
@@ -158,9 +160,10 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
           anthologys[anthologyIndex] ? anthologys[anthologyIndex].title : ''
         }`}
         onBack={() => {
-          navigation.navigate('home');
+          navigation.navigate('Animation');
         }}
         videoUrl={videoUrl}
+        videoType={videoType}
         videoUrlAvailable={!loading}
         nextVideoAvailable={nextVideoAvailable}
         onVideoErr={switchVideoSrc}

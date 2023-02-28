@@ -38,15 +38,13 @@ class Agent {
   }
 
   load() {
-    console.log('fetch')
     fetch(this._url)
       .then(response => response.text())
       .then((responseText) => {
         const document = getDomFromString(responseText);
         let thumb_l = document.getElementsByClass('thumb l')[0];
-        let title = thumb_l.getElementsByTagName('a')[0];
+        let title = document.getElementsByTagName('h1')[0];
         if (this._afterLoadTitle) {
-          console.log(title.innerHTML)
           this._afterLoadTitle(title.innerHTML);
         }
 
@@ -56,10 +54,19 @@ class Agent {
         }
         let sinInfoDom = document.getElementsByClass('sinfo')[0]
         let infoSubDoms = sinInfoDom.getElementsByTagName('span');
+        const pDoms = sinInfoDom.getElementsByTagName('p')
+        let state = pDoms[0].innerHTML
+        let alias = '暂无别名'
+        if (pDoms.length !== 1) {
+          //有别名
+          alias = pDoms[0].innerHTML
+          state = pDoms[1].innerHTML
+        }
+
         let infoSub = {
           author: infoSubDoms[4].getElementsByTagName('a').reduce((pre, cur) => pre + ' ' + cur.innerHTML, ''),
-          alias: title.innerHTML,
-          state: sinInfoDom.getElementsByTagName('p')[0].innerHTML,
+          alias,
+          state,
           time: infoSubDoms[0].getElementsByTagName('a')[0].innerHTML,
           type: infoSubDoms[2].getElementsByTagName('a').map(a => {
             return a.innerHTML;
@@ -95,7 +102,6 @@ class Agent {
         })
 
         if (this._afterLoadSources) {
-          console.log(_sources)
           this._afterLoadSources(_sources);
         }
 
@@ -131,7 +137,8 @@ class Agent {
         }
         let document = getDomFromString(responseText)
         let src_type = document.getElementById('playbox')["data-vid"].split('$')
-        callback(true, src_type[0], src_type[1])
+        const type = src_type[0].includes('m3u8') ? 'm3u8' : src_type[1]
+        callback(true, src_type[0], type)
       })
       .catch(err => {
         console.log(err)

@@ -6139,12 +6139,7 @@ react-native-gradle-plugin@^0.71.15:
   resolved "https://registry.npmmirror.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.15.tgz"
   integrity sha512-7S3pAuPaQJlhax6EZ4JMsDNpj05TfuzX9gPgWLrFfAIWIFLuJ6aDQYAZy2TEI9QJALPoWrj8LWaqP/DGYh14pw==
 
-react-native-orientation-locker@^1.4.0:
-  version "1.5.0"
-  resolved "https://registry.npmmirror.com/react-native-orientation-locker/-/react-native-orientation-locker-1.5.0.tgz"
-  integrity sha512-4XOCGmNN4BXg5JUFjUuXpsfhPJmbA3LkQilJO1ed+6vL97teTdG2w5IEevKiqL9/hPjeWE8YYtX/YW+yp53hkg==
-
-react-native-orientation-locker@^1.5.0:
+react-native-orientation-locker@^1.4.0, react-native-orientation-locker@^1.5.0:
   version "1.5.0"
   resolved "https://registry.npmmirror.com/react-native-orientation-locker/-/react-native-orientation-locker-1.5.0.tgz#324853937eed4835ecd1c8613ab2206135d908ac"
   integrity sha512-4XOCGmNN4BXg5JUFjUuXpsfhPJmbA3LkQilJO1ed+6vL97teTdG2w5IEevKiqL9/hPjeWE8YYtX/YW+yp53hkg==

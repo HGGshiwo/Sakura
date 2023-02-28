@@ -1,6 +1,6 @@
-import {FAB, Text} from '@rneui/themed';
+import {FAB} from '@rneui/themed';
 import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
-import Scrubber from './Scrubber';
+import Scrubber from '../Scrubber';
 import Video, {
   OnBandwidthUpdateData,
   OnLoadData,
@@ -8,35 +8,33 @@ import Video, {
   OnSeekData,
 } from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlay} from '@fortawesome/free-solid-svg-icons/faPlay';
-import {TouchableNativeFeedback} from 'react-native-gesture-handler';
 import {TouchableWithoutFeedback} from 'react-native';
-import {
-  faChevronLeft,
-  faExpand,
-  faForwardStep,
-  faPause,
-} from '@fortawesome/free-solid-svg-icons';
+import {faChevronLeft, faExpand} from '@fortawesome/free-solid-svg-icons';
 import {useEffect, useRef, useState} from 'react';
-import sec_to_time from '../../public/sec_to_time';
+import sec_to_time from '../../../public/sec_to_time';
 import Orientation from 'react-native-orientation-locker';
-import {TextStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 import {Pressable} from 'react-native';
+import {LoadingText} from './LoadingText';
+import {PlayButton} from './PlayButton';
+import {NextButton} from './NextButton';
+import { RateMessage } from './RateMessage';
 
-interface playerProps {
+interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
   nextVideoAvailable: boolean; //下一个视频是否可用
   videoUrl: string;
+  videoType:string,
   title: string;
   onVideoErr: Function;
   onBack: () => void;
   toNextVideo: () => void;
 }
 
-const Player: React.FC<playerProps> = ({
+const Player: React.FC<PlayerProps> = ({
   videoUrlAvailable,
   nextVideoAvailable,
   videoUrl,
+  videoType,
   title,
   onVideoErr,
   onBack,
@@ -55,9 +53,11 @@ const Player: React.FC<playerProps> = ({
   const [fmtDuration, setFmtDuration] = useState('00:00'); //格式化后的视频位置
   const [fmtProgress, setFmtProgress] = useState('00:00'); //格式化后的视频时长
   const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
-  const controlTimer = useRef(-1);
+  const controlTimer = useRef(-1); //当前的计时器
   const [bitrateText, setBitrateText] = useState(''); //带宽
-
+  const [playRate, setPlayRate] = useState(1); //当前播放速度
+  const [rateMessageVisible, setRateMessageVisible] = useState(false) //加速消息是否可见
+  
   useEffect(() => {
     setControlVisible(true);
   }, [videoUrl]);
@@ -114,11 +114,11 @@ const Player: React.FC<playerProps> = ({
       clearTimeout(controlTimer.current);
       controlTimer.current = -1;
     }
-    controlTimer.current = setTimeout(() => {
-      if (!seekingRef.current) {
+    if (!seekingRef.current) {
+      controlTimer.current = setTimeout(() => {
         setControlVisible(false);
-      }
-    }, 3000);
+      }, 3000);
+    }
   };
 
   //打开control并在一段时间之后关闭
@@ -129,12 +129,21 @@ const Player: React.FC<playerProps> = ({
 
   //点击了视频空白区域
   const handlePressVideo = () => {
-    controlVisible ? setControlVisible(false) : openControl();
+    if (controlVisible) {
+      if (controlTimer.current !== -1) {
+        clearTimeout(controlTimer.current);
+        controlTimer.current = -1;
+      }
+      setControlVisible(false);
+    } else {
+      openControl();
+    }
   };
 
   const handlePlay = () => {
+    console.log('press');
     setPaused(!paused);
-    openControl()
+    openControl();
   };
 
   function handleOrientation(orientation: string) {
@@ -154,47 +163,41 @@ const Player: React.FC<playerProps> = ({
   const onBandwithUpdate = ({bitrate}: OnBandwidthUpdateData) => {
     const M = 1 << 20;
     const K = 1 << 10;
+    bitrate = bitrate / 8;
     let text =
       bitrate > M
-        ? `${(bitrate / M).toFixed(2)}Mb/s`
+        ? `${(bitrate / M).toFixed(2)}MB/s`
         : bitrate > K
-        ? `${(bitrate / K).toFixed(2)}Kb/s`
-        : `${bitrate}b/s`;
+        ? `${(bitrate / K).toFixed(2)}KB/s`
+        : `${bitrate}B/s`;
     setBitrateText(text);
   };
 
-  const PlayButton = () => {
-    return (
-      <Pressable
-        hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
-        onPress={handlePlay}>
-        {paused ? (
-          <FontAwesomeIcon color="white" size={24} icon={faPlay} />
-        ) : (
-          <FontAwesomeIcon color="white" size={24} icon={faPause} />
-        )}
-      </Pressable>
-    );
+  //长按加速
+  const onLongPress = () => {
+    setRateMessageVisible(true)
+    setPlayRate(3);
   };
 
-  const LoadingText: React.FC<{title: string; style?: TextStyle}> = ({
-    title,
-    style,
-  }) => {
-    return <Text style={[styles.loadingText, style]}>{title}</Text>;
+  //取消长按返回原速
+  const onPressOut = () => {
+    if (playRate != 1) {
+      setRateMessageVisible(false)
+      setPlayRate(1);
+    }
   };
 
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (
-        <Text style={styles.loadingText}>解析视频地址中...</Text>
+        <LoadingText title="解析视频地址中..." />
       ) : (
         <>
           <Video
             ref={videoRef}
             source={{
               uri: videoUrl,
-              type: 'm3u8',
+              type: videoType,
             }}
             onLoad={onLoad} // Callback when remote video is buffering
             onError={videoError} // Callback when video cannot be loaded
@@ -204,19 +207,27 @@ const Player: React.FC<playerProps> = ({
             onProgress={onProgress}
             reportBandwidth={loading}
             onBandwidthUpdate={onBandwithUpdate}
+            rate={playRate}
           />
+
           <TouchableWithoutFeedback
             style={{height: '100%'}}
-            onPress={handlePressVideo}>
-            <View style={styles.touchable}></View>
+            onPress={handlePressVideo}
+            onLongPress={onLongPress}
+            onPressOut={onPressOut}>
+            <View style={styles.touchable} />
           </TouchableWithoutFeedback>
+
           {erring ? <LoadingText title="视频源不可用..." /> : null}
+
           {!erring && loading ? (
             <>
               <FAB color="black" loading size="small" />
-              <Text style={styles.loadingText}>{bitrateText}</Text>
+              <LoadingText title={bitrateText} />
             </>
           ) : null}
+
+          {/* top bar  */}
           <View
             style={[
               styles.topBar,
@@ -234,13 +245,15 @@ const Player: React.FC<playerProps> = ({
               <LoadingText title={title} style={{paddingLeft: 10}} />
             </View>
           </View>
+
+          {/* bottom bar */}
           <View
             style={[
               styles.bottomBar,
               styles.bar,
               {display: controlVisible && !fullscreen ? 'flex' : 'none'},
             ]}>
-            <PlayButton />
+            <PlayButton onPress={handlePlay} paused={paused} />
             <View style={styles.slider}>
               <Scrubber
                 value={progress}
@@ -261,6 +274,8 @@ const Player: React.FC<playerProps> = ({
               <FontAwesomeIcon color="white" size={24} icon={faExpand} />
             </Pressable>
           </View>
+
+          {/* bottom bar */}
           <View
             style={[
               styles.bottomBar,
@@ -287,21 +302,17 @@ const Player: React.FC<playerProps> = ({
             </View>
             <View style={styles.bottomBarRow}>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
-                <PlayButton />
-                <TouchableNativeFeedback
+                <PlayButton onPress={handlePlay} paused={paused} />
+                <NextButton
                   onPress={toNextVideo}
-                  disabled={!nextVideoAvailable}>
-                  <FontAwesomeIcon
-                    style={{marginLeft: 20}}
-                    size={20}
-                    icon={faForwardStep}
-                    color={nextVideoAvailable?'white':'grey'}
-                  />
-                </TouchableNativeFeedback>
+                  disabled={!nextVideoAvailable}
+                />
               </View>
               <LoadingText title="倍速" />
             </View>
           </View>
+
+          <RateMessage show={rateMessageVisible}/>
         </>
       )}
     </View>
@@ -331,10 +342,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-  },
-  loadingText: {
-    color: 'white',
-    elevation: 1,
   },
   bar: {
     width: '100%',

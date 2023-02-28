@@ -1,4 +1,3 @@
-import {Button, Image} from '@rneui/themed';
 import {
   View,
   StyleSheet,
@@ -9,27 +8,21 @@ import {
 
 import React, {useEffect, useState} from 'react';
 import {Agent} from '../../api/yinghuacd/HomeAgent';
-import {SearchBar} from '@rneui/themed';
+import {SearchBar} from '../../component/SearchBar';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {ParallaxCarousel} from './ParallaxCarousel';
 import {NavBar} from './NavBar';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faClose, faSearch} from '@fortawesome/free-solid-svg-icons';
-import {InfoText, SubInfoText, SubTitleBold} from '../../component/Text';
-import {TextButton} from '../../component/TextButton';
-import { DualItemRow } from '../../component/DualListItem';
-import { TitleLine } from '../VideoPage/TitleLine';
-import { ListTitleLine } from '../../component/ListTitleLine';
-import { FlatList } from 'react-native-gesture-handler';
+import {InfoText, SubInfoText} from '../../component/Text';
+import {DualItemRow} from '../../component/DualListItem';
+import {ListTitleLine} from '../../component/ListTitleLine';
+import {FlatList} from 'react-native-gesture-handler';
 
 interface Props {
   navigation: any;
 }
 
-const HomePage: React.FC<Props> = ({navigation}) => {
-  const [windowWidth, setWindowWidth] = useState(0);
+const AnimationPage: React.FC<Props> = ({navigation}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
-  const [searchValue, setSearchValue] = useState('');
   const [sections, setSections] = useState<any[]>([]);
 
   useEffect(() => {
@@ -38,27 +31,26 @@ const HomePage: React.FC<Props> = ({navigation}) => {
     agent.afterLoadSections(setSections);
     agent.load();
   }, []);
-    
+
   const SubItem = (index: number, recent: RecommandInfo) => {
-      return (
-        <View style={styles.infoContainer}>
-          <Pressable
-            onPress={() => {
-              navigation.push('video', {url: recent.href});
-            }}
-            key={index}>
-            <ImageBackground
-              style={styles.imgContainer}
-              imageStyle={styles.image}
-              source={{uri: recent.img}}
-              resizeMode='cover'
-              >
-              <InfoText style={styles.imgText} title={recent.state} />
-            </ImageBackground>
-          </Pressable>
-          <InfoText title={recent.title} />
-        </View>
-      );
+    return (
+      <View style={styles.infoContainer}>
+        <Pressable
+          onPress={() => {
+            navigation.push('Video', {url: recent.href});
+          }}
+          key={index}>
+          <ImageBackground
+            style={styles.imgContainer}
+            imageStyle={styles.image}
+            source={{uri: recent.img}}
+            resizeMode="cover">
+            <InfoText style={styles.imgText} title={recent.state} />
+          </ImageBackground>
+        </Pressable>
+        <InfoText title={recent.title} />
+      </View>
+    );
   };
 
   interface ListItemProps {
@@ -66,20 +58,19 @@ const HomePage: React.FC<Props> = ({navigation}) => {
     item: RecommandInfo;
   }
 
-  const WatchHistoryItem = ({item, index}:ListItemProps) => {
+  const WatchHistoryItem = ({item, index}: ListItemProps) => {
     return (
       <View style={styles.infoContainer}>
         <Pressable
           onPress={() => {
-            navigation.push('video', {url: item.href});
+            navigation.push('Video', {url: item.href});
           }}
           key={index}>
           <ImageBackground
             style={styles.imgContainer2}
             imageStyle={styles.image}
             source={{uri: item.img}}
-            resizeMode='cover'
-            >
+            resizeMode="cover">
             <InfoText style={styles.imgText} title={item.state} />
           </ImageBackground>
         </Pressable>
@@ -87,41 +78,43 @@ const HomePage: React.FC<Props> = ({navigation}) => {
         <SubInfoText title={'看到第1话20%'} />
       </View>
     );
-};
+  };
 
   return (
     <View style={styles.container}>
       <SearchBar
-        platform="ios"
-        cancelButtonTitle={'搜索'}
-        showCancel={false}
-        onCancel={() => {}}
-        value={searchValue}
-        onChangeText={setSearchValue}
-        containerStyle={styles.searchContainer}
-        inputContainerStyle={styles.inputContainer}
-        searchIcon={<FontAwesomeIcon icon={faSearch} />}
-        clearIcon={<FontAwesomeIcon icon={faClose} />}
-        cancelButtonProps={{color: 'deeppink'}}
+        placeholder="查找关键词"
+        isButton={true}
+        onPress={() => {
+          navigation.navigate('Search');
+        }}
       />
-      
+
       <SectionList
-        contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40 }}
+        contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
           <>
             <ParallaxCarousel carousels={carousels} />
             <NavBar navigation={navigation} />
-            <ListTitleLine title='最近在看' buttonText='更多' onPress={()=>{}}/>
-            <FlatList horizontal data={sections[0]?sections[0].data:[]} renderItem={WatchHistoryItem}/>
+            <ListTitleLine
+              title="最近在看"
+              buttonText="更多"
+              onPress={() => {}}
+            />
+            <FlatList
+              horizontal
+              data={sections[0] ? sections[0].data : []}
+              renderItem={WatchHistoryItem}
+            />
           </>
         }
         sections={sections}
         keyExtractor={(item, index) => item + index}
         renderItem={({item, index, section}) => (
-          <DualItemRow children={SubItem} index={index} datas={section.data}/>
+          <DualItemRow children={SubItem} index={index} datas={section.data} />
         )}
         renderSectionHeader={({section: {title}}) => (
-          <ListTitleLine title={title} buttonText='更多' onPress={()=>{}}/>
+          <ListTitleLine title={title} buttonText="更多" onPress={() => {}} />
         )}
       />
     </View>
@@ -134,6 +127,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    paddingTop: 10,
     backgroundColor: 'white',
   },
   searchContainer: {
@@ -179,7 +173,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     height: 60,
     width: 120,
-  }
+  },
 });
 
-export default HomePage;
+export default AnimationPage;

@@ -4,7 +4,7 @@ import {ListItemInfo} from '../../type/ListItemInfo';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
 import {faXmark} from '@fortawesome/free-solid-svg-icons';
-import {SubTitle} from '../../component/Text';
+import {SubTitle, SubTitleBold} from '../../component/Text';
 import {DualItemRow} from '../../component/DualListItem';
 import {FlatList} from 'react-native-gesture-handler';
 
@@ -48,7 +48,7 @@ const AnthologySheet = ({
   ) : (
     <View style={{...styles.container, height, top}}>
       <View style={styles.headerRow}>
-        <Text style={styles.text}>详情</Text>
+        <SubTitleBold title='选集'/>
         <Pressable onPress={onClose}>
           <FontAwesomeIcon icon={faXmark} />
         </Pressable>
@@ -104,9 +104,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     justifyContent: 'space-between',
-  },
-  text: {
-    fontSize: 18,
   },
   text2: {
     fontSize: 16,
