@@ -1,6 +1,6 @@
 import {StyleSheet, View} from 'react-native';
 import { SubTitleBold } from './Text';
-import {TextButton} from './TextButton';
+import {TextButton} from './Button';
 
 type listTitleLineProps = {
   title: string;

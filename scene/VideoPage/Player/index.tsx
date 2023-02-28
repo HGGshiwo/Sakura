@@ -17,13 +17,14 @@ import {Pressable} from 'react-native';
 import {LoadingText} from './LoadingText';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
-import { RateMessage } from './RateMessage';
+import {RateMessage} from './RateMessage';
+import {BackButton} from '../../../component/Button';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
   nextVideoAvailable: boolean; //下一个视频是否可用
   videoUrl: string;
-  videoType:string,
+  videoType: string;
   title: string;
   onVideoErr: Function;
   onBack: () => void;
@@ -56,8 +57,8 @@ const Player: React.FC<PlayerProps> = ({
   const controlTimer = useRef(-1); //当前的计时器
   const [bitrateText, setBitrateText] = useState(''); //带宽
   const [playRate, setPlayRate] = useState(1); //当前播放速度
-  const [rateMessageVisible, setRateMessageVisible] = useState(false) //加速消息是否可见
-  
+  const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
+
   useEffect(() => {
     setControlVisible(true);
   }, [videoUrl]);
@@ -175,14 +176,14 @@ const Player: React.FC<PlayerProps> = ({
 
   //长按加速
   const onLongPress = () => {
-    setRateMessageVisible(true)
+    setRateMessageVisible(true);
     setPlayRate(3);
   };
 
   //取消长按返回原速
   const onPressOut = () => {
     if (playRate != 1) {
-      setRateMessageVisible(false)
+      setRateMessageVisible(false);
       setPlayRate(1);
     }
   };
@@ -235,13 +236,11 @@ const Player: React.FC<PlayerProps> = ({
               {display: controlVisible ? 'flex' : 'none'},
             ]}>
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
-              <Pressable
-                hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
+              <BackButton
                 onPress={() => {
                   fullscreen ? handleFullscreen() : onBack();
-                }}>
-                <FontAwesomeIcon color="white" icon={faChevronLeft} />
-              </Pressable>
+                }}
+              />
               <LoadingText title={title} style={{paddingLeft: 10}} />
             </View>
           </View>
@@ -312,7 +311,7 @@ const Player: React.FC<PlayerProps> = ({
             </View>
           </View>
 
-          <RateMessage show={rateMessageVisible}/>
+          <RateMessage show={rateMessageVisible} />
         </>
       )}
     </View>

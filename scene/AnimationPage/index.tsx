@@ -1,10 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  SectionList,
-  Pressable,
-  ImageBackground,
-} from 'react-native';
+import {View, StyleSheet, SectionList} from 'react-native';
 
 import React, {useEffect, useState} from 'react';
 import {Agent} from '../../api/yinghuacd/HomeAgent';
@@ -12,10 +6,15 @@ import {SearchBar} from '../../component/SearchBar';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {ParallaxCarousel} from './ParallaxCarousel';
 import {NavBar} from './NavBar';
-import {InfoText, SubInfoText} from '../../component/Text';
 import {DualItemRow} from '../../component/DualListItem';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
+import {
+  H1HistoryInfoItem,
+  V2RecommandInfoItemItem,
+} from '../../component/ListItem';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faHouseChimneyWindow} from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   navigation: any;
@@ -32,63 +31,23 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
     agent.load();
   }, []);
 
-  const SubItem = (index: number, recent: RecommandInfo) => {
-    return (
-      <View style={styles.infoContainer}>
-        <Pressable
-          onPress={() => {
-            navigation.push('Video', {url: recent.href});
-          }}
-          key={index}>
-          <ImageBackground
-            style={styles.imgContainer}
-            imageStyle={styles.image}
-            source={{uri: recent.img}}
-            resizeMode="cover">
-            <InfoText style={styles.imgText} title={recent.state} />
-          </ImageBackground>
-        </Pressable>
-        <InfoText title={recent.title} />
-      </View>
-    );
-  };
-
-  interface ListItemProps {
-    index: number;
-    item: RecommandInfo;
-  }
-
-  const WatchHistoryItem = ({item, index}: ListItemProps) => {
-    return (
-      <View style={styles.infoContainer}>
-        <Pressable
-          onPress={() => {
-            navigation.push('Video', {url: item.href});
-          }}
-          key={index}>
-          <ImageBackground
-            style={styles.imgContainer2}
-            imageStyle={styles.image}
-            source={{uri: item.img}}
-            resizeMode="cover">
-            <InfoText style={styles.imgText} title={item.state} />
-          </ImageBackground>
-        </Pressable>
-        <InfoText style={{width: 120}} title={item.title} />
-        <SubInfoText title={'看到第1话20%'} />
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
-      <SearchBar
-        placeholder="查找关键词"
-        isButton={true}
-        onPress={() => {
-          navigation.navigate('Search');
-        }}
-      />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+          height: 60,
+        }}>
+        <SearchBar
+          placeholder="查找关键词"
+          isButton={true}
+          onPress={() => {
+            navigation.navigate('Search');
+          }}
+        />
+      </View>
 
       <SectionList
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
@@ -104,14 +63,34 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
             <FlatList
               horizontal
               data={sections[0] ? sections[0].data : []}
-              renderItem={WatchHistoryItem}
+              renderItem={({item, index}) => (
+                <H1HistoryInfoItem
+                  item={item}
+                  index={index}
+                  onPress={item => {
+                    navigation.push('Video', {url: item.href});
+                  }}
+                />
+              )}
             />
           </>
         }
         sections={sections}
         keyExtractor={(item, index) => item + index}
-        renderItem={({item, index, section}) => (
-          <DualItemRow children={SubItem} index={index} datas={section.data} />
+        renderItem={({index, section}) => (
+          <DualItemRow
+            children={(index, info) => (
+              <V2RecommandInfoItemItem
+                index={index}
+                item={info}
+                onPress={(recent: RecommandInfo) => {
+                  navigation.push('Video', {url: recent.href});
+                }}
+              />
+            )}
+            index={index}
+            datas={section.data}
+          />
         )}
         renderSectionHeader={({section: {title}}) => (
           <ListTitleLine title={title} buttonText="更多" onPress={() => {}} />
@@ -122,57 +101,10 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  barContainer: {
-    flexDirection: 'row',
-  },
   container: {
     flex: 1,
     paddingTop: 10,
     backgroundColor: 'white',
-  },
-  searchContainer: {
-    backgroundColor: 'white',
-    marginHorizontal: 20,
-  },
-  inputContainer: {
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    // borderRadius: 20,
-  },
-  infoContainer: {
-    flex: 1,
-    margin: 10,
-    height: 100,
-    justifyContent: 'flex-start',
-    // backgroundColor: 'green',
-  },
-  imgContainer: {
-    justifyContent: 'center',
-    resizeMode: 'cover',
-    height: 80,
-  },
-  imgText: {
-    bottom: 2,
-    right: 2,
-    position: 'absolute',
-    color: 'white',
-    backgroundColor: '#rgba(0,0,0,0.5)',
-  },
-  titleRow: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-    paddingHorizontal: 10,
-  },
-  image: {
-    borderRadius: 5,
-  },
-  imgContainer2: {
-    justifyContent: 'center',
-    resizeMode: 'cover',
-    height: 60,
-    width: 120,
   },
 });
 

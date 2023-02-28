@@ -1,7 +1,7 @@
-import { ListItemInfo } from "../../../type/ListItemInfo";
+import { SearchInfo } from "../../../type/SearchInfo";
 
 class Agent {
-    afterSearch: (callback: (result: ListItemInfo[])=>void)=>void;
+    afterSearch: (callback: (result: SearchInfo[])=>void)=>void;
     search: (arg: string)=>void;
 }
 

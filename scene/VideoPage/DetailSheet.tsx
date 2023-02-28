@@ -1,11 +1,9 @@
 import {InfoSub} from '../../type/InfoSub';
 import {Text, Image} from '@rneui/themed';
-import {StyleSheet, View, ScrollView, Pressable} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faXmark} from '@fortawesome/free-solid-svg-icons';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {InfoText, RateText, SubTitleBold, Title} from '../../component/Text';
 import { Tag } from '../../component/Tag';
-import { CloseButton } from '../../component/CloseButton';
+import { CloseButton } from '../../component/Button';
 
 type detailSheetProps = {
   height: number;

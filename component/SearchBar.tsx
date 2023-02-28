@@ -2,6 +2,7 @@ import {faMagnifyingGlass, faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable, View, TextInput, Text, StyleSheet} from 'react-native';
 import {useState} from 'react';
+import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 interface Props {
   isButton?: boolean;
@@ -10,6 +11,7 @@ interface Props {
   autoFocus?: boolean;
   onChangeText?: (text: string) => void;
   loading?: boolean;
+  style?: ViewStyle;
 }
 
 const SearchBar: React.FC<Props> = ({
@@ -19,11 +21,12 @@ const SearchBar: React.FC<Props> = ({
   autoFocus = false,
   onChangeText,
   loading = false,
+  style={}
 }) => {
   const [searchValue, setSearchValue] = useState('');
   return (
     <Pressable onPress={onPress}>
-      <View style={styles.container}>
+      <View style={[styles.container, style]}>
         <FontAwesomeIcon
           color="lightgrey"
           icon={loading ? faSpinner : faMagnifyingGlass}
@@ -56,7 +59,7 @@ const styles = StyleSheet.create({
     margin: 10,
     backgroundColor: '#f7f8f9',
     color: 'black',
-    alignSelf: 'center',
+    // alignSelf: 'center',
     alignItems: 'center',
     flexDirection: 'row',
   },

@@ -16,6 +16,7 @@ import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {VideoPageProps} from '../../App';
+import { V1RecommandInfoItem } from '../../component/ListItem';
 
 const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const emptyInfoSub = {
@@ -51,7 +52,6 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const [relatives, setRelatives] = useState<ListItemInfo[]>([]); //同系列列表
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [recommands, setRecommands] = useState<RecommandInfo[]>([]); //同系列列表
-  const [followed, setFollowed] = useState(false); //是否是追番
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
@@ -183,8 +183,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
                 <View style={{padding: 10, width: windowWidth}}>
                   <TitleLine
                     title={title}
-                    onPress={setFollowed}
-                    followed={followed}
+                    onPress={()=>{}}
+                    followed={false}
                   />
                   <DetailButtonLine
                     author={infoSub.author}
@@ -207,8 +207,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
               </>
             }
             data={recommands}
-            renderItem={({item}) => {
-              return <RecommandLine item={item} onPress={onPressRecommand} />;
+            renderItem={({item, index}) => {
+              return <V1RecommandInfoItem index={index} item={item} onPress={onPressRecommand} />;
             }}
             keyExtractor={item => `${item.id}`}
           />

@@ -11,8 +11,33 @@ class Agent {
     this._afterSearch = callback;
   }
 
+  getResult(liDoms) {
+    return liDoms.map((liDom, index) => {
+      const aDom = liDom.getElementsByTagName('h2')[0].getElementsByTagName('a')[0]
+      const spans = liDom.getElementsByTagName('span')
+      return {
+        href: aDom.href,
+        img: liDom.getElementsByTagName('img')[0].src,
+        state: spans[0]?spans[0].innerHTML:'',
+        title: aDom.innerHTML,
+        id: index,
+        type: spans[1].getElementsByClass('a').map((aDom)=>{return aDom.innerHTML}),
+        info: liDom.getElementsByTagName('p')[0].innerHTML
+      }
+    })
+  }
+
   search(arg) {
     if (this._afterSearch) {
+      if(!arg) {
+        this._afterSearch([])
+        return
+      }
+      arg = arg.trim()
+      if(arg==='') {
+        this._afterSearch([])
+        return
+      }
       fetch(`${this._url}${arg}/`)
         .then(response => response.text())
         .then((responseText) => {
@@ -21,15 +46,8 @@ class Agent {
           //获取页数
           const pages = document.getElementsByClass('pages')
           if (pages.length === 0) {
-            const h2Doms = document.getElementsByTagName("h2")
-            const result = h2Doms.map((h2Dom, index) => {
-              const aDom = h2Dom.getElementsByTagName('a')[0]
-              return {
-                title: aDom.innerHTML,
-                id: index,
-                data: aDom.href
-              }
-            })
+            const liDoms = document.getElementsByClass('lpic')[0].getElementsByTagName("li")
+            const result = this.getResult(liDoms)
             this._afterSearch(result) //只有一页结果
             return [];
           }
@@ -40,25 +58,18 @@ class Agent {
               .then((responseText) => {
                 console.log(1)
                 const document = getDomFromString(responseText)
-                return document.getElementsByTagName("h2")
+                return document.getElementsByClass('lpic')[0].getElementsByTagName("li")
               })
               .catch(err => { console.log(err) })
           })
           return Promise.all(promises)
         })
-        .then((h2Domsaa) => {
-          if(h2Domsaa.length === 0) {
+        .then((liDomsaa) => {
+          if(liDomsaa.length === 0) {
             return
           }
-          const h2Doms = h2Domsaa.flat()
-          const result = h2Doms.map((h2Dom, index) => {
-            const aDom = h2Dom.getElementsByTagName('a')[0]
-            return {
-              title: aDom.innerHTML,
-              id: index,
-              data: aDom.href
-            }
-          })
+          const liDoms = liDomsaa.flat()
+          const result = this.getResult(liDoms)
           this._afterSearch(result)
         })
         .catch(err => {

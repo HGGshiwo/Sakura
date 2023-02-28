@@ -2,13 +2,13 @@ import {View, StyleSheet} from 'react-native';
 
 import React, {PropsWithChildren, ReactNode} from 'react';
 
-interface ItemProps {
+interface ItemProps<T> {
   index: number;
-  datas: any[];
-  children: (index: number, info: any) => ReactNode;
+  datas: T[];
+  children: (index: number, info: T, onPress?: Function) => ReactNode;
 }
 
-const DualItemRow: React.FC<ItemProps> = ({index, datas, children}) => {
+const DualItemRow: React.FC<ItemProps<any>> = ({index, datas, children}) => {
   if (index % 2 === 1) return <></>;
 
   return (
