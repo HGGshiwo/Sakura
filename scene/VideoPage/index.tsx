@@ -22,6 +22,7 @@ import {UpdateMode} from 'realm';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {InfoText} from '../../component/Text';
+import LoadingBox from '../../component/LoadingBox';
 const {useRealm} = Context;
 
 const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
@@ -211,10 +212,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         <Tab.Item>评论</Tab.Item>
       </Tab>
       {loading ? (
-        <View style={{flex: 1, alignItems: 'center', paddingTop: '30%'}}>
-          <FontAwesomeIcon icon={faSpinner} color='grey' />
-          <InfoText style={{paddingTop: 10}} title="加载中" />
-        </View>
+        <LoadingBox backgroundColor='grey' style={{paddingTop: 40}} color='grey' text='加载中...'/>
       ) : (
         <TabView containerStyle={{flex: 1}} value={index} onChange={setIndex}>
           <TabView.Item style={{flex: 1}}>

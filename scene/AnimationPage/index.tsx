@@ -14,7 +14,8 @@ import {
   V2RecommandInfoItemItem,
 } from '../../component/ListItem';
 import Context, {History} from '../../models';
-import { HistoryInfo } from '../../type/HistoryInfo';
+import {HistoryInfo} from '../../type/HistoryInfo';
+import LoadingBox from '../../component/LoadingBox';
 const {useRealm, useQuery} = Context;
 
 interface Props {
@@ -26,26 +27,31 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
   // realm.write(()=>{
   //   realm.deleteAll()
   // })
-  
+
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
-  const [historys, setHistorys] = useState<HistoryInfo[]>([])
-  const _historys = useQuery(History)
+  const [historys, setHistorys] = useState<HistoryInfo[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    setHistorys([..._historys.sorted("time", true)])
-  },[_historys])
+  const _historys = useQuery(History);
 
   useEffect(() => {
-    console.log('mount')
+    setHistorys([..._historys.sorted('time', true)]);
+  }, [_historys]);
+
+  useEffect(() => {
+    console.log('mount');
     const agent = new Agent();
-    agent.afterLoadCarousels(setCarousels);
-    agent.afterLoadSections(setSections);
+    agent.afterLoad(({carousels, sections, dailys}) => {
+      setCarousels(carousels);
+      setSections(sections);
+      setLoading(false);
+    });
     agent.load();
 
-    return ()=>{
-      console.log('anime unmount')
-    }
+    return () => {
+      console.log('anime unmount');
+    };
   }, []);
 
   return (
@@ -66,56 +72,60 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
         />
       </View>
 
-      <SectionList
-        contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
-        ListHeaderComponent={
-          <>
-            <ParallaxCarousel carousels={carousels} />
-            <NavBar navigation={navigation} />
-            <ListTitleLine
-              show={historys.length !== 0}
-              title="最近在看"
-              buttonText="更多"
-              onPress={() => {}}
-            />
-            <FlatList
-              horizontal
-              data={historys}
-              renderItem={({item, index}) => {
-                return (
-                  <H1HistoryInfoItem
-                    item={item}
-                    index={index}
-                    onPress={item => {
-                      navigation.push('Video', {url: item.href});
-                    }}
-                  />
-                );
-              }}
-            />
-          </>
-        }
-        sections={sections}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({index, section}) => (
-          <DualItemRow
-            children={(index, info) => (
-              <V2RecommandInfoItemItem
-                index={index}
-                item={info}
-                onPress={(recent: RecommandInfo) => {
-                  navigation.push('Video', {url: recent.href});
+      {loading ? (
+        <LoadingBox color='grey' backgroundColor='grey' style={{paddingTop: '30%'}} text="加载中..." />
+      ) : (
+        <SectionList
+          contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
+          ListHeaderComponent={
+            <>
+              <ParallaxCarousel carousels={carousels} />
+              <NavBar navigation={navigation} />
+              <ListTitleLine
+                show={historys.length !== 0}
+                title="最近在看"
+                buttonText="更多"
+                onPress={() => {}}
+              />
+              <FlatList
+                horizontal
+                data={historys}
+                renderItem={({item, index}) => {
+                  return (
+                    <H1HistoryInfoItem
+                      item={item}
+                      index={index}
+                      onPress={item => {
+                        navigation.push('Video', {url: item.href});
+                      }}
+                    />
+                  );
                 }}
               />
-            )}
-            index={index}
-            datas={section.data}
-          />
-        )}
-        renderSectionHeader={({section: {title}}) => (
-          <ListTitleLine title={title} buttonText="更多" onPress={() => {}} />
-        )}
-      />
+            </>
+          }
+          sections={sections}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({index, section}) => (
+            <DualItemRow
+              children={(index, info) => (
+                <V2RecommandInfoItemItem
+                  index={index}
+                  item={info}
+                  onPress={(recent: RecommandInfo) => {
+                    navigation.push('Video', {url: recent.href});
+                  }}
+                />
+              )}
+              index={index}
+              datas={section.data}
+            />
+          )}
+          renderSectionHeader={({section: {title}}) => (
+            <ListTitleLine title={title} buttonText="更多" onPress={() => {}} />
+          )}
+        />
+      )}
     </View>
   );
 };

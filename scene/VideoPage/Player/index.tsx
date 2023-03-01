@@ -19,6 +19,7 @@ import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
 import {BackButton} from '../../../component/Button';
+import LoadingBox from '../../../component/LoadingBox';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -62,12 +63,12 @@ const Player: React.FC<PlayerProps> = ({
   const [bitrateText, setBitrateText] = useState(''); //带宽
   const [playRate, setPlayRate] = useState(1); //当前播放速度
   const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
-  const progressRef = useRef(0)
-  const durationRef = useRef(0)
+  const progressRef = useRef(0);
+  const durationRef = useRef(0);
 
   useEffect(() => {
     setControlVisible(true);
-    setErring(false); 
+    setErring(false);
   }, [videoUrl]);
 
   useEffect(() => {
@@ -75,9 +76,12 @@ const Player: React.FC<PlayerProps> = ({
     Orientation.addOrientationListener(handleOrientation);
     const interval = setInterval(() => {
       //每15s更新数据库
-      console.log(progressRef.current, durationRef.current)
+      console.log(progressRef.current, durationRef.current);
       if (durationRef.current) {
-        onProgress(progressRef.current, progressRef.current / durationRef.current);
+        onProgress(
+          progressRef.current,
+          progressRef.current / durationRef.current,
+        );
       }
     }, 15000);
     return () => {
@@ -97,9 +101,9 @@ const Player: React.FC<PlayerProps> = ({
     setLoading(false);
     setFmtDuration(sec_to_time(data.duration));
     setDuration(data.duration);
-    durationRef.current = data.duration
+    durationRef.current = data.duration;
     setPaused(false);
-    onSlidingComplete(defaultProgress)
+    onSlidingComplete(defaultProgress);
     waitCloseControl();
   };
 
@@ -109,7 +113,7 @@ const Player: React.FC<PlayerProps> = ({
     if (!seekingRef.current) {
       //当seek时由video更新progress
       setProgress(data.currentTime);
-      progressRef.current = data.currentTime
+      progressRef.current = data.currentTime;
     }
   };
 
@@ -239,13 +243,8 @@ const Player: React.FC<PlayerProps> = ({
           </TouchableWithoutFeedback>
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
-
-          {!erring && loading ? (
-            <>
-              <FAB color="black" loading size="small" />
-              <LoadingText title={bitrateText} />
-            </>
-          ) : null}
+          
+          <LoadingBox show={!erring && loading} text={bitrateText} />
 
           {/* top bar  */}
           <View
@@ -260,7 +259,11 @@ const Player: React.FC<PlayerProps> = ({
                   fullscreen ? handleFullscreen() : onBack();
                 }}
               />
-              <LoadingText title={title} numberOfLines={1} style={{paddingLeft: 10}} />
+              <LoadingText
+                title={title}
+                numberOfLines={1}
+                style={{paddingLeft: 10}}
+              />
             </View>
           </View>
 

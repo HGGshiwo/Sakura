@@ -1,9 +1,8 @@
+import { AnimePageInfo } from "../../../type/AnimePageInfo";
+
 class Agent {
     load: Function;
-    afterLoadCarousels(callback: Function): void
-    afterLoadSections(callback: Function): void
-    afterLoadDailys(callback: Function): void
-    afterLoadRankings(callback: Function): void
+    afterLoad(callback: (data: AnimePageInfo)=>void): void
 }
 
 export { Agent }
