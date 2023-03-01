@@ -106,9 +106,6 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
           );
         });
 
-        curSourceIndex.current = 0;
-        curSources.current = sources[history.current!.anthologyIndex].data;
-
         setTitle(title);
         setImgUrl(img);
         setInfoSub(infoSub);
@@ -119,8 +116,14 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         setInfo(info);
         setRelatives(relatives);
         setDefaultProgress(history.current!.progress);
-        setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
+
         setLoading(false); //页面内容获取成功，页面不再加载
+        setNextVideoAvailable(
+          history.current!.anthologyIndex + 1 < anthologys.length,
+        );
+        setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
+        curSourceIndex.current = 0;
+        curSources.current = sources[history.current!.anthologyIndex].data;
         switchVideoSrc();
       },
     );
@@ -135,13 +138,12 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
       history.current!.anthologyIndex = index;
       history.current!.anthologyTitle = anthologys[index].title;
     });
-
+    setDefaultProgress(0);
     setNextVideoAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
     setVideoUrlAvailable(false);
     videoUrlAvailableRef.current = false;
     curSourceIndex.current = 0;
-    console.log(sources, index);
     curSources.current = sources[index].data;
     switchVideoSrc();
   };
@@ -212,7 +214,12 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         <Tab.Item>评论</Tab.Item>
       </Tab>
       {loading ? (
-        <LoadingBox backgroundColor='grey' style={{paddingTop: 40}} color='grey' text='加载中...'/>
+        <LoadingBox
+          backgroundColor="grey"
+          style={{paddingTop: 40}}
+          color="grey"
+          text="加载中..."
+        />
       ) : (
         <TabView containerStyle={{flex: 1}} value={index} onChange={setIndex}>
           <TabView.Item style={{flex: 1}}>

@@ -12,7 +12,11 @@ class Agent {
   }
 
   load() {
-    fetch(this._url)
+    fetch(this._url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+      }
+    })
       .then(response => response.text())
       .then((responseText) => {
         const document = getDomFromString(responseText);
@@ -92,6 +96,8 @@ class Agent {
           sections,
         })
 
+      }).catch(err => {
+        console.log(err)
       })
   }
 }
