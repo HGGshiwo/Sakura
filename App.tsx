@@ -11,18 +11,19 @@ import {StatusBar, useColorScheme, Text} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigation/native-stack';
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import VideoPage from './scene/VideoPage';
 import AnimationPage from './scene/AnimationPage';
-import SearchPage from './scene/SearchPage'
+import SearchPage from './scene/SearchPage';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {
-  faBook,
-  faPalette,
-  faUser,
-} from '@fortawesome/free-solid-svg-icons';
+import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
+import Context from './models';
+const {RealmProvider} = Context;
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -65,7 +66,11 @@ function App(): JSX.Element {
           tabBarLabel: ({focused, color, position}) => {
             return (
               <Text
-                style={{paddingBottom: 8, fontSize: 10, color: focused ? 'deeppink' : 'grey'}}>
+                style={{
+                  paddingBottom: 8,
+                  fontSize: 10,
+                  color: focused ? 'deeppink' : 'grey',
+                }}>
                 {texts[route.name as keyof typeof texts]}
               </Text>
             );
@@ -83,23 +88,25 @@ function App(): JSX.Element {
     return <></>;
   };
   const Stack = createNativeStackNavigator();
-  
-  
+
   return (
     <SafeAreaProvider style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
+
       <NavigationContainer>
         <GestureHandlerRootView style={{flex: 1}}>
-          <Stack.Navigator
-            initialRouteName="home"
-            screenOptions={{headerShown: false}}>
-            <Stack.Screen name="Tab" component={TabPage} />
-            <Stack.Screen name="Video" component={VideoPage} />
-            <Stack.Screen name="Search" component={SearchPage} />
-          </Stack.Navigator>
+          <RealmProvider>
+            <Stack.Navigator
+              initialRouteName="home"
+              screenOptions={{headerShown: false}}>
+              <Stack.Screen name="Tab" component={TabPage} />
+              <Stack.Screen name="Video" component={VideoPage} />
+              <Stack.Screen name="Search" component={SearchPage} />
+            </Stack.Navigator>
+          </RealmProvider>
         </GestureHandlerRootView>
       </NavigationContainer>
     </SafeAreaProvider>
@@ -107,11 +114,10 @@ function App(): JSX.Element {
 }
 type RootStackParamList = {
   Animation: undefined;
-  Video: { url: string };
+  Video: {url: string};
   Search: undefined;
 };
 
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
-export type { VideoPageProps }
+export type {VideoPageProps};
 export default App;
-

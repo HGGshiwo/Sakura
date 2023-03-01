@@ -3,7 +3,6 @@ type RecommandInfo = {
     img: string,
     state: string,
     title:string,
-    id: number,
 }
 
 export {RecommandInfo}

@@ -13,22 +13,39 @@ import {
   H1HistoryInfoItem,
   V2RecommandInfoItemItem,
 } from '../../component/ListItem';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faHouseChimneyWindow} from '@fortawesome/free-solid-svg-icons';
+import Context, {History} from '../../models';
+import { HistoryInfo } from '../../type/HistoryInfo';
+const {useRealm, useQuery} = Context;
 
 interface Props {
   navigation: any;
 }
 
 const AnimationPage: React.FC<Props> = ({navigation}) => {
+  // const realm = useRealm();
+  // realm.write(()=>{
+  //   realm.deleteAll()
+  // })
+  
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
+  const [historys, setHistorys] = useState<HistoryInfo[]>([])
+  const _historys = useQuery(History)
+
+  useEffect(()=>{
+    setHistorys([..._historys.sorted("time", true)])
+  },[_historys])
 
   useEffect(() => {
+    console.log('mount')
     const agent = new Agent();
     agent.afterLoadCarousels(setCarousels);
     agent.afterLoadSections(setSections);
     agent.load();
+
+    return ()=>{
+      console.log('anime unmount')
+    }
   }, []);
 
   return (
@@ -56,22 +73,25 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
             <ParallaxCarousel carousels={carousels} />
             <NavBar navigation={navigation} />
             <ListTitleLine
+              show={historys.length !== 0}
               title="最近在看"
               buttonText="更多"
               onPress={() => {}}
             />
             <FlatList
               horizontal
-              data={sections[0] ? sections[0].data : []}
-              renderItem={({item, index}) => (
-                <H1HistoryInfoItem
-                  item={item}
-                  index={index}
-                  onPress={item => {
-                    navigation.push('Video', {url: item.href});
-                  }}
-                />
-              )}
+              data={historys}
+              renderItem={({item, index}) => {
+                return (
+                  <H1HistoryInfoItem
+                    item={item}
+                    index={index}
+                    onPress={item => {
+                      navigation.push('Video', {url: item.href});
+                    }}
+                  />
+                );
+              }}
             />
           </>
         }

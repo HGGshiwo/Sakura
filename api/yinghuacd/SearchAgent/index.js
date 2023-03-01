@@ -1,4 +1,4 @@
-import { Dom, getDomFromString } from "../../../public/Dom";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com/search/';
 

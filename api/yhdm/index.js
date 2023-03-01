@@ -1,5 +1,5 @@
 //樱花动漫api
-import {getDomFromString} from '../../public/Dom';
+import {getDomFromString} from '../Dom';
 import { GetUrlQuery } from './ckplayer4';
 import {__getset_play} from './yx_playpre10';
 

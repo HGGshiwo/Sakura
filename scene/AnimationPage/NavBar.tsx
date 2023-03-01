@@ -1,14 +1,9 @@
-import {View, Text, Dimensions, StyleSheet, FlatList} from 'react-native';
-import {useEffect, useState} from 'react';
-import {Agent} from '../../api/yinghuacd/HomeAgent';
-import {RecommandInfo} from '../../type/RecommandInfo';
-import {ParallaxCarousel} from './ParallaxCarousel';
+import {View, Text, StyleSheet, FlatList} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
   faBusinessTime,
   faCarrot,
-  faClock,
   faClockRotateLeft,
   faHeart,
   faLemon,

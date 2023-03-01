@@ -29,6 +29,8 @@ interface PlayerProps {
   onVideoErr: Function;
   onBack: () => void;
   toNextVideo: () => void;
+  onProgress: (progress: number, perProgress: number) => void;
+  defaultProgress: number; //初始的进度
 }
 
 const Player: React.FC<PlayerProps> = ({
@@ -40,6 +42,8 @@ const Player: React.FC<PlayerProps> = ({
   onVideoErr,
   onBack,
   toNextVideo,
+  onProgress,
+  defaultProgress,
 }) => {
   const videoRef = useRef<Video | null>(null);
 
@@ -47,7 +51,7 @@ const Player: React.FC<PlayerProps> = ({
   const [paused, setPaused] = useState(true); //视频是否暂停
   const [loading, setLoading] = useState(true); //视频是否在加载中
   const [erring, setErring] = useState(false); //视频是否播放错误
-  const [progress, setProgress] = useState(0); //当前视频播放进度
+  const [progress, setProgress] = useState(defaultProgress); //当前视频播放进度
   const [duration, setDuration] = useState(0); //当前视频总时长
   const [cache, setCache] = useState(0); //当前视频缓存位置
   const seekingRef = useRef(false); //是否在加载
@@ -58,6 +62,8 @@ const Player: React.FC<PlayerProps> = ({
   const [bitrateText, setBitrateText] = useState(''); //带宽
   const [playRate, setPlayRate] = useState(1); //当前播放速度
   const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
+  const progressRef = useRef(0)
+  const durationRef = useRef(0)
 
   useEffect(() => {
     setControlVisible(true);
@@ -66,8 +72,16 @@ const Player: React.FC<PlayerProps> = ({
   useEffect(() => {
     // This would be inside componentDidMount()
     Orientation.addOrientationListener(handleOrientation);
+    const interval = setInterval(() => {
+      //每15s更新数据库
+      console.log(progressRef.current, durationRef.current)
+      if (durationRef.current) {
+        onProgress(progressRef.current, progressRef.current / durationRef.current);
+      }
+    }, 15000);
     return () => {
       // This would be inside componentWillUnmount()
+      clearInterval(interval);
       Orientation.removeOrientationListener(handleOrientation);
     };
   }, []);
@@ -82,16 +96,19 @@ const Player: React.FC<PlayerProps> = ({
     setLoading(false);
     setFmtDuration(sec_to_time(data.duration));
     setDuration(data.duration);
+    durationRef.current = data.duration
     setPaused(false);
+    onSlidingComplete(defaultProgress)
     waitCloseControl();
   };
 
-  const onProgress = (data: OnProgressData) => {
+  const _onProgress = (data: OnProgressData) => {
     setFmtProgress(sec_to_time(data.currentTime));
     setCache(data.playableDuration);
     if (!seekingRef.current) {
       //当seek时由video更新progress
       setProgress(data.currentTime);
+      progressRef.current = data.currentTime
     }
   };
 
@@ -205,10 +222,11 @@ const Player: React.FC<PlayerProps> = ({
             onSeek={onSeek}
             style={styles.video}
             paused={paused}
-            onProgress={onProgress}
+            onProgress={_onProgress}
             reportBandwidth={loading}
             onBandwidthUpdate={onBandwithUpdate}
             rate={playRate}
+            progressUpdateInterval={1000}
           />
 
           <TouchableWithoutFeedback

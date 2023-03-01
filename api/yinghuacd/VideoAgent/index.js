@@ -1,4 +1,4 @@
-import { Dom, getDomFromString } from "../../../public/Dom";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
 
@@ -6,6 +6,7 @@ const showUrl = 'show' //详情页
 
 class Agent {
   constructor(url) {
+    this._rawUrl = url
     this._url = href + url
   }
 
@@ -41,14 +42,17 @@ class Agent {
     fetch(this._url)
       .then(response => response.text())
       .then((responseText) => {
+
         const document = getDomFromString(responseText);
         let thumb_l = document.getElementsByClass('thumb l')[0];
         let title = document.getElementsByTagName('h1')[0];
+
         if (this._afterLoadTitle) {
           this._afterLoadTitle(title.innerHTML);
         }
 
         let img = thumb_l.getElementsByTagName('img')[0];
+
         if (this._afterLoadImgSrc) {
           this._afterLoadImgSrc(img.src);
         }
@@ -57,6 +61,7 @@ class Agent {
         const pDoms = sinInfoDom.getElementsByTagName('p')
         let state = pDoms[0].innerHTML
         let alias = '暂无别名'
+
         if (pDoms.length !== 1) {
           //有别名
           alias = pDoms[0].innerHTML
@@ -73,6 +78,7 @@ class Agent {
           }),
           produce: infoSubDoms[1].getElementsByTagName('a')[0].innerHTML,
         };
+
         if (this._afterLoadInfoSub) {
           this._afterLoadInfoSub(infoSub);
         }

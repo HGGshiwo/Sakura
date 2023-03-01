@@ -52,6 +52,7 @@ const SearchPage: React.FC<Props> = ({navigation}) => {
       </View>
 
       <FlatList
+        contentContainerStyle={{paddingHorizontal: 15}}
         ItemSeparatorComponent={() => {
           return <Divider />;
         }}

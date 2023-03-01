@@ -15,14 +15,14 @@ const RateMessage: React.FC<Props> = ({show}) => {
         alignItems:'center',
         top: 45,
         width: '100%',
-        borderRadius: 20,
       }}>
       <View
         style={{
           flexDirection: 'row',
           padding: 10,
           backgroundColor: 'rgba(0,0,0,0.5)',
-          alignItems:'center'
+          alignItems:'center',
+          borderRadius: 5,
         }}>
         <FontAwesomeIcon color='white' icon={faForwardFast} />
         <Text style={{color: 'white', paddingLeft: 10}}>倍速播放中</Text>

@@ -14,7 +14,7 @@ const SBImageItem: React.FC<Props> = ({style, item, showIndex = true}) => {
   return (
     <View style={[styles.container, style]}>
       <ActivityIndicator size="small" />
-      <Image key={item.id} style={styles.image} source={{uri: item.img}} />
+      <Image key={item.href} style={styles.image} source={{uri: item.img}} />
       <Text
         style={{
           position: 'absolute',
