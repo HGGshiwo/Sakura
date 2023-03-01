@@ -19,7 +19,12 @@ const SubTitleBold: React.FC<Props> = ({title, style}) => {
   );
 };
 
-const SubTitle: React.FC<Props> = ({numberOfLines=0, title, active, style}) => {
+const SubTitle: React.FC<Props> = ({
+  numberOfLines = 0,
+  title,
+  active,
+  style,
+}) => {
   let color = active ? 'deeppink' : 'black';
   return (
     <Text
@@ -55,9 +60,7 @@ const InfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
   return (
     <Text
       ellipsizeMode="tail"
-      numberOfLines={
-        numberOfLines < 0 ? 0 : numberOfLines ? numberOfLines : 1
-      }
+      numberOfLines={numberOfLines < 0 ? 0 : numberOfLines ? numberOfLines : 1}
       style={[{color: 'black'}, style]}>
       {title}
     </Text>
@@ -86,4 +89,24 @@ const RateText: React.FC<Props> = ({title, style}) => {
   );
 };
 
-export {SubTitleBold, SubTitle, Title, InfoText, RateText, SubInfoText};
+const LoadingText: React.FC<Props> = ({title, style, numberOfLines}) => {
+  return (
+    <Text
+      numberOfLines={numberOfLines ? numberOfLines : 1}
+      style={[{color: 'white', elevation: 1}, style]}>
+      {title}
+    </Text>
+  );
+};
+
+export {};
+
+export {
+  LoadingText,
+  SubTitleBold,
+  SubTitle,
+  Title,
+  InfoText,
+  RateText,
+  SubInfoText,
+};

@@ -72,7 +72,6 @@ const H1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
   index,
   onPress,
 }) => {
-  console.log(item)
   return (
     <View style={styles.itemContainerV}>
       <Pressable
@@ -90,9 +89,9 @@ const H1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
       </Pressable>
       <InfoText style={{width: 120}} title={item.title} />
       <SubInfoText
-        title={`看到${item.anthologyTitle} ${(
-          item.progressPer * 100
-        ).toFixed(0)}%`}
+        title={`看到${item.anthologyTitle} ${(item.progressPer * 100).toFixed(
+          0,
+        )}%`}
       />
     </View>
   );

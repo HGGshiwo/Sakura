@@ -6,36 +6,11 @@ const showUrl = 'show' //详情页
 
 class Agent {
   constructor(url) {
-    this._rawUrl = url
     this._url = href + url
   }
 
-  afterLoadTitle(callback) {
-    this._afterLoadTitle = callback;
-  }
-
-  afterLoadInfo(callback) {
-    this._afterLoadInfo = callback;
-  }
-
-  afterLoadInfoSub(callback) {
-    this._afterLoadInfoSub = callback;
-  }
-
-  afterLoadSources(callback) {
-    this._afterLoadSources = callback;
-  }
-
-  afterLoadRelatives(callback) {
-    this._afterLoadRelatives = callback;
-  }
-
-  afterLoadRecommands(callback) {
-    this._afterLoadRecommands = callback;
-  }
-
-  afterLoadImgSrc(callback) {
-    this._afterLoadImgSrc = callback;
+  afterLoad(callback) {
+    this._afterLoad = callback;
   }
 
   load() {
@@ -47,15 +22,8 @@ class Agent {
         let thumb_l = document.getElementsByClass('thumb l')[0];
         let title = document.getElementsByTagName('h1')[0];
 
-        if (this._afterLoadTitle) {
-          this._afterLoadTitle(title.innerHTML);
-        }
-
         let img = thumb_l.getElementsByTagName('img')[0];
 
-        if (this._afterLoadImgSrc) {
-          this._afterLoadImgSrc(img.src);
-        }
         let sinInfoDom = document.getElementsByClass('sinfo')[0]
         let infoSubDoms = sinInfoDom.getElementsByTagName('span');
         const pDoms = sinInfoDom.getElementsByTagName('p')
@@ -79,14 +47,7 @@ class Agent {
           produce: infoSubDoms[1].getElementsByTagName('a')[0].innerHTML,
         };
 
-        if (this._afterLoadInfoSub) {
-          this._afterLoadInfoSub(infoSub);
-        }
-
         let infoDom = document.getElementsByClass('info')[0];
-        if (this._afterLoadInfo) {
-          this._afterLoadInfo(infoDom.innerHTML);
-        }
 
         //播放列表
         let movurlDoms = document.getElementsByClass('movurl');
@@ -107,14 +68,8 @@ class Agent {
           return a.key > b.key ? 1 : -1
         })
 
-        if (this._afterLoadSources) {
-          this._afterLoadSources(_sources);
-        }
-
         //相关系列
-        if (this._afterLoadRelatives) {
-          this._afterLoadRelatives([]);
-        }
+
         //相关推荐
         let recommands = document
           .getElementsByClass('pics')[0]
@@ -128,9 +83,15 @@ class Agent {
               state: liDom.getElementsByTagName('font')[0].innerHTML,
             };
           });
-        if (this._afterLoadRecommands) {
-          this._afterLoadRecommands(recommands);
-        }
+
+        this._afterLoad({
+          title: title.innerHTML,
+          img: img.src,
+          infoSub,
+          recommands,
+          sources: _sources,
+          info: infoDom.innerHTML
+        })
       })
   }
 

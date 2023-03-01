@@ -1,12 +1,11 @@
-import {Tab, TabView} from '@rneui/themed';
+import {FAB, Tab, TabView} from '@rneui/themed';
 import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, Dimensions, View, FlatList, StatusBar} from 'react-native';
+import {StyleSheet, Dimensions, View, FlatList} from 'react-native';
 import {Agent} from '../../api/yinghuacd/VideoAgent';
 import {ListItemInfo} from '../../type/ListItemInfo';
 import {Source} from '../../type/Source';
 import {InfoSub} from '../../type/InfoSub';
 import {DetailSheet} from './DetailSheet';
-import {RecommandLine} from './RecommandLine';
 import {ListLine} from './ListLine';
 import {DetailButtonLine} from './DetailButtonLine';
 import {ListTitleLine} from '../../component/ListTitleLine';
@@ -17,9 +16,13 @@ import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {VideoPageProps} from '../../App';
 import {V1RecommandInfoItem} from '../../component/ListItem';
-import Context, {Anime, History} from '../../models';
+import Context, {History} from '../../models';
 import {HistoryInfo} from '../../type/HistoryInfo';
-const {useRealm, useQuery, useObject} = Context;
+import {UpdateMode} from 'realm';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faSpinner} from '@fortawesome/free-solid-svg-icons';
+import {InfoText} from '../../component/Text';
+const {useRealm} = Context;
 
 const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const emptyInfoSub = {
@@ -41,10 +44,10 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoType, setVideoType] = useState('');
   const [videoHeight, setVideoHeight] = useState(0);
-  const [loading, setLoading] = useState(true); //url是否准备好
+  const [videoUrlAvailable, setVideoUrlAvailable] = useState(false); //url是否准备好
   const curSourceIndex = useRef(0); //当前的source源
   const curSources = useRef<string[]>([]); //当前可用的源
-  const videoSolved = useRef(false); //视频是否可以播放，不能使用useState
+  const videoUrlAvailableRef = useRef(false); //视频是否可以播放，不能使用useState
 
   //页面显示相关
   const [title, setTitle] = useState('');
@@ -60,6 +63,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const [nextVideoAvailable, setNextVideoAvailable] = useState(false);
   const [defaultProgress, setDefaultProgress] = useState(0);
+  const [loading, setLoading] = useState(true); //页面是否在加载中
+
   const ratio = 0.56; //视频长宽比例
   const history = useRef<HistoryInfo | null>();
 
@@ -73,83 +78,52 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
     setWindowWidth(width);
     setVideoHeight(width * ratio);
 
-    //获取当前视频的历史记录
-    history.current = realm.objectForPrimaryKey(History, url);
-    //如果不存在记录，则创建数据
-    if (!history.current) {
-      realm.write(() => {
-        history.current = realm.create(History, {
-          href: url,
-          time: new Date().getTime(),
-          img: 'http://www.yinghuacd.com/js/20180601/0601.png',
-          state: '',
-          title: '',
-          anthologyIndex: 0,
-          progress: 0,
-          progressPer: 0,
-          anthologyTitle: '',
+    agent.current.afterLoad(
+      ({title, img, infoSub, recommands, sources, info}) => {
+        const _anthologys = sources.map((_source, index) => {
+          return {id: index, data: _source.data, title: _source.key};
         });
-      });
-    }
-    else {
-      realm.write(()=>{
-        history.current!.time = new Date().getTime()
-      })
-      
-    }
-    agent.current.afterLoadTitle((_title: string) => {
-      setTitle(_title);
-      realm.write(() => {
-        history.current!.title = _title;
-      });
-    });
 
-    agent.current.afterLoadSources((_sources: Source[]) => {
-      setSources(_sources);
-      const _anthologys = _sources.map((_source, index) => {
-        return {id: index, data: _source.data, title: _source.key};
-      });
-      realm.write(() => {
-        history.current!.anthologyTitle = _anthologys[anthologyIndex].title;
-      });
-      setAnthologys(_anthologys);
+        const _history = realm.objectForPrimaryKey(History, url);
 
-      setLoading(true);
+        //更新数据库
+        realm.write(() => {
+          history.current = realm.create(
+            History,
+            {
+              href: url,
+              time: new Date().getTime(),
+              img,
+              state: infoSub.state,
+              title,
+              anthologyIndex: _history ? _history.anthologyIndex : 0,
+              progress: _history ? _history.progress : 0,
+              progressPer: _history ? _history.progressPer : 0,
+              anthologyTitle: _history ? _history.anthologyTitle : '',
+            },
+            UpdateMode.Modified,
+          );
+        });
 
-      setDefaultProgress(history.current ? history.current.progress : 0);
-      setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
+        curSourceIndex.current = 0;
+        curSources.current = sources[history.current!.anthologyIndex].data;
 
-      videoSolved.current = false;
-      curSourceIndex.current = 0;
-      curSources.current = _sources[history.current!.anthologyIndex].data;
-      switchVideoSrc();
-    });
+        setTitle(title);
+        setImgUrl(img);
+        setInfoSub(infoSub);
+        setRecommands(recommands);
+        setSources(sources);
 
-    agent.current.afterLoadInfoSub((_infoSub: InfoSub) => {
-      setInfoSub(_infoSub);
-      realm.write(() => {
-        history.current!.state = _infoSub.state;
-      });
-    });
+        setAnthologys(_anthologys);
+        setInfo(info);
+        setRelatives(relatives);
+        setDefaultProgress(history.current!.progress);
+        setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
+        setLoading(false); //页面内容获取成功，页面不再加载
+        switchVideoSrc();
+      },
+    );
 
-    agent.current.afterLoadInfo((_info: string) => {
-      setInfo(_info);
-    });
-
-    agent.current.afterLoadImgSrc((src: string) => {
-      setImgUrl(src);
-      realm.write(() => {
-        history.current!.img = src;
-      });
-    });
-
-    agent.current.afterLoadRelatives((_relatives: ListItemInfo[]) => {
-      setRelatives(_relatives);
-    });
-
-    agent.current.afterLoadRecommands((_recommands: RecommandInfo[]) => {
-      setRecommands(_recommands);
-    });
     agent.current.load();
   }, []);
 
@@ -163,8 +137,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
     setNextVideoAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
-    setLoading(true);
-    videoSolved.current = false;
+    setVideoUrlAvailable(false);
+    videoUrlAvailableRef.current = false;
     curSourceIndex.current = 0;
     console.log(sources, index);
     curSources.current = sources[index].data;
@@ -186,13 +160,13 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
       agent.current.loadVideoSrc(
         vUrl,
         (state: boolean, src: string, type: string) => {
-          if (videoSolved.current) return;
+          if (videoUrlAvailableRef.current) return;
           console.log(state, src, type);
           if (state) {
             setVideoUrl(src);
             setVideoType(type);
-            setLoading(false);
-            videoSolved.current = true;
+            setVideoUrlAvailable(true);
+            videoUrlAvailableRef.current = true;
           } else {
             switchVideoSrc();
           }
@@ -224,7 +198,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         }}
         videoUrl={videoUrl}
         videoType={videoType}
-        videoUrlAvailable={!loading}
+        videoUrlAvailable={videoUrlAvailable}
         nextVideoAvailable={nextVideoAvailable}
         onVideoErr={switchVideoSrc}
         toNextVideo={toNextVideo}
@@ -236,53 +210,59 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         <Tab.Item>简介</Tab.Item>
         <Tab.Item>评论</Tab.Item>
       </Tab>
-
-      <TabView value={index} onChange={setIndex}>
-        <TabView.Item>
-          <FlatList
-            ListHeaderComponent={
-              <>
-                <View style={{padding: 10, width: windowWidth}}>
-                  <TitleLine
-                    title={title}
-                    onPress={() => {}}
-                    followed={false}
+      {loading ? (
+        <View style={{flex: 1, alignItems: 'center', paddingTop: '30%'}}>
+          <FontAwesomeIcon icon={faSpinner} color='grey' />
+          <InfoText style={{paddingTop: 10}} title="加载中" />
+        </View>
+      ) : (
+        <TabView containerStyle={{flex: 1}} value={index} onChange={setIndex}>
+          <TabView.Item style={{flex: 1}}>
+            <FlatList
+              ListHeaderComponent={
+                <>
+                  <View style={{padding: 10, width: windowWidth}}>
+                    <TitleLine
+                      title={title}
+                      onPress={() => {}}
+                      followed={false}
+                    />
+                    <DetailButtonLine
+                      author={infoSub.author}
+                      onPress={() => setDetailSheetVisible(true)}
+                    />
+                    <ListTitleLine
+                      title={'选集'}
+                      buttonText={infoSub?.state}
+                      onPress={() => setAnthologySheetVisible(true)}
+                    />
+                    {relatives.length == 0 ? null : (
+                      <RelaviteLine relatives={relatives} />
+                    )}
+                    <ListLine
+                      data={anthologys}
+                      onPress={changeAnthology}
+                      activeIndex={anthologyIndex}
+                    />
+                  </View>
+                </>
+              }
+              data={recommands}
+              renderItem={({item, index}) => {
+                return (
+                  <V1RecommandInfoItem
+                    index={index}
+                    item={item}
+                    onPress={onPressRecommand}
                   />
-                  <DetailButtonLine
-                    author={infoSub.author}
-                    onPress={() => setDetailSheetVisible(true)}
-                  />
-                  <ListTitleLine
-                    title={'选集'}
-                    buttonText={infoSub?.state}
-                    onPress={() => setAnthologySheetVisible(true)}
-                  />
-                  {relatives.length == 0 ? null : (
-                    <RelaviteLine relatives={relatives} />
-                  )}
-                  <ListLine
-                    data={anthologys}
-                    onPress={changeAnthology}
-                    activeIndex={anthologyIndex}
-                  />
-                </View>
-              </>
-            }
-            data={recommands}
-            renderItem={({item, index}) => {
-              return (
-                <V1RecommandInfoItem
-                  index={index}
-                  item={item}
-                  onPress={onPressRecommand}
-                />
-              );
-            }}
-            keyExtractor={item => `${item.href}`}
-          />
-        </TabView.Item>
-        <TabView.Item></TabView.Item>
-      </TabView>
+                );
+              }}
+              keyExtractor={item => `${item.href}`}
+            />
+          </TabView.Item>
+          <TabView.Item></TabView.Item>
+        </TabView>
+      )}
 
       <DetailSheet
         top={videoHeight}
@@ -305,7 +285,6 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         state={infoSub.state}
         visible={anthologySheetVisible}
         onClose={() => {
-          console.log('close');
           setAnthologySheetVisible(false);
         }}
         onPress={changeAnthology}

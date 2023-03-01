@@ -14,7 +14,7 @@ import {useEffect, useRef, useState} from 'react';
 import sec_to_time from '../../../public/sec_to_time';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
-import {LoadingText} from './LoadingText';
+import {LoadingText} from '../../../component/Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
@@ -67,6 +67,7 @@ const Player: React.FC<PlayerProps> = ({
 
   useEffect(() => {
     setControlVisible(true);
+    setErring(false); 
   }, [videoUrl]);
 
   useEffect(() => {
@@ -259,7 +260,7 @@ const Player: React.FC<PlayerProps> = ({
                   fullscreen ? handleFullscreen() : onBack();
                 }}
               />
-              <LoadingText title={title} style={{paddingLeft: 10}} />
+              <LoadingText title={title} numberOfLines={1} style={{paddingLeft: 10}} />
             </View>
           </View>
 
