@@ -2,6 +2,7 @@ import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
 import {V1SearchInfoItem} from '../../component/ListItem';
+import { LoadingContainer } from '../../component/Loading';
 import {InfoText} from '../../component/Text';
 import {ListItemInfo} from '../../type/ListItemInfo';
 
@@ -52,7 +53,7 @@ const IndexPage: React.FC<Props> = ({navigation}) => {
   }, []);
 
   return (
-    <View style={{flex: 1}}>
+    <LoadingContainer loading={loading}>
       <View></View>
       <FlatList
         contentContainerStyle={{paddingHorizontal: 15}}
@@ -78,7 +79,7 @@ const IndexPage: React.FC<Props> = ({navigation}) => {
           </View>
         )}
       />
-    </View>
+    </LoadingContainer>
   );
 };
 

@@ -42,10 +42,11 @@ class Agent {
         //获取最近更新/日本动漫/国产动漫/美国动漫/动漫电影
         let first_l = document.getElementsByClass('firs l')[0]
         let imgs = first_l.getElementsByClass('img')
-        const sections = ["最近更新", "日本动漫", "国产动漫", "美国动漫", "动漫电影"]
-          .map((title, index) => {
+        const sections = first_l.getElementsByClass('dtit').slice(1)
+          .map((dtitDom, index) => {
             return {
-              title: title,
+              title: dtitDom.getElementsByTagName('h2')[0].getElementsByTagName('a')[0].innerHTML,
+              href: dtitDom.getElementsByTagName('span')[0].getElementsByTagName('a')[0].href,
               data: imgs[index].getElementsByTagName('li')
                 .map((liDom, index) => {
                   let aDoms = liDom.getElementsByTagName('p')[1].getElementsByTagName('a')
@@ -98,7 +99,7 @@ class Agent {
 
       }).catch(err => {
         console.log(err)
-        if(this._afterErr) {
+        if (this._afterErr) {
           this._afterErr(`${err}`)
         }
       })

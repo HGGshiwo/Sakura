@@ -126,6 +126,32 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
   );
 };
 
+//分类结果的一项，列表方向纵向，一行3个，包含信息: RecommandInfo
+const V3RecommandInfoItemItem: React.FC<Props<RecommandInfo>> = ({
+  index,
+  item,
+  onPress,
+}) => {
+  return (
+    <View style={styles.itemContainerV}>
+      <Pressable
+        onPress={() => {
+          onPress(item);
+        }}
+        key={index}>
+        <ImageBackground
+          style={{flex: 1, height: 180}}
+          imageStyle={styles.ibImage}
+          source={{uri: item.img}}
+          resizeMode="cover">
+          <InfoText style={styles.ibText} title={item.state} />
+        </ImageBackground>
+      </Pressable>
+      <InfoText title={item.title} />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   itemContainerH: {
     justifyContent: 'space-between',
@@ -190,6 +216,7 @@ const styles = StyleSheet.create({
 export {
   V1RecommandInfoItem,
   V2RecommandInfoItemItem,
+  V3RecommandInfoItemItem,
   H1HistoryInfoItem,
   V1SearchInfoItem,
 };

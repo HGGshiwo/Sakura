@@ -6,7 +6,7 @@ import {SearchBar} from '../../component/SearchBar';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {ParallaxCarousel} from './ParallaxCarousel';
 import {NavBar} from './NavBar';
-import {DualItemRow} from '../../component/DualListItem';
+import MultiItemRow from '../../component/MultiItemRow';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../component/ListItem';
 import Context, {History} from '../../models';
 import {HistoryInfo} from '../../type/HistoryInfo';
-import LoadingBox from '../../component/LoadingBox';
+import {LoadingBox} from '../../component/Loading';
 const {useRealm, useQuery} = Context;
 
 interface Props {
@@ -117,11 +117,13 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
           sections={sections}
           keyExtractor={(item, index) => item + index}
           renderItem={({index, section}) => (
-            <DualItemRow
+            <MultiItemRow
+              numberOfItem={2}
               children={(index, info) => (
                 <V2RecommandInfoItemItem
                   index={index}
                   item={info}
+                  key={index}
                   onPress={(recent: RecommandInfo) => {
                     navigation.push('Video', {url: recent.href});
                   }}
@@ -131,8 +133,15 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
               datas={section.data}
             />
           )}
-          renderSectionHeader={({section: {title}}) => (
-            <ListTitleLine title={title} buttonText="更多" onPress={() => {}} />
+          renderSectionHeader={({section: {title, href}}) => (
+            <ListTitleLine
+              title={title}
+              buttonText="更多"
+              onPress={() => {
+                // console.log(title, href)
+                navigation.navigate('Category', {url: href, title});
+              }}
+            />
           )}
         />
       )}

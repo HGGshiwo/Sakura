@@ -48,16 +48,17 @@ class Agent {
           const pages = document.getElementsByClass('pages')
           if (pages.length === 0) {
             const liDoms = document.getElementsByClass('lpic')[0].getElementsByTagName("li")
+            console.log(777)
             const result = this.getResult(liDoms)
             this._afterSearch(result) //只有一页结果
             return [];
           }
+          console.log(666)
           const aDoms = pages[0].getElementsByTagName('a')
           const promises = aDoms.slice(3, -2).map(aDom => {
-            return fetch(`${this._url}${arg}/${aDom.href}`)
+            return fetch(`${this._url}${aDom.href}`)
               .then(response => response.text())
               .then((responseText) => {
-                console.log(1)
                 const document = getDomFromString(responseText)
                 return document.getElementsByClass('lpic')[0].getElementsByTagName("li")
               })

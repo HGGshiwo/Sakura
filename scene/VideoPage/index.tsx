@@ -22,7 +22,7 @@ import {UpdateMode} from 'realm';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {InfoText} from '../../component/Text';
-import LoadingBox from '../../component/LoadingBox';
+import {LoadingBox} from '../../component/Loading';
 const {useRealm} = Context;
 
 const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {

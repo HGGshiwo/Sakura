@@ -19,7 +19,7 @@ import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
 import {BackButton} from '../../../component/Button';
-import LoadingBox from '../../../component/LoadingBox';
+import {LoadingBox} from '../../../component/Loading';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功

@@ -23,6 +23,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import Context from './models';
+import CategoryPage from './scene/CategoryPage';
 const {RealmProvider} = Context;
 
 function App(): JSX.Element {
@@ -105,6 +106,7 @@ function App(): JSX.Element {
               <Stack.Screen name="Tab" component={TabPage} />
               <Stack.Screen name="Video" component={VideoPage} />
               <Stack.Screen name="Search" component={SearchPage} />
+              <Stack.Screen name="Category" component={CategoryPage} />
             </Stack.Navigator>
           </RealmProvider>
         </GestureHandlerRootView>

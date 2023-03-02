@@ -1,12 +1,11 @@
 import {Text} from '@rneui/themed';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, FlatList} from 'react-native';
 import {ListItemInfo} from '../../type/ListItemInfo';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
 import {faXmark} from '@fortawesome/free-solid-svg-icons';
 import {SubTitle, SubTitleBold} from '../../component/Text';
-import {DualItemRow} from '../../component/DualListItem';
-import {FlatList} from 'react-native-gesture-handler';
+import MultiItemRow from '../../component/MultiItemRow';
 
 type anthologySheetProps = {
   height: number;
@@ -29,7 +28,12 @@ const AnthologySheet = ({
   onClose,
   onPress,
 }: anthologySheetProps) => {
-  const ItemBox = (index: number, anthology: ListItemInfo) => {
+  type ItemBoxProps = {
+    index: number;
+    anthology: ListItemInfo;
+  };
+
+  const ItemBox: React.FC<ItemBoxProps> = ({index, anthology}) => {
     return (
       <Pressable
         style={{flex: 1}}
@@ -48,7 +52,7 @@ const AnthologySheet = ({
   ) : (
     <View style={{...styles.container, height, top}}>
       <View style={styles.headerRow}>
-        <SubTitleBold title='选集'/>
+        <SubTitleBold title="选集" />
         <Pressable onPress={onClose}>
           <FontAwesomeIcon icon={faXmark} />
         </Pressable>
@@ -60,7 +64,14 @@ const AnthologySheet = ({
         contentContainerStyle={styles.rowContainer}
         data={anthologys}
         renderItem={({item, index}) => (
-          <DualItemRow children={ItemBox} index={index} datas={anthologys} />
+          <MultiItemRow
+            numberOfItem={2}
+            children={(index, info) => (
+              <ItemBox index={index} anthology={info} key={index}/>
+            )}
+            index={index}
+            datas={anthologys}
+          />
         )}
       />
     </View>
@@ -72,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     position: 'absolute',
     elevation: 1,
-    width: '100%'
+    width: '100%',
   },
   headerRow: {
     flexDirection: 'row',
