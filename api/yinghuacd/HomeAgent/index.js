@@ -11,12 +11,12 @@ class Agent {
     this._afterLoad = callback;
   }
 
+  afterErr(callback) {
+    this._afterErr = callback
+  }
+
   load() {
-    fetch(this._url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
-      }
-    })
+    fetch(this._url)
       .then(response => response.text())
       .then((responseText) => {
         const document = getDomFromString(responseText);
@@ -98,6 +98,9 @@ class Agent {
 
       }).catch(err => {
         console.log(err)
+        if(this._afterErr) {
+          this._afterErr(`${err}`)
+        }
       })
   }
 }

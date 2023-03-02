@@ -32,7 +32,7 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
   const [sections, setSections] = useState<any[]>([]);
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [text, setText] = useState('加载中...');
   const _historys = useQuery(History);
 
   useEffect(() => {
@@ -47,6 +47,11 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
       setSections(sections);
       setLoading(false);
     });
+
+    agent.afterErr((err: string) => {
+      setText(err);
+    });
+
     agent.load();
 
     return () => {
@@ -73,7 +78,12 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
       </View>
 
       {loading ? (
-        <LoadingBox color='grey' backgroundColor='grey' style={{paddingTop: '30%'}} text="加载中..." />
+        <LoadingBox
+          color="grey"
+          backgroundColor="grey"
+          style={{paddingTop: '30%'}}
+          text={text}
+        />
       ) : (
         <SectionList
           contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
