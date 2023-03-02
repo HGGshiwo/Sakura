@@ -39,8 +39,8 @@ interface ContainerProps extends Props {
 const LoadingContainer: React.FC<ContainerProps> = ({
   text = '加载中...',
   style,
-  color = 'white',
-  backgroundColor = 'black',
+  color = 'grey',
+  backgroundColor = 'grey',
   loading = false,
   children,
 }) => {

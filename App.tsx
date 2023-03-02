@@ -18,12 +18,15 @@ import {
 import VideoPage from './scene/VideoPage';
 import AnimationPage from './scene/AnimationPage';
 import SearchPage from './scene/SearchPage';
+import CategoryPage from './scene/CategoryPage';
+
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import Context from './models';
-import CategoryPage from './scene/CategoryPage';
+import IndexPage from './scene/IndexPage';
+
 const {RealmProvider} = Context;
 
 function App(): JSX.Element {
@@ -107,6 +110,7 @@ function App(): JSX.Element {
               <Stack.Screen name="Video" component={VideoPage} />
               <Stack.Screen name="Search" component={SearchPage} />
               <Stack.Screen name="Category" component={CategoryPage} />
+              <Stack.Screen name="Index" component={IndexPage} />
             </Stack.Navigator>
           </RealmProvider>
         </GestureHandlerRootView>

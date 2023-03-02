@@ -1,86 +1,75 @@
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
-import {V1SearchInfoItem} from '../../component/ListItem';
-import { LoadingContainer } from '../../component/Loading';
-import {InfoText} from '../../component/Text';
-import {ListItemInfo} from '../../type/ListItemInfo';
+import {Agent} from '../../api/yinghuacd/IndexAgent';
+import HeadBar from '../../component/HeadBar';
+import {
+  V3RecommandInfoItemItem,
+} from '../../component/ListItem';
+import {LoadingContainer} from '../../component/Loading';
+import MultiItemRow from '../../component/MultiItemRow';
+import {SubTitleBold} from '../../component/Text';
+import {RecommandInfo} from '../../type/RecommandInfo';
+import {SearchInfo} from '../../type/SearchInfo';
 
 interface Props {
   navigation: any;
+  url: string;
+  title: string;
+  route: any;
 }
 
-// 地区:日本大陆美国英国韩国   语言:日语国语粤语英语韩语方言
-
-// 类型:热血格斗恋爱校园搞笑LOLI神魔机战科幻真人青春魔法美少女神话冒险运动竞技童话励志后宫战争吸血鬼
-
-const IndexPage: React.FC<Props> = ({navigation}) => {
-  const [args, setArgs] = useState<{title: string; data: ListItemInfo[]}[]>([]);
-
+const IndexPage: React.FC<Props> = ({navigation, route={url:'/japan/', title: '番剧'}}) => {
+  const [results, setResults] = useState<SearchInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const {url, title} = route.params
   useEffect(() => {
-    const letters = Array(26).map((_, index) => {
-      const letter = String.fromCharCode(97 + index);
-      return {
-        data: letter,
-        id: index,
-        title: letter,
-      };
+    const agent = new Agent();
+    agent.afterSearch(_results => {
+      setResults(_results);
+      setLoading(false);
     });
-    const years = Array(10).map((_, index) => {
-      const year = (2014+index).toString();
-      return {
-        data: year,
-        id: year,
-        title: year,
-      };
-
-    });
-
-    const _args = [
-      {title: '字母', data: letters},
-      {title: '年份', data: years},
-      {title: '地区', data: [
-        {title: '日本', id: 0, data: 'japan'},
-        {title: '大陆', id: 1, data: 'china'},
-        {title: '美国', id: 2, data: 'american'},
-        {title: '英国', id: 3, data:  'england'},
-        {title: '韩国', id: 4, data: 'korea'},
-      ]},
-      {title: '语言', data: [
-        {title: '日语', }
-      ]}
-    ];
+    agent.search([url]);
+    
   }, []);
 
   return (
-    <LoadingContainer loading={loading}>
-      <View></View>
-      <FlatList
-        contentContainerStyle={{paddingHorizontal: 15}}
-        ItemSeparatorComponent={() => {
-          return <Divider />;
-        }}
-        keyExtractor={item => `${item.id}`}
-        data={results}
-        renderItem={({item, index}) => {
-          return (
-            <V1SearchInfoItem
-              item={item}
+    <View style={{flex: 1}}>
+      <HeadBar
+        onPress={() => {
+          navigation.navigate('Tab');
+        }}>
+        <SubTitleBold title={title} />
+      </HeadBar>
+      <LoadingContainer loading={loading}>
+        <FlatList
+          contentContainerStyle={{paddingHorizontal: 15}}
+          ItemSeparatorComponent={() => {
+            return <Divider />;
+          }}
+          keyExtractor={item => `${item.id}`}
+          data={results}
+          renderItem={({item, index}) => (
+            <MultiItemRow
+              numberOfItem={3}
               index={index}
-              onPress={() => {
-                navigation.navigate('Video', {url: item.href});
-              }}
+              datas={results}
+              children={(index, info: RecommandInfo) => (
+                <V3RecommandInfoItemItem
+                  index={index}
+                  item={info}
+                  key={index}
+                  onPress={() => {
+                    navigation.navigate('Video', {url: info.href});
+                  }}
+                />
+              )}
             />
-          );
-        }}
-        ListEmptyComponent={() => (
-          <View style={{width: '100%', alignItems: 'center'}}>
-            <InfoText title="找不到结果" />
-          </View>
-        )}
-      />
-    </LoadingContainer>
+          )}
+        />
+      </LoadingContainer>
+    </View>
   );
 };
 
-export {IndexPage};
+export default IndexPage;

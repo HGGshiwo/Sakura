@@ -38,7 +38,7 @@ class Agent {
           })
         })
         carousels = carousels.flat()
-
+        const hrefs = ['ribendongman/','guochandongman/','meiguodongman/','ribendongman/','ribendongman/']
         //获取最近更新/日本动漫/国产动漫/美国动漫/动漫电影
         let first_l = document.getElementsByClass('firs l')[0]
         let imgs = first_l.getElementsByClass('img')
@@ -46,7 +46,7 @@ class Agent {
           .map((dtitDom, index) => {
             return {
               title: dtitDom.getElementsByTagName('h2')[0].getElementsByTagName('a')[0].innerHTML,
-              href: dtitDom.getElementsByTagName('span')[0].getElementsByTagName('a')[0].href,
+              href: hrefs[index],//dtitDom.getElementsByTagName('span')[0].getElementsByTagName('a')[0].href,
               data: imgs[index].getElementsByTagName('li')
                 .map((liDom, index) => {
                   let aDoms = liDom.getElementsByTagName('p')[1].getElementsByTagName('a')

@@ -2,7 +2,7 @@ import React from 'react';
 // import {Image} from '@rneui/themed';
 import type {StyleProp, ViewStyle, ImageURISource} from 'react-native';
 import {StyleSheet, View, ActivityIndicator, Text, Image} from 'react-native';
-import {RecommandInfo} from '../../../type/RecommandInfo';
+import {RecommandInfo} from '../../type/RecommandInfo';
 
 interface Props {
   style?: StyleProp<ViewStyle>;

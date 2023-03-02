@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Pressable} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
@@ -11,18 +11,18 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
-  navigation: any;
+  onPress: (href: string)=>void;
 }
 
-const NavBar: React.FC<Props> = ({navigation}) => {
+const NavBar: React.FC<Props> = ({onPress}) => {
   const data = [
-    {title: '全部内容', icon: faYoutube},
-    {title: '时间表', icon: faBusinessTime},
-    {title: '排行榜', icon: faRankingStar},
-    {title: '历史记录', icon: faClockRotateLeft},
-    {title: '国创', icon: faCarrot},
-    {title: '日漫', icon: faLemon},
-    {title: '我的追番', icon: faHeart}
+    {title: '全部内容', icon: faYoutube, href: 'Index'},
+    {title: '时间表', icon: faBusinessTime, href: 'Tab'},
+    {title: '排行榜', icon: faRankingStar, href: 'Tab'},
+    {title: '历史记录', icon: faClockRotateLeft, href: 'Tab'},
+    {title: '国创', icon: faCarrot, href: 'Tab'},
+    {title: '日漫', icon: faLemon, href: 'Tab'},
+    {title: '我的追番', icon: faHeart, href: 'Tab'}
   ];
 
   return (
@@ -33,10 +33,12 @@ const NavBar: React.FC<Props> = ({navigation}) => {
       ItemSeparatorComponent={() => <View style={{width: 30}} />}
       renderItem={({item}) => {
         return (
+          <Pressable onPress={()=>onPress(item.href)}>
           <View style={styles.itemContainer}>
             <FontAwesomeIcon color="deeppink" size={25} icon={item.icon} />
             <Text style={{fontSize: 12, paddingTop: 5}}>{`${item.title}`}</Text>
           </View>
+          </Pressable>
         );
       }}
     />

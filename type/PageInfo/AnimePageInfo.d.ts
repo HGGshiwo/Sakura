@@ -1,5 +1,5 @@
-import { RecommandInfo } from "./RecommandInfo";
-import { Section } from "./Section";
+import { RecommandInfo } from "../RecommandInfo";
+import { Section } from "../Section";
 
 interface AnimePageInfo {
   carousels: RecommandInfo[],

@@ -4,8 +4,8 @@ import React, {useEffect, useState} from 'react';
 import {Agent} from '../../api/yinghuacd/HomeAgent';
 import {SearchBar} from '../../component/SearchBar';
 import {RecommandInfo} from '../../type/RecommandInfo';
-import {ParallaxCarousel} from './ParallaxCarousel';
-import {NavBar} from './NavBar';
+import {ParallaxCarousel} from '../../component/ParallaxCarousel';
+import {NavBar} from '../../component/NavBar';
 import MultiItemRow from '../../component/MultiItemRow';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
@@ -15,7 +15,7 @@ import {
 } from '../../component/ListItem';
 import Context, {History} from '../../models';
 import {HistoryInfo} from '../../type/HistoryInfo';
-import {LoadingBox} from '../../component/Loading';
+import {LoadingBox, LoadingContainer} from '../../component/Loading';
 const {useRealm, useQuery} = Context;
 
 interface Props {
@@ -66,7 +66,7 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
           flexDirection: 'row',
           alignItems: 'center',
           paddingHorizontal: 10,
-          height: 60,
+          // paddingVertical: 15,
         }}>
         <SearchBar
           placeholder="查找关键词"
@@ -76,21 +76,20 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
           }}
         />
       </View>
-
-      {loading ? (
-        <LoadingBox
-          color="grey"
-          backgroundColor="grey"
-          style={{paddingTop: '30%'}}
-          text={text}
-        />
-      ) : (
+      <LoadingContainer
+        loading={loading}
+        text={text}
+        style={{paddingTop: '30%'}}>
         <SectionList
           contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
           ListHeaderComponent={
             <>
               <ParallaxCarousel carousels={carousels} />
-              <NavBar navigation={navigation} />
+              <NavBar
+                onPress={href => {
+                  navigation.navigate(href, {title: '全部动漫', url: 'japan/'});
+                }}
+              />
               <ListTitleLine
                 show={historys.length !== 0}
                 title="最近在看"
@@ -144,7 +143,7 @@ const AnimationPage: React.FC<Props> = ({navigation}) => {
             />
           )}
         />
-      )}
+      </LoadingContainer>
     </View>
   );
 };

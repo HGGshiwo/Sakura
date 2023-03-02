@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
-import {RecommandInfo} from '../../../type/RecommandInfo';
+import {RecommandInfo} from '../../type/RecommandInfo';
 import {SBItem} from './SBItem';
 const colors = [
   '#26292E',
@@ -71,7 +71,7 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            width: 100,
+            width: 10*carousels.length,
             alignSelf: 'center',
             position: 'absolute',
             bottom: 15,

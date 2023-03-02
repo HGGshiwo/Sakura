@@ -1,4 +1,4 @@
-import { AnimePageInfo } from "../../../type/AnimePageInfo";
+import { AnimePageInfo } from "../../../type/PageInfo/AnimePageInfo";
 
 class Agent {
     load: Function;

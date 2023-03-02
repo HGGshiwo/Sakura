@@ -1,18 +1,17 @@
-import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
-import {View, FlatList} from 'react-native';
-import {Agent} from '../../api/yinghuacd/IndexAgent';
+import {SectionList, View} from 'react-native';
+import {Agent} from '../../api/yinghuacd/CategoryAgent';
+import EndLine from '../../component/EndLine';
 import HeadBar from '../../component/HeadBar';
-import {
-  V1SearchInfoItem,
-  V3RecommandInfoItemItem,
-} from '../../component/ListItem';
+import {V3RecommandInfoItemItem} from '../../component/ListItem';
 import {LoadingContainer} from '../../component/Loading';
 import MultiItemRow from '../../component/MultiItemRow';
-import {InfoText, SubInfoText, SubTitleBold} from '../../component/Text';
-import {ListItemInfo} from '../../type/ListItemInfo';
+import {NavBar} from '../../component/NavBar';
+import {ParallaxCarousel} from '../../component/ParallaxCarousel';
+import {SearchBar} from '../../component/SearchBar';
+import {SubTitleBold} from '../../component/Text';
 import {RecommandInfo} from '../../type/RecommandInfo';
-import {SearchInfo} from '../../type/SearchInfo';
+import {Section} from '../../type/Section';
 
 interface Props {
   navigation: any;
@@ -22,16 +21,20 @@ interface Props {
 }
 
 const CategoryPage: React.FC<Props> = ({navigation, route}) => {
-  const [results, setResults] = useState<SearchInfo[]>([]);
+  const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
+
   const [loading, setLoading] = useState(true);
-  const {url, title} = route.params
+  const {url, title} = route.params;
+
   useEffect(() => {
     const agent = new Agent();
-    agent.afterSearch(_results => {
-      setResults(_results);
+    agent.afterLoad(({carousels, sections}) => {
+      setCarousels(carousels);
+      setSections(sections);
       setLoading(false);
     });
-    agent.search([url]);
+    agent.load(url);
   }, []);
 
   return (
@@ -40,33 +43,47 @@ const CategoryPage: React.FC<Props> = ({navigation, route}) => {
         onPress={() => {
           navigation.navigate('Tab');
         }}>
-        <SubTitleBold title={title} />
+        <View style={{flexDirection: 'row', width:'100%', justifyContent: 'space-between', alignItems:'center'}}>
+          <SubTitleBold style={{color: 'grey'}} title={title} />
+          <SearchBar style={{width: 200}} />
+        </View>
       </HeadBar>
       <LoadingContainer loading={loading}>
-        <FlatList
-          contentContainerStyle={{paddingHorizontal: 15}}
-          ItemSeparatorComponent={() => {
-            return <Divider />;
-          }}
-          keyExtractor={item => `${item.id}`}
-          data={results}
-          renderItem={({item, index}) => (
+        <SectionList
+          contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
+          ListHeaderComponent={
+            <>
+              <ParallaxCarousel carousels={carousels} />
+              <NavBar
+                onPress={href => {
+                  navigation.navigate(href, {title: '全部动漫', url: 'japan/'});
+                }}
+              />
+            </>
+          }
+          sections={sections}
+          keyExtractor={(item, index) => item.title + index}
+          renderItem={({index, section}) => (
             <MultiItemRow
               numberOfItem={3}
-              index={index}
-              datas={results}
-              children={(index, info: RecommandInfo) => (
+              children={(index, info) => (
                 <V3RecommandInfoItemItem
                   index={index}
                   item={info}
                   key={index}
-                  onPress={() => {
-                    navigation.navigate('Video', {url: info.href});
+                  onPress={(recent: RecommandInfo) => {
+                    navigation.push('Video', {url: recent.href});
                   }}
                 />
               )}
+              index={index}
+              datas={section.data}
             />
           )}
+          renderSectionHeader={({section: {title}}) => (
+            <SubTitleBold title={title} />
+          )}
+          ListFooterComponent={<EndLine />}
         />
       </LoadingContainer>
     </View>
