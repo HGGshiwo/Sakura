@@ -16,7 +16,7 @@ import {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import VideoPage from './scene/VideoPage';
-import AnimationPage from './scene/AnimationPage';
+import AnimePage from './scene/AnimePage';
 import SearchPage from './scene/SearchPage';
 import CategoryPage from './scene/CategoryPage';
 
@@ -26,6 +26,7 @@ import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import Context from './models';
 import IndexPage from './scene/IndexPage';
+import UserPage from './scene/UserPage';
 
 const {RealmProvider} = Context;
 
@@ -80,10 +81,10 @@ function App(): JSX.Element {
             );
           },
         })}>
-        <Tab.Screen name="Animation" component={AnimationPage} />
+        <Tab.Screen name="Animation" component={AnimePage} />
         <Tab.Screen name="Novel" component={UserStackScreen} />
         <Tab.Screen name="Comic" component={UserStackScreen} />
-        <Tab.Screen name="User" component={UserStackScreen} />
+        <Tab.Screen name="User" component={UserPage} />
       </Tab.Navigator>
     );
   };
@@ -97,7 +98,7 @@ function App(): JSX.Element {
     <SafeAreaProvider style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+        backgroundColor='#ff4081'
       />
 
       <NavigationContainer>

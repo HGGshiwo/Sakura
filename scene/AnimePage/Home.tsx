@@ -1,0 +1,135 @@
+import {SectionList} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Agent} from '../../api/yinghuacd/HomeAgent';
+import {RecommandInfo} from '../../type/RecommandInfo';
+import {ParallaxCarousel} from '../../component/ParallaxCarousel';
+import {NavBar} from '../../component/NavBar';
+import MultiItemRow from '../../component/MultiItemRow';
+import {ListTitleLine} from '../../component/ListTitleLine';
+import {FlatList} from 'react-native-gesture-handler';
+import {
+  H1HistoryInfoItem,
+  V2RecommandInfoItemItem,
+} from '../../component/ListItem';
+import Context from '../../models';
+import History from '../../models/History';
+import HistoryInfo from '../../type/HistoryInfo';
+import {LoadingContainer} from '../../component/Loading';
+import Anime from '../../models/Anime';
+const {useRealm, useQuery} = Context;
+
+interface Props {
+  navigate: (where: string, param?: any) => void;
+  push: (where: string, param?: any) => void;
+}
+
+const Home: React.FC<Props> = ({navigate, push}) => {
+  const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
+  const [sections, setSections] = useState<any[]>([]);
+  const [historys, setHistorys] = useState<HistoryInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [text, setText] = useState('加载中...');
+  const _historys = useQuery<History>(History);
+  const realm = useRealm();
+
+  useEffect(() => {
+    let historys = [..._historys.sorted('time', true)].map(_history => {
+      const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+      return {
+        href: _history.href,
+        progress: _history.progress,
+        progressPer: _history.progressPer,
+        anthologyIndex: _history.anthologyIndex,
+        anthologyTitle: _history.anthologyTitle,
+        time: _history.time,
+        img: _animes!.img,
+        title: _animes!.title,
+        state: _animes!.state,
+      };
+    });
+    setHistorys(historys);
+  }, [_historys]);
+
+  useEffect(() => {
+    console.log('mount');
+    const agent = new Agent();
+    agent.afterLoad(({carousels, sections, dailys}) => {
+      setCarousels(carousels);
+      setSections(sections);
+      setLoading(false);
+    });
+
+    agent.afterErr((err: string) => {
+      setText(err);
+    });
+
+    agent.load();
+  }, []);
+
+  return (
+    <LoadingContainer loading={loading} text={text} style={{paddingTop: '30%'}}>
+      <SectionList
+        contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
+        ListHeaderComponent={
+          <>
+            <ParallaxCarousel carousels={carousels} />
+            <NavBar
+              onPress={href => {
+                navigate(href, {title: '全部动漫', url: 'japan/'});
+              }}
+            />
+            <ListTitleLine
+              show={historys.length !== 0}
+              title="最近在看"
+              buttonText="更多"
+              onPress={() => {}}
+            />
+            <FlatList
+              horizontal
+              data={historys}
+              renderItem={({item, index}) => (
+                <H1HistoryInfoItem
+                  item={item}
+                  index={index}
+                  onPress={item => {
+                    push('Video', {url: item.href});
+                  }}
+                />
+              )}
+            />
+          </>
+        }
+        sections={sections}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({index, section}) => (
+          <MultiItemRow
+            numberOfItem={2}
+            children={(index, info) => (
+              <V2RecommandInfoItemItem
+                index={index}
+                item={info}
+                key={index}
+                onPress={(recent: RecommandInfo) => {
+                  push('Video', {url: recent.href});
+                }}
+              />
+            )}
+            index={index}
+            datas={section.data}
+          />
+        )}
+        renderSectionHeader={({section: {title, href}}) => (
+          <ListTitleLine
+            title={title}
+            buttonText="更多"
+            onPress={() => {
+              navigate('Category', {url: href, title});
+            }}
+          />
+        )}
+      />
+    </LoadingContainer>
+  );
+};
+
+export default Home;

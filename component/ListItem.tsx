@@ -1,7 +1,7 @@
 import {Divider, Image} from '@rneui/themed';
 import {StyleSheet, View, Pressable, ImageBackground} from 'react-native';
 import {InfoText, RateText, SubInfoText, SubTitle} from '../component/Text';
-import {HistoryInfo} from '../type/HistoryInfo';
+import HistoryInfo from '../type/HistoryInfo';
 import {RecommandInfo} from '../type/RecommandInfo';
 import {SearchInfo} from '../type/SearchInfo';
 import {FollowButton, RoundButton} from './Button';
@@ -93,6 +93,32 @@ const H1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
           0,
         )}%`}
       />
+    </View>
+  );
+};
+
+//用户追番的一项，列表方向: 横向，一列1个，包含信息：RecommandInfo
+const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
+  item,
+  index,
+  onPress,
+}) => {
+  return (
+    <View style={styles.itemContainerV}>
+      <Pressable
+        onPress={() => {
+          onPress(item);
+        }}
+        key={index}>
+        <ImageBackground
+          style={styles.ibContainer60H}
+          imageStyle={styles.ibImage}
+          source={{uri: item.img}}
+          resizeMode="cover">
+          <InfoText style={styles.ibText} title={item.state} />
+        </ImageBackground>
+      </Pressable>
+      <InfoText style={{width: 120}} title={item.title} />
     </View>
   );
 };
@@ -219,4 +245,5 @@ export {
   V3RecommandInfoItemItem,
   H1HistoryInfoItem,
   V1SearchInfoItem,
+  H1RecommandInfoItem,
 };

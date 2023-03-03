@@ -1,6 +1,7 @@
 import { RecommandInfo } from "./RecommandInfo";
 
 interface HistoryInfo extends RecommandInfo{
+    href: string; //番剧地址
     progress:number; //进度
     progressPer:number; //进度百分比
     anthologyIndex:number; //当前的选集
@@ -8,4 +9,4 @@ interface HistoryInfo extends RecommandInfo{
     time; //点击的时间
 }
 
-export {HistoryInfo}
+export default HistoryInfo;

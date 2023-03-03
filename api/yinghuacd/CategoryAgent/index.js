@@ -21,13 +21,11 @@ class Agent {
           let imgs = document.getElementsByClass('imgs')
           const sections = document.getElementsByClass('dtit')
             .map((dtitDom, index) => {
-              console.log(66, imgs)
               return {
                 title: dtitDom.getElementsByTagName('h2')[0].innerHTML,
                 href: '',
                 data: imgs[index].getElementsByTagName('li')
                   .map((liDom, index) => {
-                    console.log(liDom)
                     let aDoms = liDom.getElementsByTagName('p')[1].getElementsByTagName('a')
                     let state = aDoms.length === 0 ? '' : aDoms[0].innerHTML
                     return {

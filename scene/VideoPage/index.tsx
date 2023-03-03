@@ -1,4 +1,4 @@
-import {FAB, Tab, TabView} from '@rneui/themed';
+import {Tab, TabView} from '@rneui/themed';
 import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, Dimensions, View, FlatList} from 'react-native';
 import {Agent} from '../../api/yinghuacd/VideoAgent';
@@ -16,13 +16,13 @@ import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {VideoPageProps} from '../../App';
 import {V1RecommandInfoItem} from '../../component/ListItem';
-import Context, {History} from '../../models';
-import {HistoryInfo} from '../../type/HistoryInfo';
+import Context from '../../models';
+import History from '../../models/History';
+import HistoryInfo from '../../type/HistoryInfo';
 import {UpdateMode} from 'realm';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faSpinner} from '@fortawesome/free-solid-svg-icons';
-import {InfoText} from '../../component/Text';
-import {LoadingBox} from '../../component/Loading';
+import {LoadingBox, LoadingContainer} from '../../component/Loading';
+import Anime from '../../models/Anime';
+import Follow from '../../models/Follow';
 const {useRealm} = Context;
 
 const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
@@ -65,9 +65,10 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   const [nextVideoAvailable, setNextVideoAvailable] = useState(false);
   const [defaultProgress, setDefaultProgress] = useState(0);
   const [loading, setLoading] = useState(true); //页面是否在加载中
+  const [followed, setFollowed] = useState(false); //是否追番
 
   const ratio = 0.56; //视频长宽比例
-  const history = useRef<HistoryInfo | null>();
+  const history = useRef<History | null>();
 
   //数据相关
   const realm = useRealm();
@@ -87,16 +88,27 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
 
         const _history = realm.objectForPrimaryKey(History, url);
 
-        //更新数据库
+        //更新番剧数据库
+        realm.write(() => {
+          realm.create(
+            Anime,
+            {
+              href: url,
+              img,
+              state: infoSub.state,
+              title,
+            },
+            UpdateMode.Modified,
+          );
+        });
+
+        //更新历史记录数据库
         realm.write(() => {
           history.current = realm.create(
             History,
             {
               href: url,
               time: new Date().getTime(),
-              img,
-              state: infoSub.state,
-              title,
               anthologyIndex: _history ? _history.anthologyIndex : 0,
               progress: _history ? _history.progress : 0,
               progressPer: _history ? _history.progressPer : 0,
@@ -127,8 +139,11 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         switchVideoSrc();
       },
     );
-
     agent.current.load();
+
+    //查看数据库看是否追番
+    const _follow = realm.objectForPrimaryKey(Follow, url)
+    setFollowed(!!_follow && _follow!.following)
   }, []);
 
   //切换视频选集
@@ -182,11 +197,25 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
     navigation.push('Video', {url: item.href});
   };
 
-  //video unmouted回调函数
+  //更新进度回调函数
   const onVideoUnMounted = (progress: number, progressPer: number) => {
     realm.write(() => {
       history.current!.progress = progress;
       history.current!.progressPer = progressPer;
+    });
+  };
+
+  //点击追番按钮的回调函数
+  const handlePressFollowed = (followed: boolean) => {
+    realm.write(() => {
+      realm.create(
+        Follow,
+        {
+          href: url,
+          following: followed,
+        },
+        UpdateMode.Modified,
+      );
     });
   };
 
@@ -213,14 +242,12 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         <Tab.Item>简介</Tab.Item>
         <Tab.Item>评论</Tab.Item>
       </Tab>
-      {loading ? (
-        <LoadingBox
-          backgroundColor="grey"
-          style={{paddingTop: 40}}
-          color="grey"
-          text="加载中..."
-        />
-      ) : (
+      <LoadingContainer
+        loading={loading}
+        style={{paddingTop: 40}}
+        backgroundColor="grey"
+        color="grey"
+        text="加载中...">
         <TabView containerStyle={{flex: 1}} value={index} onChange={setIndex}>
           <TabView.Item style={{flex: 1}}>
             <FlatList
@@ -229,8 +256,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
                   <View style={{padding: 10, width: windowWidth}}>
                     <TitleLine
                       title={title}
-                      onPress={() => {}}
-                      followed={false}
+                      onPress={handlePressFollowed}
+                      followed={followed}
                     />
                     <DetailButtonLine
                       author={infoSub.author}
@@ -253,21 +280,19 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
                 </>
               }
               data={recommands}
-              renderItem={({item, index}) => {
-                return (
-                  <V1RecommandInfoItem
-                    index={index}
-                    item={item}
-                    onPress={onPressRecommand}
-                  />
-                );
-              }}
+              renderItem={({item, index}) => (
+                <V1RecommandInfoItem
+                  index={index}
+                  item={item}
+                  onPress={onPressRecommand}
+                />
+              )}
               keyExtractor={item => `${item.href}`}
             />
           </TabView.Item>
           <TabView.Item></TabView.Item>
         </TabView>
-      )}
+      </LoadingContainer>
 
       <DetailSheet
         top={videoHeight}
