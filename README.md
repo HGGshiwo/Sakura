@@ -2,6 +2,8 @@
 
 用于看番的app，之后也支持看漫画和小说。
 
+安装包下载地址：[https://github.com/HGGshiwo/Sakura/releases/tag/v1.0.0-alpha](https://github.com/HGGshiwo/Sakura/releases/tag/v1.0.0-alpha)
+
 目前看番存在的问题:
 
 - 某些稳定的视频源收费，并且和谐严重
@@ -16,20 +18,48 @@
 - react native实现
 - 具体的UI设计参考了B站
 
-播放器:
+## UI界面
 
-![视频播放](img/play2.jpg)
+<table>
+   <tr>
+    <td colspan=3>播放界面</td>
+  </tr>
+  <tr>
+    <td colspan=3><img src="./img/play2.jpg" ></td>
+  </tr>
+  <tr>
+    <td align=center>首页</td>
+    <td align=center>分类</td>
+    <td align=center>搜索</td>
+  </tr>
+  <tr>
+    <td><img src="./img/home.jpg" width=270 ></td>
+    <td><img src="./img/category.jpg" width=270 ></td>
+    <td><img src="./img/search.jpg" width=270 ></td>
+  </tr>
+  <tr>
+    <td align=center>播放界面</td>
+    <td align=center>历史记录</td>
+    <td align=center>下载列表</td>
+  </tr>
+  <tr>
+    <td><img src="./img/play.jpg" width=270 ></td>
+    <td align=center>todo</td>
+    <td align=center>todo</td>
+  </tr>
+    <tr>
+    <td align=center>索引</td>
+    <td align=center>每日推荐</td>
+    <td align=center>排行榜</td>
+  </tr>
+  <tr>
+    <td align=center>todo</td>
+    <td align=center>todo</td>
+    <td align=center>todo</td>
+  </tr>
+ </table>
 
-|||
-|-|-|
-|![首页](img/home.jpg)首页|![视频播放](img/play.jpg)播放|
-|![搜索](img/search.jpg)搜索||
+ ## 参考项目
 
-## 目录
-todo
-## 每日推荐
-todo
-## 排行榜
-todo
-## 播放记录
-todo
+ - [https://github.com/670848654/SakuraAnime.git](https://github.com/670848654/SakuraAnime.git)
+ - [https://github.com/androiddevnotesforks/Imomoe.git](https://github.com/androiddevnotesforks/Imomoe.git)
