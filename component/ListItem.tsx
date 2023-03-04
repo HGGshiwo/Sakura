@@ -1,4 +1,5 @@
-import {Divider, Image} from '@rneui/themed';
+import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {StyleSheet, View, Pressable, ImageBackground} from 'react-native';
 import {InfoText, RateText, SubInfoText, SubTitle} from '../component/Text';
 import HistoryInfo from '../type/HistoryInfo';
@@ -9,34 +10,47 @@ import {FollowButton, RoundButton} from './Button';
 interface Props<T> {
   index: number;
   onPress: (item: T) => void;
+  onDelete?: (item: T) => void;
   item: T;
+  imgVerticle?: boolean;
 }
 
 //推荐列表的一项, 列表方向: 纵向，一行1个，包含信息： RecommandInfo
-const V1RecommandInfoItem = ({item, onPress}: Props<RecommandInfo>) => {
+const V1RecommandInfoItem = ({
+  item,
+  onPress,
+  onDelete,
+  imgVerticle,
+}: Props<RecommandInfo>) => {
   return (
-    <>
-      <Divider></Divider>
-      <Pressable
-        onPress={() => {
-          onPress(item);
-        }}>
-        <View style={styles.itemContainerH}>
-          <ImageBackground
-            imageStyle={styles.ibImage}
-            style={styles.ibContainer80H}
-            source={{uri: item.img}}
-          />
-          <View style={styles.infoContainer}>
-            <SubTitle title={item.title} />
-            <SubInfoText title={item.state} />
-          </View>
-          <View style={styles.rateContainer}>
-            <RateText title="9.7" />
-          </View>
+    <Pressable
+      onPress={() => {
+        onPress(item);
+      }}>
+      <View style={styles.itemContainerH}>
+        <ImageBackground
+          imageStyle={styles.ibImage}
+          style={imgVerticle ? styles.ibContainer60V : styles.ibContainer80H}
+          source={{uri: item.img}}
+        />
+        <View style={styles.infoContainer}>
+          <SubTitle title={item.title} />
+          <SubInfoText title={item.state} />
         </View>
-      </Pressable>
-    </>
+        <View style={styles.rateContainer}>
+          {onDelete ? (
+            <>
+              <RoundButton text="立即观看" />
+              <Pressable onPress={() => onDelete(item)}>
+                <RoundButton style={{marginVertical: 20}} text="取消追番" />
+              </Pressable>
+            </>
+          ) : (
+            <RateText title="9.7" />
+          )}
+        </View>
+      </View>
+    </Pressable>
   );
 };
 
@@ -97,6 +111,56 @@ const H1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
   );
 };
 
+const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
+  return (
+    <View style={styles.itemContainerV}>
+      <View
+        style={[
+          styles.ibContainer60H,
+          {alignItems: 'center', marginBottom: 20},
+        ]}>
+        <InfoText title="暂无数据" />
+      </View>
+    </View>
+  );
+};
+
+//观看历史的一项，列表方向: 纵向，一行1个，包含信息：HistoryInfo
+const V1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
+  item,
+  index,
+  onPress,
+  onDelete,
+}) => {
+  return (
+    <Pressable onPress={() => onPress(item)}>
+      <View style={styles.itemContainerH}>
+        <ImageBackground
+          imageStyle={styles.ibImage}
+          style={styles.ibContainer60V}
+          source={{uri: item.img}}
+        />
+        <View style={styles.infoContainer}>
+          <SubTitle numberOfLines={1} title={item.title} />
+          <View>
+            <SubInfoText title={item.state} />
+            <SubInfoText
+              title={`看到${item.anthologyTitle} ${(
+                item.progressPer * 100
+              ).toFixed(0)}%`}
+            />
+          </View>
+        </View>
+        <View style={{alignItems: 'center', flex: 1, alignSelf: 'center'}}>
+          <Pressable onPress={onDelete ? () => onDelete(item) : null}>
+            <FontAwesomeIcon color="grey" icon={faTrashCan} />
+          </Pressable>
+        </View>
+      </View>
+    </Pressable>
+  );
+};
+
 //用户追番的一项，列表方向: 横向，一列1个，包含信息：RecommandInfo
 const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
   item,
@@ -119,16 +183,6 @@ const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
         </ImageBackground>
       </Pressable>
       <InfoText style={{width: 120}} title={item.title} />
-    </View>
-  );
-};
-
-const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
-  return (
-    <View style={styles.itemContainerV}>
-      <View style={[styles.ibContainer60H, {alignItems: 'center', marginBottom: 20}]}>
-        <InfoText title="暂无数据" />
-      </View>
     </View>
   );
 };
@@ -242,6 +296,8 @@ const styles = StyleSheet.create({
   rateContainer: {
     flex: 1,
     padding: 10,
+    paddingRight: 40,
+    justifyContent: 'space-between',
   },
   rateTitle: {
     color: 'orange',
@@ -258,4 +314,5 @@ export {
   V1SearchInfoItem,
   H1RecommandInfoItem,
   EmptyH1HistoryInfoItem,
+  V1HistoryInfoItem,
 };

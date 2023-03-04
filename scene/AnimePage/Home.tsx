@@ -17,7 +17,7 @@ import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
 import Anime from '../../models/Anime';
 import { useNavigation } from '@react-navigation/native';
-import { AnimeHomeProps } from '../../App';
+import { AnimeHomeProps } from '../../type/route';
 const {useRealm, useQuery} = Context;
 
 const Home: React.FC<{}> = () => {
@@ -71,11 +71,7 @@ const Home: React.FC<{}> = () => {
         ListHeaderComponent={
           <>
             <ParallaxCarousel carousels={carousels} />
-            <NavBar
-              onPress={href => {
-                navigation.navigate(href, {title: '全部动漫', url: 'japan/'});
-              }}
-            />
+            <NavBar />
             <ListTitleLine
               show={historys.length !== 0}
               title="最近在看"

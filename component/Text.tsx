@@ -99,8 +99,6 @@ const LoadingText: React.FC<Props> = ({title, style, numberOfLines}) => {
   );
 };
 
-export {};
-
 export {
   LoadingText,
   SubTitleBold,

@@ -10,6 +10,9 @@ type RootStackParamList = {
     Tab: undefined;
     Index: { url: string, title: string };
     User: undefined;
+    History: undefined;
+    Follow: undefined;
+    NoParam: undefined; //不会进入，只会跳出
 };
 
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
@@ -20,14 +23,19 @@ type AnimeOtherProps = NativeStackScreenProps<RootStackParamList, 'AnimeOther'>;
 type CategoryPageProps = NativeStackScreenProps<RootStackParamList, 'Category'>;
 type IndexPageProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
 type UserPageProps = NativeStackScreenProps<RootStackParamList, 'User'>;
-
+type FollowPageProps = NativeStackScreenProps<RootStackParamList, 'Follow'>;
+type HistoryPageProps = NativeStackScreenProps<RootStackParamList, 'History'>;
+type NoParamProps = NativeStackScreenProps<RootStackParamList, 'NoParam'>;
 export type {
-    VideoPageProps,
-    SearchPageProps,
-    AnimePageProps,
-    AnimeHomeProps,
-    AnimeOtherProps,
-    CategoryPageProps,
-    IndexPageProps,
-    UserPageProps,
+  VideoPageProps,
+  SearchPageProps,
+  AnimePageProps,
+  AnimeHomeProps,
+  AnimeOtherProps,
+  CategoryPageProps,
+  IndexPageProps,
+  UserPageProps,
+  FollowPageProps,
+  NoParamProps, 
+  HistoryPageProps,
 };

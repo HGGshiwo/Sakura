@@ -9,21 +9,46 @@ import {
   faLemon,
   faRankingStar,
 } from '@fortawesome/free-solid-svg-icons';
+import {useNavigation} from '@react-navigation/native';
+import {NoParamProps} from '../type/route';
 
-interface Props {
-  onPress: (href: 'Index')=>void;
-}
+type Data = {
+  title: string;
+  icon: any;
+  data: string;
+};
 
-const NavBar: React.FC<Props> = ({onPress}) => {
-  const data = [
-    {title: '全部内容', icon: faYoutube, href: 'Index'},
-    {title: '时间表', icon: faBusinessTime, href: 'Tab'},
-    {title: '排行榜', icon: faRankingStar, href: 'Tab'},
-    {title: '历史记录', icon: faClockRotateLeft, href: 'Tab'},
-    {title: '国创', icon: faCarrot, href: 'Tab'},
-    {title: '日漫', icon: faLemon, href: 'Tab'},
-    {title: '我的追番', icon: faHeart, href: 'Tab'}
+const NavBar: React.FC<{}> = () => {
+  const navigation = useNavigation<NoParamProps['navigation']>();
+  const data: Data[] = [
+    {title: '全部内容', icon: faYoutube, data: 'all'},
+    {title: '时间表', icon: faBusinessTime, data: 'Time'},
+    {title: '排行榜', icon: faRankingStar, data: 'Ranking'},
+    {title: '历史记录', icon: faClockRotateLeft, data: 'History'},
+    {title: '国创', icon: faCarrot, data: 'china'},
+    {title: '日漫', icon: faLemon, data: 'japan'},
+    {title: '我的追番', icon: faHeart, data: 'Follow'},
   ];
+
+  const onPress = (item: Data) => {
+    switch (item.data) {
+      case 'all':
+        navigation.navigate('Index', {url: 'japan/', title: '全部内容'});
+        break;
+      case 'japan':
+        navigation.navigate('Index', {url: 'japan/', title: '日本动漫'});
+        break;
+      case 'china':
+        navigation.navigate('Index', {url: 'china/', title: '国产动漫'});
+        break;
+      case 'Time':
+      case 'Ranking':
+        break;
+      default:
+        navigation.navigate(item.data as 'Follow' | 'History');
+        break;
+    }
+  };
 
   return (
     <FlatList
@@ -33,11 +58,12 @@ const NavBar: React.FC<Props> = ({onPress}) => {
       ItemSeparatorComponent={() => <View style={{width: 30}} />}
       renderItem={({item}) => {
         return (
-          <Pressable onPress={()=>onPress(item.href)}>
-          <View style={styles.itemContainer}>
-            <FontAwesomeIcon color="deeppink" size={25} icon={item.icon} />
-            <Text style={{fontSize: 12, paddingTop: 5}}>{`${item.title}`}</Text>
-          </View>
+          <Pressable onPress={() => onPress(item)}>
+            <View style={styles.itemContainer}>
+              <FontAwesomeIcon color="deeppink" size={25} icon={item.icon} />
+              <Text
+                style={{fontSize: 12, paddingTop: 5}}>{`${item.title}`}</Text>
+            </View>
           </Pressable>
         );
       }}
@@ -49,7 +75,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     marginVertical: 10,
-    justifyContent:'flex-start'
+    justifyContent: 'flex-start',
   },
   itemContainer: {
     flex: 1,

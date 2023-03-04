@@ -69,7 +69,13 @@ const UserPage: React.FC<{}> = () => {
 
   const FirstRoute = () => (
     <View style={{paddingHorizontal: 10}}>
-      <ListTitleLine title="历史记录" buttonText="更多" onPress={() => {}} />
+      <ListTitleLine
+        title="历史记录"
+        buttonText="更多"
+        onPress={() => {
+          navigation.navigate('History');
+        }}
+      />
       <FlatList
         horizontal
         data={historys}
@@ -85,7 +91,9 @@ const UserPage: React.FC<{}> = () => {
         ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
       />
       <Divider />
-      <ListTitleLine title="追番" buttonText="更多" onPress={() => {}} />
+      <ListTitleLine title="追番" buttonText="更多" onPress={() => {
+          navigation.navigate('Follow');
+        }} />
       <FlatList
         horizontal
         data={follows}

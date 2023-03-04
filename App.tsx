@@ -27,6 +27,8 @@ import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import Context from './models';
 import IndexPage from './scene/IndexPage';
 import UserPage from './scene/UserPage';
+import HistoryPage from './scene/HistoryPage';
+import FollowPage from './scene/FollowPage';
 
 const {RealmProvider} = Context;
 
@@ -83,6 +85,16 @@ const TabPage = () => {
   );
 };
 
+const routes = [
+  {name: 'Tab', component: TabPage},
+  {name: 'Video', component: VideoPage},
+  {name: 'Search', component: SearchPage},
+  {name: 'Category', component: CategoryPage},
+  {name: 'Index', component: IndexPage},
+  {name: 'History', component: HistoryPage},
+  {name: 'Follow', component: FollowPage},
+]
+
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -99,11 +111,9 @@ function App(): JSX.Element {
           <RealmProvider>
             <Stack.Navigator
               screenOptions={{headerShown: false}}>
-              <Stack.Screen name="Tab" component={TabPage} />
-              <Stack.Screen name="Video" component={VideoPage} />
-              <Stack.Screen name="Search" component={SearchPage} />
-              <Stack.Screen name="Category" component={CategoryPage} />
-              <Stack.Screen name="Index" component={IndexPage} />
+              {routes.map((route, index)=>(
+                <Stack.Screen key={index} name={route.name} component={route.component}/>
+              ))}
             </Stack.Navigator>
           </RealmProvider>
         </GestureHandlerRootView>

@@ -17,14 +17,14 @@ import {RecommandInfo} from '../../type/RecommandInfo';
 import {V1RecommandInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import History from '../../models/History';
-import HistoryInfo from '../../type/HistoryInfo';
 import {UpdateMode} from 'realm';
-import {LoadingBox, LoadingContainer} from '../../component/Loading';
+import {LoadingContainer} from '../../component/Loading';
 import Anime from '../../models/Anime';
 import Follow from '../../models/Follow';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../type/route';
 import Container from '../../component/Container';
+import {Divider} from '@rneui/themed';
 const {useRealm} = Context;
 
 const VideoPage: React.FC<{}> = () => {
@@ -280,9 +280,11 @@ const VideoPage: React.FC<{}> = () => {
                       activeIndex={anthologyIndex}
                     />
                   </View>
+                  <Divider />
                 </>
               }
               data={recommands}
+              ItemSeparatorComponent={() => <Divider />}
               renderItem={({item, index}) => (
                 <V1RecommandInfoItem
                   index={index}

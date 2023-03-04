@@ -39,15 +39,15 @@ const IndexPage: React.FC<{}> = () => {
       <HeadBar
         onPress={() => {
           navigation.navigate('Tab');
-        }}>
+        }}
+        style={{paddingVertical: 20}}
+        >
         <SubTitleBold title={title} />
       </HeadBar>
+      <Divider />
       <LoadingContainer loading={loading}>
         <FlatList
           contentContainerStyle={{paddingHorizontal: 15}}
-          ItemSeparatorComponent={() => {
-            return <Divider />;
-          }}
           keyExtractor={item => `${item.id}`}
           data={results}
           renderItem={({item, index}) => (

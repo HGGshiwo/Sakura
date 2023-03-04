@@ -77,7 +77,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   );
 };
 
-const RoundButton: React.FC<{text: string; style: ViewStyle}> = ({
+const RoundButton: React.FC<{text: string; style?: ViewStyle}> = ({
   text,
   style,
 }) => {
