@@ -1,6 +1,10 @@
 import {useEffect, useState} from 'react';
 import {FlatList, View, useWindowDimensions} from 'react-native';
-import {EmptyH1HistoryInfoItem, H1HistoryInfoItem, H1RecommandInfoItem} from '../../component/ListItem';
+import {
+  EmptyH1HistoryInfoItem,
+  H1HistoryInfoItem,
+  H1RecommandInfoItem,
+} from '../../component/ListItem';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import History from '../../models/History';
 import Context from '../../models';
@@ -15,6 +19,7 @@ import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {UserPageProps} from '../../type/route';
 import Container from '../../component/Container';
+import {Divider} from '@rneui/themed';
 
 const UserPage: React.FC<{}> = () => {
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
@@ -64,11 +69,7 @@ const UserPage: React.FC<{}> = () => {
 
   const FirstRoute = () => (
     <View style={{paddingHorizontal: 10}}>
-      <ListTitleLine
-        title="历史记录"
-        buttonText="更多"
-        onPress={() => {}}
-      />
+      <ListTitleLine title="历史记录" buttonText="更多" onPress={() => {}} />
       <FlatList
         horizontal
         data={historys}
@@ -81,12 +82,10 @@ const UserPage: React.FC<{}> = () => {
             }}
           />
         )}
+        ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
       />
-      <ListTitleLine
-        title="追番"
-        buttonText="更多"
-        onPress={() => {}}
-      />
+      <Divider />
+      <ListTitleLine title="追番" buttonText="更多" onPress={() => {}} />
       <FlatList
         horizontal
         data={follows}
@@ -99,8 +98,9 @@ const UserPage: React.FC<{}> = () => {
             }}
           />
         )}
-        ListEmptyComponent={()=>(<EmptyH1HistoryInfoItem/>)}
+        ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
       />
+      <Divider />
     </View>
   );
 

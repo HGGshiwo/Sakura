@@ -10,7 +10,7 @@ import Video, {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {TouchableWithoutFeedback} from 'react-native';
 import {faChevronLeft, faExpand} from '@fortawesome/free-solid-svg-icons';
-import {useEffect, useRef, useState} from 'react';
+import {ReactDOM, useEffect, useRef, useState} from 'react';
 import sec_to_time from '../../../public/sec_to_time';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
@@ -20,6 +20,8 @@ import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
 import {BackButton} from '../../../component/Button';
 import {LoadingBox} from '../../../component/Loading';
+import RateSheet from './RateSheet';
+import Blank from './Blank';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -49,6 +51,7 @@ const Player: React.FC<PlayerProps> = ({
   const videoRef = useRef<Video | null>(null);
 
   const [fullscreen, setFullscreen] = useState(false); //视频是否全屏
+  const [rateSheetVisible, setRateSheetVisible] = useState(false); //速度sheet是否可见
   const [paused, setPaused] = useState(true); //视频是否暂停
   const [loading, setLoading] = useState(true); //视频是否在加载中
   const [erring, setErring] = useState(false); //视频是否播放错误
@@ -61,8 +64,14 @@ const Player: React.FC<PlayerProps> = ({
   const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
   const controlTimer = useRef(-1); //当前的计时器
   const [bitrateText, setBitrateText] = useState(''); //带宽
+
+  //速度控制
+  const [rateText, setRateText] = useState('倍速');
   const [playRate, setPlayRate] = useState(1); //当前播放速度
+  const [rateId, setRateId] = useState(2); //播放速度id
   const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
+  const prePlayRate = useRef(1); //长按前的播放速度
+
   const progressRef = useRef(0);
   const durationRef = useRef(0);
 
@@ -152,6 +161,7 @@ const Player: React.FC<PlayerProps> = ({
 
   //点击了视频空白区域
   const handlePressVideo = () => {
+    setRateSheetVisible(false)
     if (controlVisible) {
       if (controlTimer.current !== -1) {
         clearTimeout(controlTimer.current);
@@ -198,16 +208,16 @@ const Player: React.FC<PlayerProps> = ({
 
   //长按加速
   const onLongPress = () => {
+    setRateSheetVisible(false)
+    prePlayRate.current = playRate;
     setRateMessageVisible(true);
     setPlayRate(3);
   };
 
-  //取消长按返回原速
-  const onPressOut = () => {
-    if (playRate != 1) {
-      setRateMessageVisible(false);
-      setPlayRate(1);
-    }
+  const onLongPressOut = () => {
+    //取消长按返回原速
+    setRateMessageVisible(false);
+    setPlayRate(prePlayRate.current);
   };
 
   return (
@@ -234,13 +244,12 @@ const Player: React.FC<PlayerProps> = ({
             progressUpdateInterval={1000}
           />
 
-          <TouchableWithoutFeedback
-            style={{height: '100%'}}
+          <Blank         
             onPress={handlePressVideo}
             onLongPress={onLongPress}
-            onPressOut={onPressOut}>
-            <View style={styles.touchable} />
-          </TouchableWithoutFeedback>
+            onLongPressOut={onLongPressOut} 
+            onDbPress={()=>setPaused(!paused)}
+          />
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
 
@@ -251,7 +260,10 @@ const Player: React.FC<PlayerProps> = ({
             style={[
               styles.topBar,
               styles.bar,
-              {display: controlVisible ? 'flex' : 'none'},
+              {
+                display: controlVisible ? 'flex' : 'none',
+                height: fullscreen ? 60 : 40,
+              },
             ]}>
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
               <BackButton
@@ -330,13 +342,24 @@ const Player: React.FC<PlayerProps> = ({
                 />
               </View>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
-                <LoadingText title="倍速" />
-                <LoadingText title="选集" />
+                <Pressable onPress={() => setRateSheetVisible(true)}>
+                  <LoadingText title={rateText} />
+                </Pressable>
+                <LoadingText style={{marginLeft: 20}} title="选集" />
               </View>
             </View>
           </View>
-
           <RateMessage show={rateMessageVisible} />
+          <RateSheet
+            defaultActive={rateId}
+            show={rateSheetVisible}
+            onPress={(data, title, id) => {
+              setRateSheetVisible(false);
+              setRateText(title);
+              setPlayRate(data);
+              setRateId(id);
+            }}
+          />
         </>
       )}
     </View>
@@ -406,13 +429,7 @@ const styles = StyleSheet.create({
   slider: {
     flex: 1,
     marginHorizontal: 15,
-  },
-  touchable: {
-    position: 'absolute',
-    width: '100%',
-    top: 40,
-    bottom: 40,
-  },
+  }
 });
 
 export {Player};

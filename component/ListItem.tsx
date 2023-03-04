@@ -126,7 +126,7 @@ const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
 const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
   return (
     <View style={styles.itemContainerV}>
-      <View style={[styles.ibContainer60H, {alignItems: 'center'}]}>
+      <View style={[styles.ibContainer60H, {alignItems: 'center', marginBottom: 20}]}>
         <InfoText title="暂无数据" />
       </View>
     </View>
