@@ -243,7 +243,7 @@ const Player: React.FC<PlayerProps> = ({
           </TouchableWithoutFeedback>
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
-          
+
           <LoadingBox show={!erring && loading} text={bitrateText} />
 
           {/* top bar  */}
@@ -329,7 +329,10 @@ const Player: React.FC<PlayerProps> = ({
                   disabled={!nextVideoAvailable}
                 />
               </View>
-              <LoadingText title="倍速" />
+              <View style={{alignItems: 'center', flexDirection: 'row'}}>
+                <LoadingText title="倍速" />
+                <LoadingText title="选集" />
+              </View>
             </View>
           </View>
 

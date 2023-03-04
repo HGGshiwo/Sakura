@@ -123,6 +123,16 @@ const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
   );
 };
 
+const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
+  return (
+    <View style={styles.itemContainerV}>
+      <View style={[styles.ibContainer60H, {alignItems: 'center'}]}>
+        <InfoText title="暂无数据" />
+      </View>
+    </View>
+  );
+};
+
 //搜索结果的一项，列表方向: 纵向，一行1个，包含信息：SearchInfo
 const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
   item,
@@ -166,7 +176,7 @@ const V3RecommandInfoItemItem: React.FC<Props<RecommandInfo>> = ({
         }}
         key={index}>
         <ImageBackground
-          style={{flex: 1, height: 180}}
+          style={{flex: 1, height: 160}}
           imageStyle={styles.ibImage}
           source={{uri: item.img}}
           resizeMode="cover">
@@ -222,6 +232,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     color: 'white',
     backgroundColor: '#rgba(0,0,0,0.5)',
+    fontSize: 12,
   },
   infoContainer: {
     justifyContent: 'space-between',
@@ -246,4 +257,5 @@ export {
   H1HistoryInfoItem,
   V1SearchInfoItem,
   H1RecommandInfoItem,
+  EmptyH1HistoryInfoItem,
 };

@@ -1,14 +1,14 @@
-import {View, StyleSheet, useWindowDimensions} from 'react-native';
+import {View, useWindowDimensions} from 'react-native';
 
 import React, {useState} from 'react';
 import {SearchBar} from '../../component/SearchBar';
-import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
+import {TabBar, TabView} from 'react-native-tab-view';
 import Home from './Home';
 import Other from './Other';
+import Container from '../../component/Container';
+import { useNavigation} from '@react-navigation/native';
+import { AnimePageProps } from '../../type/route';
 
-interface Props {
-  navigation: any;
-}
 
 const url = {
   rbdm: {url: 'ribendongman/', title: '日本动漫'},
@@ -18,16 +18,14 @@ const url = {
   qzdm: {url: 'qinzi/', title: '亲子动漫'},
 };
 
-const AnimePage: React.FC<Props> = ({navigation}) => {
-  const renderScene = ({route}) =>
+const AnimePage: React.FC<{}> = () => {
+  const navigation = useNavigation<AnimePageProps["navigation"]>()
+
+  const renderScene = ({route}:any) =>
     route.key === 'home' ? (
-      <Home navigate={navigation.navigate} push={navigation.push} />
+      <Home/>
     ) : (
-      <Other
-        navigate={navigation.navigate}
-        push={navigation.push}
-        {...url[route.key]}
-      />
+      <Other {...url[route.key as keyof typeof url]}/>
     );
 
   const layout = useWindowDimensions();
@@ -43,7 +41,7 @@ const AnimePage: React.FC<Props> = ({navigation}) => {
   const [index, setIndex] = useState(0);
 
   return (
-    <View style={styles.container}>
+    <Container>
       <View
         style={{
           flexDirection: 'row',
@@ -75,15 +73,8 @@ const AnimePage: React.FC<Props> = ({navigation}) => {
         onIndexChange={setIndex}
         initialLayout={{width: layout.width}}
       />
-    </View>
+    </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-});
 
 export default AnimePage;

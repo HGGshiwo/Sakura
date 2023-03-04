@@ -1,7 +1,9 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
 import {Agent} from '../../api/yinghuacd/IndexAgent';
+import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
 import {
   V3RecommandInfoItemItem,
@@ -10,19 +12,18 @@ import {LoadingContainer} from '../../component/Loading';
 import MultiItemRow from '../../component/MultiItemRow';
 import {SubTitleBold} from '../../component/Text';
 import {RecommandInfo} from '../../type/RecommandInfo';
+import { IndexPageProps } from '../../type/route';
 import {SearchInfo} from '../../type/SearchInfo';
 
-interface Props {
-  navigation: any;
-  url: string;
-  title: string;
-  route: any;
-}
 
-const IndexPage: React.FC<Props> = ({navigation, route={url:'/japan/', title: 'ç•ªå‰§'}}) => {
+const IndexPage: React.FC<{}> = () => {
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const route = useRoute<IndexPageProps['route']>()
+  const navigation = useNavigation<IndexPageProps['navigation']>()
+
   const {url, title} = route.params
+  
   useEffect(() => {
     const agent = new Agent();
     agent.afterSearch(_results => {
@@ -34,7 +35,7 @@ const IndexPage: React.FC<Props> = ({navigation, route={url:'/japan/', title: 'ç
   }, []);
 
   return (
-    <View style={{flex: 1}}>
+    <Container>
       <HeadBar
         onPress={() => {
           navigation.navigate('Tab');
@@ -68,7 +69,7 @@ const IndexPage: React.FC<Props> = ({navigation, route={url:'/japan/', title: 'ç
           )}
         />
       </LoadingContainer>
-    </View>
+    </Container>
   );
 };
 

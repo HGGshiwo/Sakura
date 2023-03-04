@@ -16,14 +16,11 @@ import History from '../../models/History';
 import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
 import Anime from '../../models/Anime';
+import { useNavigation } from '@react-navigation/native';
+import { AnimeHomeProps } from '../../App';
 const {useRealm, useQuery} = Context;
 
-interface Props {
-  navigate: (where: string, param?: any) => void;
-  push: (where: string, param?: any) => void;
-}
-
-const Home: React.FC<Props> = ({navigate, push}) => {
+const Home: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
@@ -31,6 +28,7 @@ const Home: React.FC<Props> = ({navigate, push}) => {
   const [text, setText] = useState('加载中...');
   const _historys = useQuery<History>(History);
   const realm = useRealm();
+  const navigation = useNavigation<AnimeHomeProps["navigation"]>()
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
@@ -75,7 +73,7 @@ const Home: React.FC<Props> = ({navigate, push}) => {
             <ParallaxCarousel carousels={carousels} />
             <NavBar
               onPress={href => {
-                navigate(href, {title: '全部动漫', url: 'japan/'});
+                navigation.navigate(href, {title: '全部动漫', url: 'japan/'});
               }}
             />
             <ListTitleLine
@@ -92,7 +90,7 @@ const Home: React.FC<Props> = ({navigate, push}) => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    push('Video', {url: item.href});
+                    navigation.push('Video', {url: item.href});
                   }}
                 />
               )}
@@ -110,7 +108,7 @@ const Home: React.FC<Props> = ({navigate, push}) => {
                 item={info}
                 key={index}
                 onPress={(recent: RecommandInfo) => {
-                  push('Video', {url: recent.href});
+                  navigation.push('Video', {url: recent.href});
                 }}
               />
             )}
@@ -123,7 +121,7 @@ const Home: React.FC<Props> = ({navigate, push}) => {
             title={title}
             buttonText="更多"
             onPress={() => {
-              navigate('Category', {url: href, title});
+              navigation.navigate('Category', {url: href, title});
             }}
           />
         )}

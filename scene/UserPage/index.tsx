@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {FlatList, View, useWindowDimensions} from 'react-native';
-import {H1HistoryInfoItem, H1RecommandInfoItem} from '../../component/ListItem';
+import {EmptyH1HistoryInfoItem, H1HistoryInfoItem, H1RecommandInfoItem} from '../../component/ListItem';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import History from '../../models/History';
 import Context from '../../models';
@@ -12,16 +12,15 @@ import Follow from '../../models/Follow';
 import {RecommandInfo} from '../../type/RecommandInfo';
 const {useRealm, useQuery} = Context;
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import {useNavigation} from '@react-navigation/native';
+import {UserPageProps} from '../../type/route';
+import Container from '../../component/Container';
 
-type Props = {
-  navigation: any;
-};
-
-const UserPage: React.FC<Props> = ({navigation}) => {
+const UserPage: React.FC<{}> = () => {
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
   const [follows, setFollows] = useState<RecommandInfo[]>([]);
   const [index, setIndex] = useState(0);
-
+  const navigation = useNavigation<UserPageProps['navigation']>();
   const _historys = useQuery<History>(History);
   const _follows = useQuery<Follow>(Follow);
 
@@ -66,8 +65,7 @@ const UserPage: React.FC<Props> = ({navigation}) => {
   const FirstRoute = () => (
     <View style={{paddingHorizontal: 10}}>
       <ListTitleLine
-        show={historys.length !== 0}
-        title="番剧历史记录"
+        title="历史记录"
         buttonText="更多"
         onPress={() => {}}
       />
@@ -85,7 +83,6 @@ const UserPage: React.FC<Props> = ({navigation}) => {
         )}
       />
       <ListTitleLine
-        show={historys.length !== 0}
         title="追番"
         buttonText="更多"
         onPress={() => {}}
@@ -102,6 +99,7 @@ const UserPage: React.FC<Props> = ({navigation}) => {
             }}
           />
         )}
+        ListEmptyComponent={()=>(<EmptyH1HistoryInfoItem/>)}
       />
     </View>
   );
@@ -119,12 +117,7 @@ const UserPage: React.FC<Props> = ({navigation}) => {
   const layout = useWindowDimensions();
 
   return (
-    <View
-      style={{
-        // paddingHorizontal: 10,
-        paddingBottom: 40,
-        flex: 1,
-      }}>
+    <Container>
       <View
         style={{
           flexDirection: 'row',
@@ -156,7 +149,7 @@ const UserPage: React.FC<Props> = ({navigation}) => {
         onIndexChange={setIndex}
         initialLayout={{width: layout.width}}
       />
-    </View>
+    </Container>
   );
 };
 

@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
-  onPress: (href: string)=>void;
+  onPress: (href: 'Index')=>void;
 }
 
 const NavBar: React.FC<Props> = ({onPress}) => {

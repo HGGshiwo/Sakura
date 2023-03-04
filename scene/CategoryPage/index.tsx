@@ -1,6 +1,8 @@
+import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList, View} from 'react-native';
 import {Agent} from '../../api/yinghuacd/CategoryAgent';
+import Container from '../../component/Container';
 import EndLine from '../../component/EndLine';
 import HeadBar from '../../component/HeadBar';
 import {V3RecommandInfoItemItem} from '../../component/ListItem';
@@ -11,19 +13,14 @@ import {ParallaxCarousel} from '../../component/ParallaxCarousel';
 import {SearchBar} from '../../component/SearchBar';
 import {SubTitleBold} from '../../component/Text';
 import {RecommandInfo} from '../../type/RecommandInfo';
+import {CategoryPageProps} from '../../type/route';
 import {Section} from '../../type/Section';
 
-interface Props {
-  navigation: any;
-  url: string;
-  title: string;
-  route: any;
-}
-
-const CategoryPage: React.FC<Props> = ({navigation, route}) => {
+const CategoryPage: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
-
+  const route = useRoute<CategoryPageProps['route']>();
+  const navigation = useNavigation<CategoryPageProps['navigation']>();
   const [loading, setLoading] = useState(true);
   const {url, title} = route.params;
 
@@ -38,12 +35,18 @@ const CategoryPage: React.FC<Props> = ({navigation, route}) => {
   }, []);
 
   return (
-    <View style={{flex: 1}}>
+    <Container>
       <HeadBar
         onPress={() => {
           navigation.navigate('Tab');
         }}>
-        <View style={{flexDirection: 'row', width:'100%', justifyContent: 'space-between', alignItems:'center'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
           <SubTitleBold style={{color: 'grey'}} title={title} />
           <SearchBar style={{width: 200}} />
         </View>
@@ -86,7 +89,7 @@ const CategoryPage: React.FC<Props> = ({navigation, route}) => {
           ListFooterComponent={<EndLine />}
         />
       </LoadingContainer>
-    </View>
+    </Container>
   );
 };
 

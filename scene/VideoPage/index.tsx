@@ -14,7 +14,6 @@ import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../type/RecommandInfo';
-import {VideoPageProps} from '../../App';
 import {V1RecommandInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import History from '../../models/History';
@@ -23,9 +22,12 @@ import {UpdateMode} from 'realm';
 import {LoadingBox, LoadingContainer} from '../../component/Loading';
 import Anime from '../../models/Anime';
 import Follow from '../../models/Follow';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {VideoPageProps} from '../../type/route';
+import Container from '../../component/Container';
 const {useRealm} = Context;
 
-const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
+const VideoPage: React.FC<{}> = () => {
   const emptyInfoSub = {
     author: '未知',
     alias: [],
@@ -34,7 +36,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
     type: [],
     produce: '',
   };
-
+  const route = useRoute<VideoPageProps['route']>();
+  const navigation = useNavigation<VideoPageProps['navigation']>();
   const {url} = route.params;
 
   const [index, setIndex] = useState(0);
@@ -142,8 +145,8 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
     agent.current.load();
 
     //查看数据库看是否追番
-    const _follow = realm.objectForPrimaryKey(Follow, url)
-    setFollowed(!!_follow && _follow!.following)
+    const _follow = realm.objectForPrimaryKey(Follow, url);
+    setFollowed(!!_follow && _follow!.following);
   }, []);
 
   //切换视频选集
@@ -220,13 +223,13 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
   };
 
   return (
-    <>
+    <Container>
       <Player
         title={`${title} ${
           anthologys[anthologyIndex] ? anthologys[anthologyIndex].title : ''
         }`}
         onBack={() => {
-          navigation.navigate('Animation');
+          navigation.goBack();
         }}
         videoUrl={videoUrl}
         videoType={videoType}
@@ -319,7 +322,7 @@ const VideoPage: React.FC<VideoPageProps> = ({route, navigation}) => {
         }}
         onPress={changeAnthology}
       />
-    </>
+    </Container>
   );
 };
 

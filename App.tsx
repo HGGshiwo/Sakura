@@ -30,6 +30,59 @@ import UserPage from './scene/UserPage';
 
 const {RealmProvider} = Context;
 
+const Tab = createBottomTabNavigator();
+const icons = {
+  Anime: faYoutube,
+  User: faUser,
+  Novel: faBook,
+  Comic: faPalette,
+};
+const UserStackScreen = () => {
+  return <></>;
+};
+const texts = {
+  Anime: '番剧',
+  User: '我的',
+  Novel: '小说',
+  Comic: '漫画',
+};
+const TabPage = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({route}) => ({
+        tabBarIcon: ({focused, color, size}) => {
+          let icon = icons[route.name as keyof typeof icons];
+          // You can return any component that you like here!
+          return (
+            <FontAwesomeIcon
+              icon={icon}
+              size={18}
+              color={focused ? 'deeppink' : 'grey'}
+            />
+          );
+        },
+        headerShown: false,
+        tabBarLabel: ({focused, color, position}) => {
+          return (
+            <Text
+              style={{
+                paddingBottom: 8,
+                fontSize: 10,
+                color: focused ? 'deeppink' : 'grey',
+              }}>
+              {texts[route.name as keyof typeof texts]}
+            </Text>
+          );
+        },
+      })}>
+      <Tab.Screen name="Anime" component={AnimePage} />
+      <Tab.Screen name="Novel" component={UserStackScreen} />
+      <Tab.Screen name="Comic" component={UserStackScreen} />
+      <Tab.Screen name="User" component={UserPage} />
+    </Tab.Navigator>
+  );
+};
+
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -37,75 +90,14 @@ function App(): JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const Tab = createBottomTabNavigator();
-  const icons = {
-    Animation: faYoutube,
-    User: faUser,
-    Novel: faBook,
-    Comic: faPalette,
-  };
-
-  const texts = {
-    Animation: '番剧',
-    User: '我的',
-    Novel: '小说',
-    Comic: '漫画',
-  };
-
-  const TabPage = () => {
-    return (
-      <Tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            let icon = icons[route.name as keyof typeof icons];
-            // You can return any component that you like here!
-            return (
-              <FontAwesomeIcon
-                icon={icon}
-                size={18}
-                color={focused ? 'deeppink' : 'grey'}
-              />
-            );
-          },
-          headerShown: false,
-          tabBarLabel: ({focused, color, position}) => {
-            return (
-              <Text
-                style={{
-                  paddingBottom: 8,
-                  fontSize: 10,
-                  color: focused ? 'deeppink' : 'grey',
-                }}>
-                {texts[route.name as keyof typeof texts]}
-              </Text>
-            );
-          },
-        })}>
-        <Tab.Screen name="Animation" component={AnimePage} />
-        <Tab.Screen name="Novel" component={UserStackScreen} />
-        <Tab.Screen name="Comic" component={UserStackScreen} />
-        <Tab.Screen name="User" component={UserPage} />
-      </Tab.Navigator>
-    );
-  };
-
-  const UserStackScreen = () => {
-    return <></>;
-  };
   const Stack = createNativeStackNavigator();
 
   return (
     <SafeAreaProvider style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor='#ff4081'
-      />
-
       <NavigationContainer>
         <GestureHandlerRootView style={{flex: 1}}>
           <RealmProvider>
             <Stack.Navigator
-              initialRouteName="home"
               screenOptions={{headerShown: false}}>
               <Stack.Screen name="Tab" component={TabPage} />
               <Stack.Screen name="Video" component={VideoPage} />
@@ -119,12 +111,5 @@ function App(): JSX.Element {
     </SafeAreaProvider>
   );
 }
-type RootStackParamList = {
-  Animation: undefined;
-  Video: {url: string};
-  Search: undefined;
-};
 
-type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
-export type {VideoPageProps};
 export default App;
