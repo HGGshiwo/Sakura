@@ -1,7 +1,6 @@
 import {Tab, TabView} from '@rneui/themed';
 import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, Dimensions, View, FlatList} from 'react-native';
-import {Agent} from '../../api/yinghuacd/VideoAgent';
 import {ListItemInfo} from '../../type/ListItemInfo';
 import {Source} from '../../type/Source';
 import {InfoSub} from '../../type/InfoSub';
@@ -25,12 +24,13 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../type/route';
 import Container from '../../component/Container';
 import {Divider} from '@rneui/themed';
+import loadPage, {loadVideoSrc} from '../../api/yinghuacd/video';
 const {useRealm} = Context;
 
 const VideoPage: React.FC<{}> = () => {
   const emptyInfoSub = {
     author: '未知',
-    alias: [],
+    alias: '',
     state: '',
     time: '',
     type: [],
@@ -75,7 +75,6 @@ const VideoPage: React.FC<{}> = () => {
 
   //数据相关
   const realm = useRealm();
-  const agent = useRef(new Agent(url));
 
   useEffect(() => {
     const {height, width} = Dimensions.get('window');
@@ -83,66 +82,63 @@ const VideoPage: React.FC<{}> = () => {
     setWindowWidth(width);
     setVideoHeight(width * ratio);
 
-    agent.current.afterLoad(
-      ({title, img, infoSub, recommands, sources, info}) => {
-        const _anthologys = sources.map((_source, index) => {
-          return {id: index, data: _source.data, title: _source.key};
-        });
+    loadPage(url, ({title, img, infoSub, recommands, sources, info}) => {
+      const _anthologys = sources.map((_source, index) => {
+        return {id: index, data: _source.data, title: _source.key};
+      });
 
-        const _history = realm.objectForPrimaryKey(History, url);
+      const _history = realm.objectForPrimaryKey(History, url);
 
-        //更新番剧数据库
-        realm.write(() => {
-          realm.create(
-            Anime,
-            {
-              href: url,
-              img,
-              state: infoSub.state,
-              title,
-            },
-            UpdateMode.Modified,
-          );
-        });
-
-        //更新历史记录数据库
-        realm.write(() => {
-          history.current = realm.create(
-            History,
-            {
-              href: url,
-              time: new Date().getTime(),
-              anthologyIndex: _history ? _history.anthologyIndex : 0,
-              progress: _history ? _history.progress : 0,
-              progressPer: _history ? _history.progressPer : 0,
-              anthologyTitle: _history ? _history.anthologyTitle : '',
-            },
-            UpdateMode.Modified,
-          );
-        });
-
-        setTitle(title);
-        setImgUrl(img);
-        setInfoSub(infoSub);
-        setRecommands(recommands);
-        setSources(sources);
-
-        setAnthologys(_anthologys);
-        setInfo(info);
-        setRelatives(relatives);
-        setDefaultProgress(history.current!.progress);
-
-        setLoading(false); //页面内容获取成功，页面不再加载
-        setNextVideoAvailable(
-          history.current!.anthologyIndex + 1 < anthologys.length,
+      //更新番剧数据库
+      realm.write(() => {
+        realm.create(
+          Anime,
+          {
+            href: url,
+            img,
+            state: infoSub.state,
+            title,
+          },
+          UpdateMode.Modified,
         );
-        setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
-        curSourceIndex.current = 0;
-        curSources.current = sources[history.current!.anthologyIndex].data;
-        switchVideoSrc();
-      },
-    );
-    agent.current.load();
+      });
+
+      //更新历史记录数据库
+      realm.write(() => {
+        history.current = realm.create(
+          History,
+          {
+            href: url,
+            time: new Date().getTime(),
+            anthologyIndex: _history ? _history.anthologyIndex : 0,
+            progress: _history ? _history.progress : 0,
+            progressPer: _history ? _history.progressPer : 0,
+            anthologyTitle: _history ? _history.anthologyTitle : '',
+          },
+          UpdateMode.Modified,
+        );
+      });
+
+      setTitle(title);
+      setImgUrl(img);
+      setInfoSub(infoSub);
+      setRecommands(recommands);
+      setSources(sources);
+
+      setAnthologys(_anthologys);
+      setInfo(info);
+      setRelatives(relatives);
+      setDefaultProgress(history.current!.progress);
+
+      setLoading(false); //页面内容获取成功，页面不再加载
+      setNextVideoAvailable(
+        history.current!.anthologyIndex + 1 < anthologys.length,
+      );
+      setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
+      curSourceIndex.current = 0;
+      curSources.current = sources[history.current!.anthologyIndex].data;
+      switchVideoSrc();
+    });
 
     //查看数据库看是否追番
     const _follow = realm.objectForPrimaryKey(Follow, url);
@@ -178,21 +174,18 @@ const VideoPage: React.FC<{}> = () => {
       );
       const vUrl = curSources.current[curSourceIndex.current];
       curSourceIndex.current += 1;
-      agent.current.loadVideoSrc(
-        vUrl,
-        (state: boolean, src: string, type: string) => {
-          if (videoUrlAvailableRef.current) return;
-          console.log(state, src, type);
-          if (state) {
-            setVideoUrl(src);
-            setVideoType(type);
-            setVideoUrlAvailable(true);
-            videoUrlAvailableRef.current = true;
-          } else {
-            switchVideoSrc();
-          }
-        },
-      );
+      loadVideoSrc(vUrl, (state: boolean, src?: string, type?: string) => {
+        if (videoUrlAvailableRef.current) return;
+        console.log(state, src, type);
+        if (state) {
+          setVideoUrl(src!);
+          setVideoType(type!);
+          setVideoUrlAvailable(true);
+          videoUrlAvailableRef.current = true;
+        } else {
+          switchVideoSrc();
+        }
+      });
     }
   };
 

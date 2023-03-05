@@ -15,20 +15,22 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
-import VideoPage from './scene/VideoPage';
-import AnimePage from './scene/AnimePage';
-import SearchPage from './scene/SearchPage';
-import CategoryPage from './scene/CategoryPage';
-
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import Context from './models';
-import IndexPage from './scene/IndexPage';
-import UserPage from './scene/UserPage';
-import HistoryPage from './scene/HistoryPage';
-import FollowPage from './scene/FollowPage';
+
+import {
+  VideoPage,
+  AnimePage,
+  CategoryPage,
+  FollowPage,
+  HistoryPage,
+  IndexPage,
+  SearchPage,
+  UserPage,
+} from './scene/Anime';
 
 const {RealmProvider} = Context;
 
@@ -93,7 +95,7 @@ const routes = [
   {name: 'Index', component: IndexPage},
   {name: 'History', component: HistoryPage},
   {name: 'Follow', component: FollowPage},
-]
+];
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -109,10 +111,13 @@ function App(): JSX.Element {
       <NavigationContainer>
         <GestureHandlerRootView style={{flex: 1}}>
           <RealmProvider>
-            <Stack.Navigator
-              screenOptions={{headerShown: false}}>
-              {routes.map((route, index)=>(
-                <Stack.Screen key={index} name={route.name} component={route.component}/>
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              {routes.map((route, index) => (
+                <Stack.Screen
+                  key={index}
+                  name={route.name}
+                  component={route.component}
+                />
               ))}
             </Stack.Navigator>
           </RealmProvider>

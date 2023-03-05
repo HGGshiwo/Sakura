@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {View, FlatList} from 'react-native';
 import {SearchBar} from '../../component/SearchBar';
-import {Agent} from '../../api/yinghuacd/SearchAgent';
 import {InfoText} from '../../component/Text';
 import {Divider} from '@rneui/themed';
 import {SearchInfo} from '../../type/SearchInfo';
@@ -11,24 +10,20 @@ import {LoadingContainer} from '../../component/Loading';
 import {useNavigation} from '@react-navigation/native';
 import {SearchPageProps} from '../../type/route';
 import Container from '../../component/Container';
+import loadPage from '../../api/yinghuacd/search';
 
 interface Props {}
 const SearchPage: React.FC<Props> = () => {
-  const agent = useRef<Agent>();
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<SearchPageProps['navigation']>();
-  useEffect(() => {
-    agent.current = new Agent();
-    agent.current.afterSearch(_results => {
-      setResults(_results);
-      setLoading(false);
-    });
-  }, []);
 
   const onChangeText = (text: string) => {
     setLoading(true);
-    agent.current?.search(text);
+    loadPage(text, _results => {
+      setResults(_results);
+      setLoading(false);
+    });
   };
 
   return (

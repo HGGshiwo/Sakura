@@ -1,4 +1,3 @@
-import {FAB} from '@rneui/themed';
 import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import Scrubber from '../Scrubber';
 import Video, {
@@ -8,10 +7,8 @@ import Video, {
   OnSeekData,
 } from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {TouchableWithoutFeedback} from 'react-native';
-import {faChevronLeft, faExpand} from '@fortawesome/free-solid-svg-icons';
-import {ReactDOM, useEffect, useRef, useState} from 'react';
-import sec_to_time from '../../../public/sec_to_time';
+import {faExpand} from '@fortawesome/free-solid-svg-icons';
+import {useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
 import {LoadingText} from '../../../component/Text';
@@ -35,6 +32,23 @@ interface PlayerProps {
   onProgress: (progress: number, perProgress: number) => void;
   defaultProgress: number; //初始的进度
 }
+
+//时间转化函数
+var sec_to_time = (s: number): string => {
+  var t = '';
+  if (s > -1) {
+    var hour = Math.floor(s / 3600);
+    var min = Math.floor(s / 60) % 60;
+    var sec = Math.floor(s % 60);
+    if(hour > 0) {
+      t = hour < 10? `0${hour}:`:`${hour}:`;
+    }
+    t = min < 10? `${t}0${min}`:`${t}${min}`;
+    t = sec < 10? `${t}:0${sec}`:`${t}:${sec}`
+  }
+  return t;
+};
+
 
 const Player: React.FC<PlayerProps> = ({
   videoUrlAvailable,
@@ -136,7 +150,7 @@ const Player: React.FC<PlayerProps> = ({
     seekingRef.current = true;
   };
 
-  const onSeek = (data: OnSeekData) => {
+  const onSeek = () => {
     seekingRef.current = false;
   };
 

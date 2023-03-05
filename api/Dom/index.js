@@ -21,7 +21,7 @@ class Dom {
     this.innerHTML = innerText(this._dom)
   }
 
-  getElementsByClass(className) {
+  getElementsByClassName(className) {
     let results = getElements({class: className}, this._dom, true);
     return results.map(result => {
       return new Dom(result);

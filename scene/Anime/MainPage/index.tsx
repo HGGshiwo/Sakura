@@ -1,14 +1,13 @@
 import {View, useWindowDimensions} from 'react-native';
 
 import React, {useState} from 'react';
-import {SearchBar} from '../../component/SearchBar';
+import {SearchBar} from '../../../component/SearchBar';
 import {TabBar, TabView} from 'react-native-tab-view';
 import Home from './Home';
 import Other from './Other';
-import Container from '../../component/Container';
-import { useNavigation} from '@react-navigation/native';
-import { AnimePageProps } from '../../type/route';
-
+import Container from '../../../component/Container';
+import {useNavigation} from '@react-navigation/native';
+import {AnimePageProps} from '../../../type/route';
 
 const url = {
   rbdm: {url: 'ribendongman/', title: '日本动漫'},
@@ -19,13 +18,13 @@ const url = {
 };
 
 const AnimePage: React.FC<{}> = () => {
-  const navigation = useNavigation<AnimePageProps["navigation"]>()
+  const navigation = useNavigation<AnimePageProps['navigation']>();
 
-  const renderScene = ({route}:any) =>
+  const renderScene = ({route}: any) =>
     route.key === 'home' ? (
-      <Home/>
+      <Home />
     ) : (
-      <Other {...url[route.key as keyof typeof url]}/>
+      <Other {...url[route.key as keyof typeof url]} />
     );
 
   const layout = useWindowDimensions();

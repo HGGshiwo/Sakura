@@ -1,23 +1,23 @@
 import {SectionList} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {Agent} from '../../api/yinghuacd/HomeAgent';
-import {RecommandInfo} from '../../type/RecommandInfo';
-import {ParallaxCarousel} from '../../component/ParallaxCarousel';
-import {NavBar} from '../../component/NavBar';
-import MultiItemRow from '../../component/MultiItemRow';
-import {ListTitleLine} from '../../component/ListTitleLine';
+import {RecommandInfo} from '../../../type/RecommandInfo';
+import {ParallaxCarousel} from '../../../component/ParallaxCarousel';
+import {NavBar} from '../../../component/NavBar';
+import MultiItemRow from '../../../component/MultiItemRow';
+import {ListTitleLine} from '../../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
 import {
   H1HistoryInfoItem,
   V2RecommandInfoItemItem,
-} from '../../component/ListItem';
-import Context from '../../models';
-import History from '../../models/History';
-import HistoryInfo from '../../type/HistoryInfo';
-import {LoadingContainer} from '../../component/Loading';
-import Anime from '../../models/Anime';
-import { useNavigation } from '@react-navigation/native';
-import { AnimeHomeProps } from '../../type/route';
+} from '../../../component/ListItem';
+import Context from '../../../models';
+import History from '../../../models/History';
+import HistoryInfo from '../../../type/HistoryInfo';
+import {LoadingContainer} from '../../../component/Loading';
+import Anime from '../../../models/Anime';
+import {useNavigation} from '@react-navigation/native';
+import {AnimeHomeProps} from '../../../type/route';
+import loadPage from '../../../api/yinghuacd/home';
 const {useRealm, useQuery} = Context;
 
 const Home: React.FC<{}> = () => {
@@ -28,7 +28,7 @@ const Home: React.FC<{}> = () => {
   const [text, setText] = useState('加载中...');
   const _historys = useQuery<History>(History);
   const realm = useRealm();
-  const navigation = useNavigation<AnimeHomeProps["navigation"]>()
+  const navigation = useNavigation<AnimeHomeProps['navigation']>();
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
@@ -49,19 +49,16 @@ const Home: React.FC<{}> = () => {
   }, [_historys]);
 
   useEffect(() => {
-    console.log('mount');
-    const agent = new Agent();
-    agent.afterLoad(({carousels, sections, dailys}) => {
-      setCarousels(carousels);
-      setSections(sections);
-      setLoading(false);
-    });
-
-    agent.afterErr((err: string) => {
-      setText(err);
-    });
-
-    agent.load();
+    loadPage(
+      ({carousels, sections, dailys}) => {
+        setCarousels(carousels);
+        setSections(sections);
+        setLoading(false);
+      },
+      (err: string) => {
+        setText(err);
+      },
+    );
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 type InfoSub = {
     author: string,
-    alias: string[],
+    alias: string,
     state: srting,
     time: string,
     type: string[]

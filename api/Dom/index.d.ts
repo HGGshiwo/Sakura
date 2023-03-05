@@ -6,11 +6,12 @@ class Dom {
     _dom: Document;
     src: string | null;
     href: string | null;
+    "data-vid": string|null;
     innerHTML: string;
     style:string;
     
     constructor(dom: Document);
-    getElementsByClass(className: string): Dom[] | null;
+    getElementsByClassName(className: string): Dom[] | null;
     getElementsByTagName(tagName: string): Dom[] | null;
     getElementById(id: string): Dom | null;
     

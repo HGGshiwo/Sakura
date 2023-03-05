@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList, View} from 'react-native';
-import {Agent} from '../../api/yinghuacd/CategoryAgent';
+import loadPage from '../../api/yinghuacd/category';
 import Container from '../../component/Container';
 import EndLine from '../../component/EndLine';
 import HeadBar from '../../component/HeadBar';
@@ -25,13 +25,11 @@ const CategoryPage: React.FC<{}> = () => {
   const {url, title} = route.params;
 
   useEffect(() => {
-    const agent = new Agent();
-    agent.afterLoad(({carousels, sections}) => {
+    loadPage(url, ({carousels, sections}) => {
       setCarousels(carousels);
       setSections(sections);
       setLoading(false);
     });
-    agent.load(url);
   }, []);
 
   return (
@@ -57,11 +55,7 @@ const CategoryPage: React.FC<{}> = () => {
           ListHeaderComponent={
             <>
               <ParallaxCarousel carousels={carousels} />
-              <NavBar
-                onPress={href => {
-                  navigation.navigate(href, {title: '全部动漫', url: 'japan/'});
-                }}
-              />
+              <NavBar />
             </>
           }
           sections={sections}
