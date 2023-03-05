@@ -1,6 +1,6 @@
 import {Image} from '@rneui/themed';
 import * as React from 'react';
-import {View, Dimensions} from 'react-native';
+import {View, Dimensions, useWindowDimensions} from 'react-native';
 import Animated, {
   Extrapolate,
   interpolate,
@@ -26,11 +26,7 @@ type parallaxCarouselProps = {
 const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
 
   const progressValue = useSharedValue<number>(0);
-  const [windowWidth, setWindowWidth] = React.useState(100);
-  React.useEffect(() => {
-    const {width} = Dimensions.get('window');
-    setWindowWidth(width);
-  }, []);
+  const layout = useWindowDimensions();
 
   type renderItemProps = {item: RecommandInfo};
 
@@ -43,10 +39,10 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
       }}>
       <Carousel
         vertical={false}
-        width={windowWidth * 0.86}
-        height={windowWidth * 0.6}
+        width={layout.width-20}
+        height={180}
         style={{
-          width: windowWidth * 0.86,
+          width: layout.width-20,
         }}
         loop
         pagingEnabled={true}

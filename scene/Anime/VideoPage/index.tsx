@@ -1,58 +1,69 @@
-import {Tab, TabView} from '@rneui/themed';
-import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, Dimensions, View, FlatList} from 'react-native';
+import React, {useState, useEffect, useRef, createRef} from 'react';
+import {
+  View,
+  useWindowDimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+} from 'react-native';
 import {ListItemInfo} from '../../../type/ListItemInfo';
 import {Source} from '../../../type/Source';
 import {InfoSub} from '../../../type/InfoSub';
 import {DetailSheet} from './DetailSheet';
-import {ListLine} from './ListLine';
-import {DetailButtonLine} from './DetailButtonLine';
-import {ListTitleLine} from '../../../component/ListTitleLine';
 import {Player} from './Player';
-import {RelaviteLine} from './RelaviteLine';
-import {TitleLine} from './TitleLine';
 import {AnthologySheet} from './AnthologySheet';
 import {RecommandInfo} from '../../../type/RecommandInfo';
-import {V1RecommandInfoItem} from '../../../component/ListItem';
 import Context from '../../../models';
 import History from '../../../models/History';
 import {UpdateMode} from 'realm';
-import {LoadingContainer} from '../../../component/Loading';
 import Anime from '../../../models/Anime';
 import Follow from '../../../models/Follow';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../../type/route';
 import Container from '../../../component/Container';
-import {Divider} from '@rneui/themed';
 import loadPage, {loadVideoSrc} from '../../../api/yinghuacd/video';
-import {RateText} from '../../../component/Text';
+import {InfoText, SubTitle} from '../../../component/Text';
+import {TabBar, TabView} from 'react-native-tab-view';
+import Profile from './Profile';
+import MultiItemRow from '../../../component/MultiItemRow';
+import { LoadingContainer } from '../../../component/Loading';
 const {useRealm} = Context;
 
+const emptyInfoSub = {
+  author: '未知',
+  alias: '',
+  state: '',
+  time: '',
+  type: [],
+  produce: '',
+};
+
+const Command = () => <View style={{flex: 1}}></View>;
+
+const routes = [
+  {key: 'profile', title: '简介'},
+  {key: 'command', title: '评论'},
+];
+
 const VideoPage: React.FC<{}> = () => {
-  const emptyInfoSub = {
-    author: '未知',
-    alias: '',
-    state: '',
-    time: '',
-    type: [],
-    produce: '',
-  };
+  const layout = useWindowDimensions();
+  const videoHeight = layout.width * 0.56;
   const route = useRoute<VideoPageProps['route']>();
   const navigation = useNavigation<VideoPageProps['navigation']>();
   const {url} = route.params;
-
   const [index, setIndex] = useState(0);
-  const [windowHeight, setWindowHeight] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(0);
 
   //视频播放相关
   const [videoUrl, setVideoUrl] = useState('');
   const [videoType, setVideoType] = useState('');
-  const [videoHeight, setVideoHeight] = useState(0);
   const [videoUrlAvailable, setVideoUrlAvailable] = useState(false); //url是否准备好
   const curSourceIndex = useRef(0); //当前的source源
   const curSources = useRef<string[]>([]); //当前可用的源
   const videoUrlAvailableRef = useRef(false); //视频是否可以播放，不能使用useState
+  const [detailLineVisible, setDetailSheetVisible] = useState(false);
+  const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
+  const [defaultProgress, setDefaultProgress] = useState(0);
+  const [nextVideoAvailable, setNextVideoAvailable] = useState(false);
 
   //页面显示相关
   const [title, setTitle] = useState('');
@@ -64,31 +75,74 @@ const VideoPage: React.FC<{}> = () => {
   const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
   const [recommands, setRecommands] = useState<RecommandInfo[]>([]); //同系列列表
   const [anthologyIndex, setAnthologyIndex] = useState(0);
-  const [detailLineVisible, setDetailSheetVisible] = useState(false);
-  const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
-  const [nextVideoAvailable, setNextVideoAvailable] = useState(false);
-  const [defaultProgress, setDefaultProgress] = useState(0);
+  const [refreshing, setRefreshing] = useState(false); //是否刷新
   const [loading, setLoading] = useState(true); //页面是否在加载中
   const [followed, setFollowed] = useState(false); //是否追番
-
-  const ratio = 0.56; //视频长宽比例
   const history = useRef<History | null>();
+  const ItemListRef = createRef<FlatList<ListItemInfo>>();
+
+  const renderScene = ({route}: any) => {
+    switch (route.key) {
+      case 'profile':
+        return (
+          <LoadingContainer
+          loading={loading}
+          style={{paddingTop: 40}}
+          backgroundColor="grey"
+          color="grey"
+          text="加载中...">
+          <Profile
+            refreshing={refreshing}
+            init={init}
+            url={url}
+            title={title}
+            imgUrl={imgUrl}
+            infoSub={infoSub}
+            info={info}
+            relatives={relatives}
+            recommands={recommands}
+            followed={followed}
+            setAnthologySheetVisible={setAnthologySheetVisible}
+            setDetailSheetVisible={setDetailSheetVisible}>
+            <FlatList
+              ref={ItemListRef}
+              getItemLayout={(item, index)=>({length: 160, offset: 160 * index, index})}
+              style={{marginBottom: 20}}
+              horizontal={true}
+              data={anthologys}
+              renderItem={({item, index}) => (
+                <Pressable onPress={() => changeAnthology(item.id)}>
+                  <View style={styles.itemContainer2}>
+                    <SubTitle
+                      title={item.title}
+                      active={anthologyIndex === index}
+                    />
+                  </View>
+                </Pressable>
+              )}
+              keyExtractor={item => `${item.id}`}
+            />
+          </Profile>
+          </LoadingContainer>
+        );
+      case 'command':
+        return <Command />;
+      default:
+        return null;
+    }
+  };
 
   //数据相关
   const realm = useRealm();
 
-  useEffect(() => {
-    const {height, width} = Dimensions.get('window');
-    setWindowHeight(height);
-    setWindowWidth(width);
-    setVideoHeight(width * ratio);
-
+  const init = () => {
+    setRefreshing(true)
     loadPage(url, ({title, img, infoSub, recommands, sources, info}) => {
       const _anthologys = sources.map((_source, index) => {
         return {id: index, data: _source.data, title: _source.key};
       });
 
-      const _history = realm.objectForPrimaryKey(History, url);
+      let _history = realm.objectForPrimaryKey(History, url);
 
       //更新番剧数据库
       realm.write(() => {
@@ -134,6 +188,7 @@ const VideoPage: React.FC<{}> = () => {
       setDefaultProgress(history.current!.progress);
 
       setLoading(false); //页面内容获取成功，页面不再加载
+      setRefreshing(false);
       setNextVideoAvailable(
         history.current!.anthologyIndex + 1 < _anthologys.length,
       );
@@ -146,7 +201,17 @@ const VideoPage: React.FC<{}> = () => {
     //查看数据库看是否追番
     const _follow = realm.objectForPrimaryKey(Follow, url);
     setFollowed(!!_follow && _follow!.following);
-  }, []);
+  }
+
+  useEffect(init, []);
+
+  useEffect(() => {
+    if (ItemListRef.current) {
+      ItemListRef.current!.scrollToIndex({
+        index: history.current!.anthologyIndex,
+      });
+    }
+  }, [ItemListRef]);
 
   //切换视频选集
   const changeAnthology = (index: number) => {
@@ -192,29 +257,11 @@ const VideoPage: React.FC<{}> = () => {
     }
   };
 
-  const onPressRecommand = (item: RecommandInfo) => {
-    navigation.push('Video', {url: item.href});
-  };
-
   //更新进度回调函数
   const onVideoUnMounted = (progress: number, progressPer: number) => {
     realm.write(() => {
       history.current!.progress = progress;
       history.current!.progressPer = progressPer;
-    });
-  };
-
-  //点击追番按钮的回调函数
-  const handlePressFollowed = (followed: boolean) => {
-    realm.write(() => {
-      realm.create(
-        Follow,
-        {
-          href: url,
-          following: followed,
-        },
-        UpdateMode.Modified,
-      );
     });
   };
 
@@ -237,68 +284,36 @@ const VideoPage: React.FC<{}> = () => {
         defaultProgress={defaultProgress}
       />
 
-      <Tab value={index} onChange={setIndex} dense style={styles.tabContainer}>
-        <Tab.Item>简介</Tab.Item>
-        <Tab.Item>评论</Tab.Item>
-      </Tab>
-      <LoadingContainer
-        loading={loading}
-        style={{paddingTop: 40}}
-        backgroundColor="grey"
-        color="grey"
-        text="加载中...">
-        <TabView containerStyle={{flex: 1}} value={index} onChange={setIndex}>
-          <TabView.Item style={{flex: 1}}>
-            <FlatList
-              ListHeaderComponent={
-                <>
-                  <View style={{padding: 10, width: windowWidth}}>
-                    <TitleLine
-                      title={title}
-                      onPress={handlePressFollowed}
-                      followed={followed}
-                    />
-                    <DetailButtonLine
-                      author={infoSub.author}
-                      onPress={() => setDetailSheetVisible(true)}
-                    />
-                    <ListTitleLine
-                      title={'选集'}
-                      buttonText={infoSub?.state}
-                      onPress={() => setAnthologySheetVisible(true)}
-                    />
-                    {relatives.length == 0 ? null : (
-                      <RelaviteLine relatives={relatives} />
-                    )}
-                    <ListLine
-                      data={anthologys}
-                      onPress={changeAnthology}
-                      activeIndex={anthologyIndex}
-                    />
-                  </View>
-                  <Divider />
-                </>
-              }
-              data={recommands}
-              ItemSeparatorComponent={() => <Divider />}
-              renderItem={({item, index}) => (
-                <V1RecommandInfoItem
-                  index={index}
-                  item={item}
-                  onPress={onPressRecommand}>
-                  <RateText title="9.7" />
-                </V1RecommandInfoItem>
-              )}
-              keyExtractor={item => `${item.href}`}
-            />
-          </TabView.Item>
-          <TabView.Item></TabView.Item>
-        </TabView>
-      </LoadingContainer>
+      <TabView
+        lazy
+        renderTabBar={(props: any) => (
+          <TabBar
+            scrollEnabled
+            {...props}
+            indicatorStyle={{backgroundColor: 'deeppink'}}
+            renderLabel={({route, focused, color}) => (
+              <InfoText
+                title={route.title!}
+                style={{
+                  color: focused ? 'deeppink' : 'black',
+                  paddingHorizontal: 5,
+                  fontWeight: focused ? 'bold' : 'normal',
+                }}
+              />
+            )}
+            style={{backgroundColor: 'white'}}
+            tabStyle={{width: 'auto'}}
+          />
+        )}
+        navigationState={{index, routes}}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{width: layout.width}}
+      />
 
       <DetailSheet
         top={videoHeight}
-        height={windowHeight - videoHeight}
+        height={layout.height - videoHeight}
         title={title}
         src={imgUrl}
         infoSub={infoSub}
@@ -311,25 +326,59 @@ const VideoPage: React.FC<{}> = () => {
 
       <AnthologySheet
         top={videoHeight}
-        height={windowHeight - videoHeight}
-        anthologys={anthologys}
-        activeIndex={anthologyIndex}
+        height={layout.height - videoHeight}
         state={infoSub.state}
         visible={anthologySheetVisible}
         onClose={() => {
           setAnthologySheetVisible(false);
-        }}
-        onPress={changeAnthology}
-      />
+        }}>
+        <FlatList
+          contentContainerStyle={{paddingBottom: 50}}
+          data={anthologys}
+          renderItem={({item, index}) => (
+            <MultiItemRow
+              numberOfItem={2}
+              children={(index, info) => (
+                <Pressable
+                  style={{flex: 1}}
+                  onPress={() => changeAnthology(index)}
+                  key={index}>
+                  <View style={styles.itemContainer}>
+                    <SubTitle
+                      title={item.title}
+                      active={index === anthologyIndex}
+                    />
+                  </View>
+                </Pressable>
+              )}
+              index={index}
+              datas={anthologys}
+            />
+          )}
+        />
+      </AnthologySheet>
     </Container>
   );
 };
 
-// Later on in your styles..
-var styles = StyleSheet.create({
-  tabContainer: {
-    width: '30%',
-    marginLeft: 10,
+const styles = StyleSheet.create({
+  itemContainer: {
+    backgroundColor: '#f1f2f3',
+    flex: 1,
+    height: 75,
+    margin: 5,
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'space-between',
+  },
+  itemContainer2: {
+    backgroundColor: '#f1f2f3',
+    width: 150,
+    height: 70,
+    marginHorizontal: 10,
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'space-between',
   },
 });
 

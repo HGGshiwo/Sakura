@@ -2,7 +2,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
-import loadPage from '../../api/yinghuacd/search';
+import loadPage from '../../api/yinghuacd/index';
 import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
 import {V3RecommandInfoItem} from '../../component/ListItem';
@@ -11,10 +11,9 @@ import MultiItemRow from '../../component/MultiItemRow';
 import {SubTitleBold} from '../../component/Text';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {IndexPageProps} from '../../type/route';
-import {SearchInfo} from '../../type/SearchInfo';
 
 const IndexPage: React.FC<{}> = () => {
-  const [results, setResults] = useState<SearchInfo[]>([]);
+  const [results, setResults] = useState<RecommandInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const route = useRoute<IndexPageProps['route']>();
   const navigation = useNavigation<IndexPageProps['navigation']>();
@@ -41,7 +40,7 @@ const IndexPage: React.FC<{}> = () => {
       <LoadingContainer loading={loading}>
         <FlatList
           contentContainerStyle={{paddingHorizontal: 15}}
-          keyExtractor={item => `${item.id}`}
+          keyExtractor={item => item.href}
           data={results}
           renderItem={({item, index}) => (
             <MultiItemRow

@@ -8,6 +8,7 @@ import Other from './Other';
 import Container from '../../../component/Container';
 import {useNavigation} from '@react-navigation/native';
 import {AnimePageProps} from '../../../type/route';
+import {InfoText} from '../../../component/Text';
 
 const url = {
   rbdm: {url: 'ribendongman/', title: '日本动漫'},
@@ -63,6 +64,16 @@ const AnimePage: React.FC<{}> = () => {
             scrollEnabled
             {...props}
             indicatorStyle={{backgroundColor: 'white'}}
+            renderLabel={({route, focused, color}) => (
+              <InfoText
+                title={route.title}
+                style={{
+                  color,
+                  paddingHorizontal: 5,
+                  fontWeight: focused ? 'bold' : 'normal',
+                }}
+              />
+            )}
             style={{backgroundColor: '#ff4081'}}
             tabStyle={{width: 'auto'}}
           />

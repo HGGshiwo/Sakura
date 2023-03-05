@@ -29,6 +29,7 @@ const Home: React.FC<{}> = () => {
   const _historys = useQuery<History>(History);
   const realm = useRealm();
   const navigation = useNavigation<AnimeHomeProps['navigation']>();
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
@@ -48,22 +49,28 @@ const Home: React.FC<{}> = () => {
     setHistorys(historys);
   }, [_historys]);
 
-  useEffect(() => {
+  const init = () => {
+    setRefreshing(true)
     loadPage(
       ({carousels, sections, dailys}) => {
         setCarousels(carousels);
         setSections(sections);
         setLoading(false);
+        setRefreshing(false)
       },
       (err: string) => {
         setText(err);
       },
     );
-  }, []);
+  }
+
+  useEffect(init, []);
 
   return (
     <LoadingContainer loading={loading} text={text} style={{paddingTop: '30%'}}>
       <SectionList
+        refreshing={refreshing}
+        onRefresh={init}
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
           <>
@@ -73,7 +80,7 @@ const Home: React.FC<{}> = () => {
               show={historys.length !== 0}
               title="最近在看"
               buttonText="更多"
-              onPress={() => {}}
+              onPress={() => {navigation.navigate('History')}}
             />
             <FlatList
               horizontal
@@ -114,7 +121,7 @@ const Home: React.FC<{}> = () => {
             title={title}
             buttonText="更多"
             onPress={() => {
-              navigation.navigate('Category', {url: href, title});
+              navigation.navigate('Index', {url: 'japan/', title});
             }}
           />
         )}

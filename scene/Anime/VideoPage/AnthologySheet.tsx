@@ -6,46 +6,26 @@ import {Pressable} from 'react-native';
 import {faXmark} from '@fortawesome/free-solid-svg-icons';
 import {SubTitle, SubTitleBold} from '../../../component/Text';
 import MultiItemRow from '../../../component/MultiItemRow';
+import { ReactNode } from 'react';
+import { CloseButton } from '../../../component/Button';
 
 type anthologySheetProps = {
   height: number;
   top: number;
-  anthologys: ListItemInfo[];
   state: string;
   visible: boolean;
-  onPress: (index: number) => void;
   onClose: () => void;
-  activeIndex: number;
+  children: ReactNode;
 };
 
 const AnthologySheet = ({
   height,
   top,
-  anthologys,
   state,
   visible,
-  activeIndex,
   onClose,
-  onPress,
+  children,
 }: anthologySheetProps) => {
-  type ItemBoxProps = {
-    index: number;
-    anthology: ListItemInfo;
-  };
-
-  const ItemBox: React.FC<ItemBoxProps> = ({index, anthology}) => {
-    return (
-      <Pressable
-        style={{flex: 1}}
-        onPress={() => {
-          onPress(index);
-        }}>
-        <View style={styles.itemContainer}>
-          <SubTitle title={anthology.title} active={index === activeIndex} />
-        </View>
-      </Pressable>
-    );
-  };
 
   return !visible ? (
     <></>
@@ -53,27 +33,12 @@ const AnthologySheet = ({
     <View style={{...styles.container, height, top}}>
       <View style={styles.headerRow}>
         <SubTitleBold title="选集" />
-        <Pressable onPress={onClose}>
-          <FontAwesomeIcon icon={faXmark} />
-        </Pressable>
+        <CloseButton onPress={onClose}/>
       </View>
       <View style={styles.stateRow}>
         <Text style={styles.text2}>{state}</Text>
       </View>
-      <FlatList
-        contentContainerStyle={styles.rowContainer}
-        data={anthologys}
-        renderItem={({item, index}) => (
-          <MultiItemRow
-            numberOfItem={2}
-            children={(index, info) => (
-              <ItemBox index={index} anthology={info} key={index}/>
-            )}
-            index={index}
-            datas={anthologys}
-          />
-        )}
-      />
+      {children}
     </View>
   );
 };

@@ -26,7 +26,7 @@ const MultiItemRow: React.FC<ItemProps<any>> = ({
       }}>
       {new Array(numberOfItem).fill(0).map((_, rowIndex) => {
         return index + rowIndex >= datas.length ? (
-          <View key={rowIndex} style={{flex: 1, margin: 10}}></View>
+          <View key={rowIndex} style={{flex: 1}}></View>
         ) : (
           children(index + rowIndex, datas[index + rowIndex])
         );
