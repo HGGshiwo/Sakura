@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Text, View, Pressable} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {InfoText} from '../../../component/Text';
+import {InfoText} from '../../../../component/Text';
 
 interface Props {
   show: boolean;

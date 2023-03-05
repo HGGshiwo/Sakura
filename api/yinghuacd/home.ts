@@ -13,7 +13,7 @@ function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: s
       //获取轮播
       let heros = document.getElementsByClassName("heros")!
       let i = 0
-      
+
       let carouselsaa = heros.map((hero) => {
         return hero.getElementsByTagName('li')!.map((liDom) => {
           let id = i
@@ -26,8 +26,8 @@ function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: s
             state: liDom.getElementsByTagName('em')![0].innerHTML,
           }
         })
-      }) 
-      
+      })
+
       const carousels = carouselsaa.flat()
       const hrefs = ['ribendongman/', 'guochandongman/', 'meiguodongman/', 'ribendongman/', 'ribendongman/']
       //获取最近更新/日本动漫/国产动漫/美国动漫/动漫电影
@@ -53,38 +53,40 @@ function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: s
           }
         })
 
-      // //获取每日更新列表
-      // let tlistDom = document.getElementsByClassName('tlist')![0]
-      // const dailys = tlistDom.getElementsByTagName('ul')!.map((ulDom) => {
-      //   return ulDom.getElementsByTagName('li')!.map((liDom, index) => {
-      //     const aDoms = liDom.getElementsByTagName('a')!
-      //     return {
-      //       id: index,
-      //       href1: aDoms[0].href!,
-      //       href2: aDoms[1].href!,
-      //       title: aDoms[1].innerHTML,
-      //       state: aDoms[0].innerHTML,
-      //     }
-      //   })
-      // })
+      //获取每日更新列表
+      let tlistDom = document.getElementsByClassName('tlist')![0]
+      const dailys = tlistDom.getElementsByTagName('ul')!.map((ulDom) => {
+        return ulDom.getElementsByTagName('li')!.map((liDom, index) => {
+          const aDoms = liDom.getElementsByTagName('a')!
+          return {
+            id: index,
+            href1: aDoms[0].href!,
+            href2: aDoms[1].href!,
+            title: aDoms[1].innerHTML,
+            state: aDoms[0].innerHTML,
+          }
+        })
+      })
 
       //获取动漫排行
       let picsDom = document.getElementsByClassName('pics')![0]
-      picsDom.getElementsByTagName('li')!.map((liDom, index) => {
+      const rankings = picsDom.getElementsByTagName('li')!.map((liDom, index) => {
         const spanDoms = liDom.getElementsByTagName('span')!
         return {
           id: index,
           img: liDom.getElementsByTagName('img')![0].src!,
+          state: spanDoms[0].getElementsByTagName('font')![0].innerHTML,
           title: liDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
           href: liDom.getElementsByTagName('a')![0].href!,
-          type: spanDoms[0].getElementsByTagName('font')![0].innerHTML,
+          type: spanDoms[1].getElementsByTagName('a')!.map((aDom: Dom) => aDom.innerHTML),
           info: spanDoms[1].getElementsByTagName('a')![0].innerHTML
         }
       })
 
       _afterLoad({
         carousels,
-        // dailys,
+        dailys,
+        rankings,
         sections,
       })
 

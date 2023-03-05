@@ -1,6 +1,6 @@
 import {Text} from '@rneui/base';
 import {StyleSheet, View} from 'react-native';
-import {TextButton} from '../../component/Button'
+import {TextButton} from '../../../component/Button'
 
 type detailButtonLineProps = {
   onPress: (event: any) => void;

@@ -55,7 +55,7 @@ const V1RecommandInfoItem = ({
 };
 
 //主页列表的一项, 列表方向: 纵向，一行2个，包含信息：RecommandInfo
-const V2RecommandInfoItemItem: React.FC<Props<RecommandInfo>> = ({
+const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
   index,
   item,
   onPress,
@@ -217,7 +217,7 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
 };
 
 //分类结果的一项，列表方向纵向，一行3个，包含信息: RecommandInfo
-const V3RecommandInfoItemItem: React.FC<Props<RecommandInfo>> = ({
+const V3RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
   index,
   item,
   onPress,
@@ -308,8 +308,8 @@ const styles = StyleSheet.create({
 
 export {
   V1RecommandInfoItem,
-  V2RecommandInfoItemItem,
-  V3RecommandInfoItemItem,
+  V2RecommandInfoItem,
+  V3RecommandInfoItem,
   H1HistoryInfoItem,
   V1SearchInfoItem,
   H1RecommandInfoItem,

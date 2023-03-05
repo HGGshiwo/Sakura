@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {SectionList} from 'react-native';
 import loadPage from '../../../api/yinghuacd/category';
 import EndLine from '../../../component/EndLine';
-import {V3RecommandInfoItemItem} from '../../../component/ListItem';
+import {V3RecommandInfoItem} from '../../../component/ListItem';
 import {LoadingContainer} from '../../../component/Loading';
 import MultiItemRow from '../../../component/MultiItemRow';
 import {NavBar} from '../../../component/NavBar';
@@ -48,7 +48,7 @@ const Other: React.FC<Props> = ({url, title}) => {
           <MultiItemRow
             numberOfItem={3}
             children={(index, info) => (
-              <V3RecommandInfoItemItem
+              <V3RecommandInfoItem
                 index={index}
                 item={info}
                 key={index}

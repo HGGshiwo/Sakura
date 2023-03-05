@@ -1,8 +1,8 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View, FlatList} from 'react-native';
 import { Pressable } from 'react-native';
-import {SubTitle} from '../../component/Text';
-import {ListItemInfo} from '../../type/ListItemInfo';
+import {SubTitle} from '../../../component/Text';
+import {ListItemInfo} from '../../../type/ListItemInfo';
 
 type listLineProps = {
   data: ListItemInfo[];

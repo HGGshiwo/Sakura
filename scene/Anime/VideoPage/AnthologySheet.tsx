@@ -1,11 +1,11 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View, FlatList} from 'react-native';
-import {ListItemInfo} from '../../type/ListItemInfo';
+import {ListItemInfo} from '../../../type/ListItemInfo';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable} from 'react-native';
 import {faXmark} from '@fortawesome/free-solid-svg-icons';
-import {SubTitle, SubTitleBold} from '../../component/Text';
-import MultiItemRow from '../../component/MultiItemRow';
+import {SubTitle, SubTitleBold} from '../../../component/Text';
+import MultiItemRow from '../../../component/MultiItemRow';
 
 type anthologySheetProps = {
   height: number;

@@ -5,7 +5,7 @@ import loadPage from '../../api/yinghuacd/category';
 import Container from '../../component/Container';
 import EndLine from '../../component/EndLine';
 import HeadBar from '../../component/HeadBar';
-import {V3RecommandInfoItemItem} from '../../component/ListItem';
+import {V3RecommandInfoItem} from '../../component/ListItem';
 import {LoadingContainer} from '../../component/Loading';
 import MultiItemRow from '../../component/MultiItemRow';
 import {NavBar} from '../../component/NavBar';
@@ -64,7 +64,7 @@ const CategoryPage: React.FC<{}> = () => {
             <MultiItemRow
               numberOfItem={3}
               children={(index, info) => (
-                <V3RecommandInfoItemItem
+                <V3RecommandInfoItem
                   index={index}
                   item={info}
                   key={index}

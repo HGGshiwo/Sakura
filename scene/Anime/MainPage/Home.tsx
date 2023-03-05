@@ -8,7 +8,7 @@ import {ListTitleLine} from '../../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
 import {
   H1HistoryInfoItem,
-  V2RecommandInfoItemItem,
+  V2RecommandInfoItem,
 } from '../../../component/ListItem';
 import Context from '../../../models';
 import History from '../../../models/History';
@@ -96,7 +96,7 @@ const Home: React.FC<{}> = () => {
           <MultiItemRow
             numberOfItem={2}
             children={(index, info) => (
-              <V2RecommandInfoItemItem
+              <V2RecommandInfoItem
                 index={index}
                 item={info}
                 key={index}

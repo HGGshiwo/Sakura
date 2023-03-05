@@ -1,6 +1,6 @@
 import {StyleSheet, View} from 'react-native';
-import {Title} from '../../component/Text';
-import {FollowButton} from '../../component/Button';
+import {Title} from '../../../component/Text';
+import {FollowButton} from '../../../component/Button';
 
 interface Props {
   title: string;

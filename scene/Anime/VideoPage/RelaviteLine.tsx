@@ -1,6 +1,6 @@
 import {Button} from '@rneui/themed';
 import {StyleSheet, FlatList} from 'react-native';
-import {ListItemInfo} from '../../type/ListItemInfo';
+import {ListItemInfo} from '../../../type/ListItemInfo';
 
 type relaviteLineProps = {
   relatives :ListItemInfo[]
