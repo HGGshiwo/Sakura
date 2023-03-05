@@ -94,6 +94,7 @@ const Player: React.FC<PlayerProps> = ({
     setErring(false);
   }, [videoUrl]);
 
+
   useEffect(() => {
     // This would be inside componentDidMount()
     Orientation.addOrientationListener(handleOrientation);

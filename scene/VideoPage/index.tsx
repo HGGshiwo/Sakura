@@ -113,7 +113,7 @@ const VideoPage: React.FC<{}> = () => {
             anthologyIndex: _history ? _history.anthologyIndex : 0,
             progress: _history ? _history.progress : 0,
             progressPer: _history ? _history.progressPer : 0,
-            anthologyTitle: _history ? _history.anthologyTitle : '',
+            anthologyTitle: _history ? _history.anthologyTitle : _anthologys[0].title,
           },
           UpdateMode.Modified,
         );
@@ -132,7 +132,7 @@ const VideoPage: React.FC<{}> = () => {
 
       setLoading(false); //页面内容获取成功，页面不再加载
       setNextVideoAvailable(
-        history.current!.anthologyIndex + 1 < anthologys.length,
+        history.current!.anthologyIndex + 1 < _anthologys.length,
       );
       setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
       curSourceIndex.current = 0;
