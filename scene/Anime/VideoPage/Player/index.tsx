@@ -19,6 +19,7 @@ import {BackButton} from '../../../../component/Button';
 import {LoadingBox} from '../../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
+import { useIsFocused, useNavigationState } from '@react-navigation/native';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -40,15 +41,14 @@ var sec_to_time = (s: number): string => {
     var hour = Math.floor(s / 3600);
     var min = Math.floor(s / 60) % 60;
     var sec = Math.floor(s % 60);
-    if(hour > 0) {
-      t = hour < 10? `0${hour}:`:`${hour}:`;
+    if (hour > 0) {
+      t = hour < 10 ? `0${hour}:` : `${hour}:`;
     }
-    t = min < 10? `${t}0${min}`:`${t}${min}`;
-    t = sec < 10? `${t}:0${sec}`:`${t}:${sec}`
+    t = min < 10 ? `${t}0${min}` : `${t}${min}`;
+    t = sec < 10 ? `${t}:0${sec}` : `${t}:${sec}`;
   }
   return t;
 };
-
 
 const Player: React.FC<PlayerProps> = ({
   videoUrlAvailable,
@@ -88,12 +88,20 @@ const Player: React.FC<PlayerProps> = ({
 
   const progressRef = useRef(0);
   const durationRef = useRef(0);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    setControlVisible(true);
-    setErring(false);
-  }, [videoUrl]);
+    if (videoUrlAvailable) {
+      setControlVisible(true);
+      setErring(false);
+    } else {
+      setPaused(true);
+    }
+  }, [videoUrlAvailable]);
 
+  useEffect(()=>{
+    setPaused(!isFocused || paused)
+  },[isFocused])
 
   useEffect(() => {
     // This would be inside componentDidMount()
@@ -101,7 +109,7 @@ const Player: React.FC<PlayerProps> = ({
     const interval = setInterval(() => {
       //每15s更新数据库
       console.log(progressRef.current, durationRef.current);
-      if (durationRef.current) {
+      if (durationRef.current && !paused) {
         onProgress(
           progressRef.current,
           progressRef.current / durationRef.current,
@@ -176,7 +184,7 @@ const Player: React.FC<PlayerProps> = ({
 
   //点击了视频空白区域
   const handlePressVideo = () => {
-    setRateSheetVisible(false)
+    setRateSheetVisible(false);
     if (controlVisible) {
       if (controlTimer.current !== -1) {
         clearTimeout(controlTimer.current);
@@ -223,7 +231,7 @@ const Player: React.FC<PlayerProps> = ({
 
   //长按加速
   const onLongPress = () => {
-    setRateSheetVisible(false)
+    setRateSheetVisible(false);
     prePlayRate.current = playRate;
     setRateMessageVisible(true);
     setPlayRate(3);
@@ -259,11 +267,11 @@ const Player: React.FC<PlayerProps> = ({
             progressUpdateInterval={1000}
           />
 
-          <Blank         
+          <Blank
             onPress={handlePressVideo}
             onLongPress={onLongPress}
-            onLongPressOut={onLongPressOut} 
-            onDbPress={()=>setPaused(!paused)}
+            onLongPressOut={onLongPressOut}
+            onDbPress={() => setPaused(!paused)}
           />
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
@@ -444,7 +452,7 @@ const styles = StyleSheet.create({
   slider: {
     flex: 1,
     marginHorizontal: 15,
-  }
+  },
 });
 
 export {Player};

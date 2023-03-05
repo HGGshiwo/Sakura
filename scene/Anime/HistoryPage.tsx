@@ -112,6 +112,7 @@ const HistoryPage: React.FC<{}> = () => {
       <Divider />
       <FlatList
         data={historys}
+        ItemSeparatorComponent={()=><Divider />}
         renderItem={({item, index}) => (
           <V1HistoryInfoItem
             item={item}
