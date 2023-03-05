@@ -42,10 +42,9 @@ const NavBar: React.FC<{}> = () => {
         navigation.navigate('Index', {url: 'china/', title: '国产动漫'});
         break;
       case 'Time':
-      case 'Ranking':
         break;
       default:
-        navigation.navigate(item.data as 'Follow' | 'History');
+        navigation.navigate(item.data as 'Follow' | 'History' | 'Ranking');
         break;
     }
   };

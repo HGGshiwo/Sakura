@@ -16,7 +16,7 @@ const Container = ({children}: ContainerProps) => {
   switch (name) {
     case 'Video':
       backgroundColor = 'black';
-      barStyle = 'dark-content';
+      barStyle = 'light-content';
       break;
     case 'Tab':
     case 'User':

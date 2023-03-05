@@ -13,6 +13,7 @@ type RootStackParamList = {
     History: undefined;
     Follow: undefined;
     NoParam: undefined; //不会进入，只会跳出
+    Ranking: undefined;
 };
 
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;

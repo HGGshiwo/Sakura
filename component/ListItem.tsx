@@ -1,7 +1,6 @@
-import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {ReactNode} from 'react';
 import {StyleSheet, View, Pressable, ImageBackground} from 'react-native';
-import {InfoText, RateText, SubInfoText, SubTitle} from '../component/Text';
+import {InfoText, SubInfoText, SubTitle} from '../component/Text';
 import HistoryInfo from '../type/HistoryInfo';
 import {RecommandInfo} from '../type/RecommandInfo';
 import {SearchInfo} from '../type/SearchInfo';
@@ -10,16 +9,16 @@ import {FollowButton, RoundButton} from './Button';
 interface Props<T> {
   index: number;
   onPress: (item: T) => void;
-  onDelete?: (item: T) => void;
   item: T;
   imgVerticle?: boolean;
+  children?: ReactNode;
 }
 
 //推荐列表的一项, 列表方向: 纵向，一行1个，包含信息： RecommandInfo
 const V1RecommandInfoItem = ({
   item,
   onPress,
-  onDelete,
+  children,
   imgVerticle,
 }: Props<RecommandInfo>) => {
   return (
@@ -37,18 +36,7 @@ const V1RecommandInfoItem = ({
           <SubTitle title={item.title} />
           <SubInfoText title={item.state} />
         </View>
-        <View style={styles.rateContainer}>
-          {onDelete ? (
-            <>
-              <RoundButton text="立即观看" />
-              <Pressable onPress={() => onDelete(item)}>
-                <RoundButton style={{marginVertical: 20}} text="取消追番" />
-              </Pressable>
-            </>
-          ) : (
-            <RateText title="9.7" />
-          )}
-        </View>
+        <View style={styles.rateContainer}>{children}</View>
       </View>
     </Pressable>
   );
@@ -128,9 +116,8 @@ const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
 //观看历史的一项，列表方向: 纵向，一行1个，包含信息：HistoryInfo
 const V1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
   item,
-  index,
+  children,
   onPress,
-  onDelete,
 }) => {
   return (
     <Pressable onPress={() => onPress(item)}>
@@ -152,9 +139,7 @@ const V1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
           </View>
         </View>
         <View style={{alignItems: 'center', flex: 1, alignSelf: 'center'}}>
-          <Pressable onPress={onDelete ? () => onDelete(item) : null}>
-            <FontAwesomeIcon color="grey" icon={faTrashCan} />
-          </Pressable>
+          {children}
         </View>
       </View>
     </Pressable>
@@ -296,8 +281,8 @@ const styles = StyleSheet.create({
   rateContainer: {
     flex: 1,
     padding: 10,
-    paddingRight: 40,
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   rateTitle: {
     color: 'orange',

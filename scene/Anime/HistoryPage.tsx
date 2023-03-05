@@ -20,6 +20,7 @@ import Dialog, {
   DialogButton,
 } from 'react-native-popup-dialog';
 import EndLine from '../../component/EndLine';
+import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
 
 const {useRealm, useQuery} = Context;
 
@@ -115,9 +116,11 @@ const HistoryPage: React.FC<{}> = () => {
           <V1HistoryInfoItem
             item={item}
             index={index}
-            onPress={() => navigation.navigate('Video', {url: item.href})}
-            onDelete={onDelete}
-          />
+            onPress={() => navigation.navigate('Video', {url: item.href})}>
+            <Pressable onPress={() => onDelete(item)}>
+              <FontAwesomeIcon color="grey" icon={faTrashCan} />
+            </Pressable>
+          </V1HistoryInfoItem>
         )}
         ListFooterComponent={
           <>

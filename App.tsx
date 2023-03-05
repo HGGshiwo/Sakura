@@ -31,6 +31,7 @@ import {
   SearchPage,
   UserPage,
 } from './scene/Anime';
+import RankingPage from './scene/Anime/RankingPage';
 
 const {RealmProvider} = Context;
 
@@ -95,6 +96,7 @@ const routes = [
   {name: 'Index', component: IndexPage},
   {name: 'History', component: HistoryPage},
   {name: 'Follow', component: FollowPage},
+  {name: 'Ranking', component: RankingPage}
 ];
 
 function App(): JSX.Element {

@@ -25,6 +25,7 @@ import {VideoPageProps} from '../../../type/route';
 import Container from '../../../component/Container';
 import {Divider} from '@rneui/themed';
 import loadPage, {loadVideoSrc} from '../../../api/yinghuacd/video';
+import {RateText} from '../../../component/Text';
 const {useRealm} = Context;
 
 const VideoPage: React.FC<{}> = () => {
@@ -113,7 +114,9 @@ const VideoPage: React.FC<{}> = () => {
             anthologyIndex: _history ? _history.anthologyIndex : 0,
             progress: _history ? _history.progress : 0,
             progressPer: _history ? _history.progressPer : 0,
-            anthologyTitle: _history ? _history.anthologyTitle : _anthologys[0].title,
+            anthologyTitle: _history
+              ? _history.anthologyTitle
+              : _anthologys[0].title,
           },
           UpdateMode.Modified,
         );
@@ -282,8 +285,9 @@ const VideoPage: React.FC<{}> = () => {
                 <V1RecommandInfoItem
                   index={index}
                   item={item}
-                  onPress={onPressRecommand}
-                />
+                  onPress={onPressRecommand}>
+                  <RateText title="9.7" />
+                </V1RecommandInfoItem>
               )}
               keyExtractor={item => `${item.href}`}
             />

@@ -1,3 +1,17 @@
+import {
+  fa0,
+  fa1,
+  fa2,
+  fa3,
+  fa4,
+  fa5,
+  fa6,
+  fa7,
+  fa8,
+  fa9,
+  faCircle,
+} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import React from 'react';
 import {StyleProp, TextStyle, Text, View} from 'react-native';
 
@@ -13,7 +27,14 @@ const SubTitleBold: React.FC<Props> = ({title, style}) => {
     <Text
       ellipsizeMode="tail"
       numberOfLines={2}
-      style={[{fontSize: 16, fontWeight: 'bold', color: 'black'}, style]}>
+      style={[
+        {
+          fontSize: 16,
+          fontWeight: 'bold',
+          color: 'black',
+        },
+        style,
+      ]}>
       {title}
     </Text>
   );
@@ -30,7 +51,10 @@ const SubTitle: React.FC<Props> = ({
     <Text
       ellipsizeMode="tail"
       numberOfLines={numberOfLines}
-      style={[{fontSize: 15, color, fontWeight: '400'}, style]}>
+      style={[
+        {fontSize: 15, color, fontWeight: '400'},
+        style,
+      ]}>
       {title}
     </Text>
   );
@@ -79,12 +103,22 @@ const SubInfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
 };
 
 const RateText: React.FC<Props> = ({title, style}) => {
+  const icons = [fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9];
+  const nums = title.split('.');
+  const num0 = parseInt(nums[0]);
+  const num1 = parseInt(nums[1]);
   return (
-    <View style={[{flexDirection: 'row', alignItems: 'baseline'}, style]}>
-      <Text style={{color: 'darkorange', fontWeight: '500', fontSize: 20}}>
-        {title}
+    <View style={[{flexDirection: 'row', alignItems: 'flex-end'}, style]}>
+      <FontAwesomeIcon color="darkorange" size={20} icon={icons[num0]} />
+      <FontAwesomeIcon color="darkorange" size={3} icon={faCircle} />
+      <FontAwesomeIcon color="darkorange" size={20} icon={icons[num1]} />
+      <Text
+        style={{
+          color: 'darkorange',
+          fontWeight: '400',
+        }}>
+        分
       </Text>
-      <Text style={{color: 'darkorange', fontWeight: '300'}}>分</Text>
     </View>
   );
 };

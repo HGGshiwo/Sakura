@@ -21,6 +21,7 @@ import Follow from '../../models/Follow';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {UpdateMode} from 'realm';
 import EndLine from '../../component/EndLine';
+import {RoundButton} from '../../component/Button';
 
 const {useRealm, useQuery} = Context;
 
@@ -118,12 +119,15 @@ const FollowPage: React.FC<{}> = () => {
         data={follows}
         renderItem={({item, index}) => (
           <V1RecommandInfoItem
+            onPress={() => navigation.navigate('Video', {url: item.href})}
             item={item}
             imgVerticle={true}
-            index={index}
-            onPress={() => navigation.navigate('Video', {url: item.href})}
-            onDelete={onDelete}
-          />
+            index={index}>
+            <RoundButton text="立即观看" />
+            <Pressable onPress={() => onDelete(item)}>
+              <RoundButton style={{marginVertical: 20}} text="取消追番" />
+            </Pressable>
+          </V1RecommandInfoItem>
         )}
         ItemSeparatorComponent={() => <Divider />}
         ListFooterComponent={
