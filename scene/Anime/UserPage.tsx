@@ -55,15 +55,18 @@ const UserPage: React.FC<{}> = () => {
   }, [_historys]);
 
   useEffect(() => {
-    let follows = [..._follows].reverse().map(_history => {
-      const _animes = realm.objectForPrimaryKey(Anime, _history.href);
-      return {
-        href: _history.href,
-        img: _animes!.img,
-        title: _animes!.title,
-        state: _animes!.state,
-      };
-    });
+    let follows = [..._follows]
+      .filter(follow => follow.following)
+      .reverse()
+      .map(_history => {
+        const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+        return {
+          href: _history.href,
+          img: _animes!.img,
+          title: _animes!.title,
+          state: _animes!.state,
+        };
+      });
     setFollows(follows);
   }, [_follows]);
 
@@ -91,9 +94,13 @@ const UserPage: React.FC<{}> = () => {
         ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
       />
       <Divider />
-      <ListTitleLine title="追番" buttonText="更多" onPress={() => {
+      <ListTitleLine
+        title="追番"
+        buttonText="更多"
+        onPress={() => {
           navigation.navigate('Follow');
-        }} />
+        }}
+      />
       <FlatList
         horizontal
         data={follows}

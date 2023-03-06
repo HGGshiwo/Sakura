@@ -77,7 +77,6 @@ const VideoPage: React.FC<{}> = () => {
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false); //是否刷新
   const [loading, setLoading] = useState(true); //页面是否在加载中
-  const [followed, setFollowed] = useState(false); //是否追番
   const history = useRef<History | null>();
   const ItemListRef = createRef<FlatList<ListItemInfo>>();
 
@@ -93,7 +92,7 @@ const VideoPage: React.FC<{}> = () => {
           text="加载中...">
           <Profile
             refreshing={refreshing}
-            init={init}
+            onRefresh={init}
             url={url}
             title={title}
             imgUrl={imgUrl}
@@ -101,7 +100,6 @@ const VideoPage: React.FC<{}> = () => {
             info={info}
             relatives={relatives}
             recommands={recommands}
-            followed={followed}
             setAnthologySheetVisible={setAnthologySheetVisible}
             setDetailSheetVisible={setDetailSheetVisible}>
             <FlatList
@@ -197,10 +195,6 @@ const VideoPage: React.FC<{}> = () => {
       curSources.current = sources[history.current!.anthologyIndex].data;
       switchVideoSrc();
     });
-
-    //查看数据库看是否追番
-    const _follow = realm.objectForPrimaryKey(Follow, url);
-    setFollowed(!!_follow && _follow!.following);
   }
 
   useEffect(init, []);

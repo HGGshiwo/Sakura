@@ -25,8 +25,7 @@ const LoadingBox: React.FC<Props> = ({
         },
         style,
       ]}>
-      {/* <FAB color={backgroundColor} loading size="small" /> */}
-      <ActivityIndicator animating={show} color={color} />
+      <ActivityIndicator size={'large'} animating={show} color={color} />
       <LoadingText title={text} style={{color, paddingTop: 10}} />
     </View>
   );

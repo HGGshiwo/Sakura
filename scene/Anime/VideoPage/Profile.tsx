@@ -16,8 +16,9 @@ import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 const {useRealm} = Context;
 import Context from '../../../models';
-import {ReactNode, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import EndLine from '../../../component/EndLine';
+import Toast from 'react-native-root-toast';
 
 type Props = {
   url: string;
@@ -28,11 +29,10 @@ type Props = {
   relatives: ListItemInfo[];
   recommands: RecommandInfo[];
   refreshing: boolean;
-  followed: boolean;
   setDetailSheetVisible: (visible: boolean) => void;
   setAnthologySheetVisible: (visible: boolean) => void;
   children: ReactNode;
-  init: () => void;
+  onRefresh: () => void;
 };
 
 const Profile: React.FC<Props> = ({
@@ -42,39 +42,56 @@ const Profile: React.FC<Props> = ({
   relatives,
   recommands,
   refreshing,
-  followed,
   setDetailSheetVisible,
   setAnthologySheetVisible,
   children,
-  init,
+  onRefresh,
 }) => {
   //数据相关
   const layout = useWindowDimensions();
   const realm = useRealm();
   const navigation = useNavigation<VideoPageProps['navigation']>();
+  const [followed, setFollowed] = useState(false); //是否追番
+
+  useEffect(() => {
+    //查看数据库看是否追番
+    const _follow = realm.objectForPrimaryKey(Follow, url);
+    setFollowed(!!_follow && _follow!.following);
+  }, []);
 
   const onPressRecommand = (item: RecommandInfo) => {
     navigation.push('Video', {url: item.href});
   };
 
   //点击追番按钮的回调函数
-  const handlePressFollowed = (followed: boolean) => {
+  const handlePressFollowed = () => {
+    setFollowed(!followed);
     realm.write(() => {
       realm.create(
         Follow,
         {
           href: url,
-          following: followed,
+          following: !followed,
         },
         UpdateMode.Modified,
       );
+    });
+    Toast.show(`${!followed ? '' : '取消'}追番成功`, {
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      textStyle:{fontSize: 14},
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.TOP,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0,
     });
   };
 
   return (
     <FlatList
       refreshing={refreshing}
-      onRefresh={() => init()}
+      onRefresh={onRefresh}
       ListHeaderComponent={
         <>
           <View style={{padding: 10, width: layout.width}}>

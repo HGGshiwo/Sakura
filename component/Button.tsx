@@ -37,31 +37,22 @@ const TextButton: React.FC<Props> = ({title, onPress}) => {
 };
 
 interface FollowButtonProps extends Props {
-  defaultFollowed: boolean;
-  onPress: (followed: boolean) => void;
+  followed: boolean;
+  onPress: () => void;
 }
 
-const FollowButton: React.FC<FollowButtonProps> = ({
-  onPress,
-  defaultFollowed,
-}) => {
-  const [followed, setFollowed] = useState(defaultFollowed);
-
+const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
   return (
     <Pressable
-      style={({pressed}) => [
+      android_ripple={{color: 'deeppink', radius: 30, borderless: false}}
+      style={[
         {
-          backgroundColor: pressed
-            ? '##FF007F'
-            : followed
-            ? 'lightgray'
-            : 'deeppink',
+          backgroundColor: followed ? 'lightgray' : 'deeppink',
         },
         styles.buttonContainer,
       ]}
       onPress={() => {
-        if (onPress) onPress(!followed);
-        setFollowed(!followed);
+        if (onPress) onPress();
       }}>
       <>
         <FontAwesomeIcon
@@ -93,11 +84,11 @@ const RoundButton: React.FC<{text: string; style?: ViewStyle}> = ({
   );
 };
 
-const BackButton: React.FC<{style?: ViewStyle; onPress: () => void; color?: string}> = ({
-  style = {},
-  onPress,
-  color='white',
-}) => {
+const BackButton: React.FC<{
+  style?: ViewStyle;
+  onPress: () => void;
+  color?: string;
+}> = ({style = {}, onPress, color = 'white'}) => {
   return (
     <Pressable
       hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}

@@ -15,6 +15,7 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
+import {RootSiblingParent} from 'react-native-root-siblings';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
@@ -96,7 +97,7 @@ const routes = [
   {name: 'Index', component: IndexPage},
   {name: 'History', component: HistoryPage},
   {name: 'Follow', component: FollowPage},
-  {name: 'Ranking', component: RankingPage}
+  {name: 'Ranking', component: RankingPage},
 ];
 
 function App(): JSX.Element {
@@ -113,15 +114,17 @@ function App(): JSX.Element {
       <NavigationContainer>
         <GestureHandlerRootView style={{flex: 1}}>
           <RealmProvider>
-            <Stack.Navigator screenOptions={{headerShown: false}}>
-              {routes.map((route, index) => (
-                <Stack.Screen
-                  key={index}
-                  name={route.name}
-                  component={route.component}
-                />
-              ))}
-            </Stack.Navigator>
+            <RootSiblingParent>
+              <Stack.Navigator screenOptions={{headerShown: false}}>
+                {routes.map((route, index) => (
+                  <Stack.Screen
+                    key={index}
+                    name={route.name}
+                    component={route.component}
+                  />
+                ))}
+              </Stack.Navigator>
+            </RootSiblingParent>
           </RealmProvider>
         </GestureHandlerRootView>
       </NavigationContainer>

@@ -4,7 +4,6 @@ import {InfoText, SubInfoText, SubTitle} from '../component/Text';
 import HistoryInfo from '../type/HistoryInfo';
 import {RecommandInfo} from '../type/RecommandInfo';
 import {SearchInfo} from '../type/SearchInfo';
-import {FollowButton, RoundButton} from './Button';
 
 interface Props<T> {
   index: number;
@@ -177,6 +176,7 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
   item,
   index,
   onPress,
+  children,
 }) => {
   return (
     <Pressable onPress={() => onPress(item)}>
@@ -193,8 +193,7 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
           <InfoText title={item.info} numberOfLines={3} />
         </View>
         <View style={{alignItems: 'center', flex: 1}}>
-          <RoundButton style={{marginVertical: 20}} text="立即观看" />
-          <FollowButton onPress={() => {}} defaultFollowed={false} />
+         {children}
         </View>
       </View>
     </Pressable>
@@ -215,7 +214,7 @@ const V3RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
         }}
         key={index}>
         <ImageBackground
-          style={{flex: 1, height: 160}}
+          style={{flex: 1, height: 140}}
           imageStyle={styles.ibImage}
           source={{uri: item.img}}
           resizeMode="cover">

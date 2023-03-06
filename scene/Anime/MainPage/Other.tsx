@@ -22,26 +22,30 @@ const Other: React.FC<Props> = ({url, title}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false)
+
   const navigation = useNavigation<AnimeOtherProps['navigation']>();
 
-  useEffect(() => {
+
+  const init = () => {
+    setRefreshing(true)
     loadPage(url, ({carousels, sections}) => {
       setCarousels(carousels);
       setSections(sections);
       setLoading(false);
+      setRefreshing(false);
     });
-  }, []);
+  }
+
+  useEffect(init, []);
 
   return (
     <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
       <SectionList
+        refreshing = {refreshing}
+        onRefresh={init}
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
-        ListHeaderComponent={
-          <>
-            <ParallaxCarousel carousels={carousels} />
-            <NavBar />
-          </>
-        }
+        ListHeaderComponent={<ParallaxCarousel carousels={carousels} />}
         sections={sections}
         keyExtractor={(item, index) => item.title + index}
         renderItem={({index, section}) => (

@@ -35,8 +35,8 @@ const FollowPage: React.FC<{}> = () => {
 
   useEffect(() => {
     let follows = [..._follows]
-      .reverse()
       .filter(follow => follow.following)
+      .reverse()
       .map(_follow => {
         const _animes = realm.objectForPrimaryKey(Anime, _follow.href);
         return {

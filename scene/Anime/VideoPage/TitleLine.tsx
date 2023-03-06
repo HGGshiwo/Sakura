@@ -5,14 +5,14 @@ import {FollowButton} from '../../../component/Button';
 interface Props {
   title: string;
   followed: boolean;
-  onPress: (followed: boolean) => void;
+  onPress: () => void;
 }
 
 const TitleLine: React.FC<Props> = ({title, followed, onPress}) => {
   return (
     <View style={styles.container}>
       <Title style={{width: '70%'}} title={title} />
-      <FollowButton onPress={onPress} defaultFollowed={followed}/>
+      <FollowButton onPress={onPress} followed={followed}/>
     </View>
   );
 };
