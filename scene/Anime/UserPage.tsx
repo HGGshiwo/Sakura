@@ -116,6 +116,28 @@ const UserPage: React.FC<{}> = () => {
         ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
       />
       <Divider />
+      <ListTitleLine
+        title="下载管理"
+        buttonText="更多"
+        onPress={() => {
+          navigation.navigate('Follow');
+        }}
+      />
+      <FlatList
+        horizontal
+        data={[]}
+        renderItem={({item, index}) => (
+          <H1RecommandInfoItem
+            item={item}
+            index={index}
+            onPress={item => {
+              navigation.push('Video', {url: item.href});
+            }}
+          />
+        )}
+        ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+      />
+      <Divider />
     </View>
   );
 

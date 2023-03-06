@@ -123,9 +123,9 @@ const FollowPage: React.FC<{}> = () => {
             item={item}
             imgVerticle={true}
             index={index}>
-            <RoundButton text="立即观看" />
+            <RoundButton style={{marginRight: 20}} text="立即观看" />
             <Pressable onPress={() => onDelete(item)}>
-              <RoundButton style={{marginVertical: 20}} text="取消追番" />
+              <RoundButton style={{marginVertical: 20, marginRight: 20}} text="取消追番" />
             </Pressable>
           </V1RecommandInfoItem>
         )}

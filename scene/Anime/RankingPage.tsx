@@ -17,22 +17,17 @@ import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
 import loadPage from '../../api/yinghuacd/home';
 import Container from '../../component/Container';
+import EndLine from '../../component/EndLine';
 import HeadBar from '../../component/HeadBar';
-import {
-  V1RecommandInfoItem,
-  V3RecommandInfoItem,
-} from '../../component/ListItem';
+import {V1RecommandInfoItem} from '../../component/ListItem';
 import {LoadingContainer} from '../../component/Loading';
-import MultiItemRow from '../../component/MultiItemRow';
 import {SubTitleBold} from '../../component/Text';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {NoParamProps} from '../../type/route';
-import {SearchInfo} from '../../type/SearchInfo';
 
 const RankingPage: React.FC<{}> = () => {
   const [rankings, setRankings] = useState<RecommandInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const route = useRoute<NoParamProps['route']>();
   const navigation = useNavigation<NoParamProps['navigation']>();
 
   useEffect(() => {
@@ -59,6 +54,8 @@ const RankingPage: React.FC<{}> = () => {
           contentContainerStyle={{paddingHorizontal: 15}}
           keyExtractor={item => item.href}
           data={rankings}
+          ItemSeparatorComponent={()=><Divider />}
+          ListFooterComponent={()=><EndLine />}
           renderItem={({item, index}) => (
             <V1RecommandInfoItem
               index={index}
@@ -70,8 +67,8 @@ const RankingPage: React.FC<{}> = () => {
               }}>
               <View
                 style={{
-                  width: 30,
-                  height: 40,
+                  width: 20,
+                  height: 30,
                   backgroundColor:
                     index === 0
                       ? 'gold'
@@ -85,7 +82,7 @@ const RankingPage: React.FC<{}> = () => {
                   borderBottomLeftRadius: 100,
                   borderBottomRightRadius: 100,
                 }}>
-                <FontAwesomeIcon size={20} color="white" icon={icons[index]} />
+                <FontAwesomeIcon color="white" icon={icons[index]} />
               </View>
             </V1RecommandInfoItem>
           )}

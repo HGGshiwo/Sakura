@@ -22,7 +22,7 @@ const NavBar: React.FC<{}> = () => {
   const navigation = useNavigation<NoParamProps['navigation']>();
   const data: Data[] = [
     {title: '全部内容', icon: faYoutube, data: 'all'},
-    {title: '时间表', icon: faBusinessTime, data: 'Time'},
+    {title: '时间表', icon: faBusinessTime, data: 'Schedule'},
     {title: '排行榜', icon: faRankingStar, data: 'Ranking'},
     {title: '历史记录', icon: faClockRotateLeft, data: 'History'},
     {title: '国创', icon: faCarrot, data: 'china'},
@@ -41,10 +41,10 @@ const NavBar: React.FC<{}> = () => {
       case 'china':
         navigation.navigate('Index', {url: 'china/', title: '国产动漫'});
         break;
-      case 'Time':
-        break;
       default:
-        navigation.navigate(item.data as 'Follow' | 'History' | 'Ranking');
+        navigation.navigate(
+          item.data as 'Follow' | 'History' | 'Ranking' | 'Schedule',
+        );
         break;
     }
   };

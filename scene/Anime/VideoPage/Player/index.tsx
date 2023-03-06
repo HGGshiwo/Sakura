@@ -8,7 +8,7 @@ import Video, {
 } from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faExpand} from '@fortawesome/free-solid-svg-icons';
-import {useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
 import {LoadingText} from '../../../../component/Text';
@@ -19,7 +19,7 @@ import {BackButton} from '../../../../component/Button';
 import {LoadingBox} from '../../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
-import { useIsFocused, useNavigationState } from '@react-navigation/native';
+import {useIsFocused, useNavigationState} from '@react-navigation/native';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -32,6 +32,10 @@ interface PlayerProps {
   toNextVideo: () => void;
   onProgress: (progress: number, perProgress: number) => void;
   defaultProgress: number; //初始的进度
+  renderAnthologys: (
+    visible: boolean,
+    setVisible: (visible: boolean) => void,
+  ) => ReactNode; //选集列表
 }
 
 //时间转化函数
@@ -61,11 +65,12 @@ const Player: React.FC<PlayerProps> = ({
   toNextVideo,
   onProgress,
   defaultProgress,
+  renderAnthologys,
 }) => {
   const videoRef = useRef<Video | null>(null);
 
   const [fullscreen, setFullscreen] = useState(false); //视频是否全屏
-  const [rateSheetVisible, setRateSheetVisible] = useState(false); //速度sheet是否可见
+
   const [paused, setPaused] = useState(true); //视频是否暂停
   const [loading, setLoading] = useState(true); //视频是否在加载中
   const [erring, setErring] = useState(false); //视频是否播放错误
@@ -75,20 +80,24 @@ const Player: React.FC<PlayerProps> = ({
   const seekingRef = useRef(false); //是否在加载
   const [fmtDuration, setFmtDuration] = useState('00:00'); //格式化后的视频位置
   const [fmtProgress, setFmtProgress] = useState('00:00'); //格式化后的视频时长
-  const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
   const controlTimer = useRef(-1); //当前的计时器
   const [bitrateText, setBitrateText] = useState(''); //带宽
+
+  //控制是否可见
+  const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
+  const [rateSheetVisible, setRateSheetVisible] = useState(false); //速度sheet是否可见
+  const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
+  const [anthologySheetVisible, setAnthologySheetVisible] = useState(false); //选集消息是否可见
 
   //速度控制
   const [rateText, setRateText] = useState('倍速');
   const [playRate, setPlayRate] = useState(1); //当前播放速度
   const [rateId, setRateId] = useState(2); //播放速度id
-  const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
   const prePlayRate = useRef(1); //长按前的播放速度
 
-  const progressRef = useRef(0);
-  const durationRef = useRef(0);
-  const isFocused = useIsFocused();
+  const progressRef = useRef(0); //进度条记录
+  const durationRef = useRef(0); //时长记录
+  const isFocused = useIsFocused(); //页面是否隐藏，隐藏则暂停播放
 
   useEffect(() => {
     if (videoUrlAvailable) {
@@ -99,17 +108,17 @@ const Player: React.FC<PlayerProps> = ({
     }
   }, [videoUrlAvailable]);
 
-  useEffect(()=>{
-    setPaused(!isFocused || paused)
-  },[isFocused])
+  useEffect(() => {
+    setPaused(!isFocused || paused);
+  }, [isFocused]);
 
   useEffect(() => {
     // This would be inside componentDidMount()
     Orientation.addOrientationListener(handleOrientation);
     const interval = setInterval(() => {
       //每15s更新数据库
-      console.log(progressRef.current, durationRef.current);
       if (durationRef.current && !paused) {
+        console.log(progressRef.current, durationRef.current);
         onProgress(
           progressRef.current,
           progressRef.current / durationRef.current,
@@ -185,6 +194,7 @@ const Player: React.FC<PlayerProps> = ({
   //点击了视频空白区域
   const handlePressVideo = () => {
     setRateSheetVisible(false);
+    setAnthologySheetVisible(false);
     if (controlVisible) {
       if (controlTimer.current !== -1) {
         clearTimeout(controlTimer.current);
@@ -196,6 +206,7 @@ const Player: React.FC<PlayerProps> = ({
     }
   };
 
+  //点击播放按钮
   const handlePlay = () => {
     console.log('press');
     setPaused(!paused);
@@ -237,8 +248,8 @@ const Player: React.FC<PlayerProps> = ({
     setPlayRate(3);
   };
 
+  //取消长按返回原速
   const onLongPressOut = () => {
-    //取消长按返回原速
     setRateMessageVisible(false);
     setPlayRate(prePlayRate.current);
   };
@@ -331,7 +342,7 @@ const Player: React.FC<PlayerProps> = ({
             </Pressable>
           </View>
 
-          {/* bottom bar */}
+          {/* bottom bar fullscreen*/}
           <View
             style={[
               styles.bottomBar,
@@ -368,11 +379,16 @@ const Player: React.FC<PlayerProps> = ({
                 <Pressable onPress={() => setRateSheetVisible(true)}>
                   <LoadingText title={rateText} />
                 </Pressable>
-                <LoadingText style={{marginLeft: 20}} title="选集" />
+                <Pressable onPress={() => setAnthologySheetVisible(true)}>
+                  <LoadingText style={{marginLeft: 20}} title="选集" />
+                </Pressable>
               </View>
             </View>
           </View>
+
           <RateMessage show={rateMessageVisible} />
+
+          {/* rate sheet  */}
           <RateSheet
             defaultActive={rateId}
             show={rateSheetVisible}
@@ -383,6 +399,7 @@ const Player: React.FC<PlayerProps> = ({
               setRateId(id);
             }}
           />
+          {renderAnthologys(anthologySheetVisible, setAnthologySheetVisible)}
         </>
       )}
     </View>

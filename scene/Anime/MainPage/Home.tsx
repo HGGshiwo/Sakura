@@ -18,6 +18,7 @@ import Anime from '../../../models/Anime';
 import {useNavigation} from '@react-navigation/native';
 import {AnimeHomeProps} from '../../../type/route';
 import loadPage from '../../../api/yinghuacd/home';
+import Toast from 'react-native-root-toast';
 const {useRealm, useQuery} = Context;
 
 const Home: React.FC<{}> = () => {
@@ -29,10 +30,10 @@ const Home: React.FC<{}> = () => {
   const _historys = useQuery<History>(History);
   const realm = useRealm();
   const navigation = useNavigation<AnimeHomeProps['navigation']>();
-  const [refreshing, setRefreshing] = useState(false)
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    let historys = [..._historys.sorted('time', true)].map(_history => {
+    let historys = [..._historys.sorted('time', true)].slice(0,10).map(_history => {
       const _animes = realm.objectForPrimaryKey(Anime, _history.href);
       return {
         href: _history.href,
@@ -50,19 +51,29 @@ const Home: React.FC<{}> = () => {
   }, [_historys]);
 
   const init = () => {
-    setRefreshing(true)
+    setRefreshing(true);
     loadPage(
       ({carousels, sections, dailys}) => {
         setCarousels(carousels);
         setSections(sections);
         setLoading(false);
-        setRefreshing(false)
+        setRefreshing(false);
+        Toast.show(`刷新成功`, {
+          backgroundColor: 'black',
+          textStyle: {fontSize: 14, color: 'white'},
+          duration: Toast.durations.SHORT,
+          position: -100,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
       },
       (err: string) => {
         setText(err);
       },
     );
-  }
+  };
 
   useEffect(init, []);
 
@@ -80,7 +91,9 @@ const Home: React.FC<{}> = () => {
               show={historys.length !== 0}
               title="最近在看"
               buttonText="更多"
-              onPress={() => {navigation.navigate('History')}}
+              onPress={() => {
+                navigation.navigate('History');
+              }}
             />
             <FlatList
               horizontal

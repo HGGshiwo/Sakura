@@ -31,6 +31,7 @@ import {
   IndexPage,
   SearchPage,
   UserPage,
+  SchedulePage,
 } from './scene/Anime';
 import RankingPage from './scene/Anime/RankingPage';
 
@@ -98,6 +99,7 @@ const routes = [
   {name: 'History', component: HistoryPage},
   {name: 'Follow', component: FollowPage},
   {name: 'Ranking', component: RankingPage},
+  {name: 'Schedule', component: SchedulePage},
 ];
 
 function App(): JSX.Element {

@@ -6,7 +6,7 @@ import IndexPage from '../Anime/IndexPage';
 import UserPage from '../Anime/UserPage';
 import HistoryPage from '../Anime/HistoryPage';
 import FollowPage from '../Anime/FollowPage';
-
+import SchedulePage from './SchedulePage';
 export {
   VideoPage,
   AnimePage,
@@ -16,4 +16,5 @@ export {
   UserPage,
   HistoryPage,
   FollowPage,
+  SchedulePage,
 };

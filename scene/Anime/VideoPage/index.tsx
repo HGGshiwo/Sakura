@@ -26,7 +26,7 @@ import {InfoText, SubTitle} from '../../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
 import Profile from './Profile';
 import MultiItemRow from '../../../component/MultiItemRow';
-import { LoadingContainer } from '../../../component/Loading';
+import {LoadingContainer} from '../../../component/Loading';
 const {useRealm} = Context;
 
 const emptyInfoSub = {
@@ -78,49 +78,54 @@ const VideoPage: React.FC<{}> = () => {
   const [refreshing, setRefreshing] = useState(false); //是否刷新
   const [loading, setLoading] = useState(true); //页面是否在加载中
   const history = useRef<History | null>();
-  const ItemListRef = createRef<FlatList<ListItemInfo>>();
-
+  const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
+  const VideoAnthologyListRef = createRef<FlatList<ListItemInfo>>()
+  
   const renderScene = ({route}: any) => {
     switch (route.key) {
       case 'profile':
         return (
           <LoadingContainer
-          loading={loading}
-          style={{paddingTop: 40}}
-          backgroundColor="grey"
-          color="grey"
-          text="加载中...">
-          <Profile
-            refreshing={refreshing}
-            onRefresh={init}
-            url={url}
-            title={title}
-            imgUrl={imgUrl}
-            infoSub={infoSub}
-            info={info}
-            relatives={relatives}
-            recommands={recommands}
-            setAnthologySheetVisible={setAnthologySheetVisible}
-            setDetailSheetVisible={setDetailSheetVisible}>
-            <FlatList
-              ref={ItemListRef}
-              getItemLayout={(item, index)=>({length: 160, offset: 160 * index, index})}
-              style={{marginBottom: 20}}
-              horizontal={true}
-              data={anthologys}
-              renderItem={({item, index}) => (
-                <Pressable onPress={() => changeAnthology(item.id)}>
-                  <View style={styles.itemContainer2}>
-                    <SubTitle
-                      title={item.title}
-                      active={anthologyIndex === index}
-                    />
-                  </View>
-                </Pressable>
-              )}
-              keyExtractor={item => `${item.id}`}
-            />
-          </Profile>
+            loading={loading}
+            style={{paddingTop: 40}}
+            backgroundColor="grey"
+            color="grey"
+            text="加载中...">
+            <Profile
+              refreshing={refreshing}
+              onRefresh={init}
+              url={url}
+              title={title}
+              imgUrl={imgUrl}
+              infoSub={infoSub}
+              info={info}
+              relatives={relatives}
+              recommands={recommands}
+              setAnthologySheetVisible={setAnthologySheetVisible}
+              setDetailSheetVisible={setDetailSheetVisible}>
+              <FlatList
+                ref={ProfileAnthologyListRef}
+                getItemLayout={(item, index) => ({
+                  length: 160,
+                  offset: 160 * index,
+                  index,
+                })}
+                style={{marginBottom: 20}}
+                horizontal={true}
+                data={anthologys}
+                renderItem={({item, index}) => (
+                  <Pressable onPress={() => changeAnthology(item.id)}>
+                    <View style={styles.itemContainer2}>
+                      <SubTitle
+                        title={item.title}
+                        active={anthologyIndex === index}
+                      />
+                    </View>
+                  </Pressable>
+                )}
+                keyExtractor={item => `${item.id}`}
+              />
+            </Profile>
           </LoadingContainer>
         );
       case 'command':
@@ -134,7 +139,7 @@ const VideoPage: React.FC<{}> = () => {
   const realm = useRealm();
 
   const init = () => {
-    setRefreshing(true)
+    setRefreshing(true);
     loadPage(url, ({title, img, infoSub, recommands, sources, info}) => {
       const _anthologys = sources.map((_source, index) => {
         return {id: index, data: _source.data, title: _source.key};
@@ -195,18 +200,27 @@ const VideoPage: React.FC<{}> = () => {
       curSources.current = sources[history.current!.anthologyIndex].data;
       switchVideoSrc();
     });
-  }
+  };
 
   useEffect(init, []);
 
+  //滚动列表
   useEffect(() => {
-    if (ItemListRef.current) {
-      ItemListRef.current!.scrollToIndex({
+    if (ProfileAnthologyListRef.current) {
+      ProfileAnthologyListRef.current!.scrollToIndex({
         index: history.current!.anthologyIndex,
       });
     }
-  }, [ItemListRef]);
+  }, [ProfileAnthologyListRef]);
 
+  useEffect(() => {
+    if (VideoAnthologyListRef.current) {
+      VideoAnthologyListRef.current!.scrollToIndex({
+        index: history.current!.anthologyIndex,
+      });
+    }
+  }, [VideoAnthologyListRef]);
+  
   //切换视频选集
   const changeAnthology = (index: number) => {
     //更新数据库, 记录下当前的位置
@@ -276,6 +290,59 @@ const VideoPage: React.FC<{}> = () => {
         toNextVideo={toNextVideo}
         onProgress={onVideoUnMounted}
         defaultProgress={defaultProgress}
+        renderAnthologys={(show: boolean, setVisible:(visible: boolean)=>void) => (
+          <View
+            style={{
+              display: show ? 'flex' : 'none',
+              position: 'absolute',
+              height: '100%',
+              backgroundColor: 'rgba(0,0,0,1)',
+              alignItems: 'center',
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              right: 0,
+              bottom: 0,
+            }}>
+            <FlatList
+              ref={VideoAnthologyListRef}
+              getItemLayout={(item, index) => ({
+                length: 45,
+                offset: 45 * index,
+                index,
+              })}
+              data={anthologys}
+              renderItem={({item, index}) => (
+                <Pressable
+                  style={{flex: 1}}
+                  onPress={() => {changeAnthology(index); setVisible(false)}}>
+                  <View
+                    style={{
+                      borderWidth: 2,
+                      height: 40,
+                      padding: 10,
+                      margin: 5,
+                      width: 160,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      borderRadius: 5,
+                      borderColor:
+                        index === anthologyIndex ? 'deeppink' : 'lightgrey',
+                    }}>
+                    <InfoText
+                      title={item.title}
+                      style={{
+                        fontWeight:
+                          index === anthologyIndex ? 'bold' : 'normal',
+                        color: index === anthologyIndex ? 'deeppink' : 'white',
+                      }}
+                    />
+                  </View>
+                </Pressable>
+              )}
+            />
+          </View>
+        )}
       />
 
       <TabView

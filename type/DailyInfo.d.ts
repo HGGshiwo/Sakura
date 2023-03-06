@@ -6,4 +6,4 @@ type DailyInfo = {
     state: string;
 }
 
-export {}
+export default DailyInfo;
