@@ -7,7 +7,8 @@ import {
 import {faHeart} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {ViewStyle, Pressable, StyleSheet, Text, View} from 'react-native';
-import {useState} from 'react';
+import theme from '../theme';
+const {FollowButtonStyle} = theme['red'];
 
 interface Props {
   onPress?: (event: any) => void;
@@ -44,10 +45,10 @@ interface FollowButtonProps extends Props {
 const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
   return (
     <Pressable
-      android_ripple={{color: 'deeppink', radius: 30, borderless: false}}
+      android_ripple={{color: FollowButtonStyle.rippleColor, radius: 30, borderless: false}}
       style={[
         {
-          backgroundColor: followed ? 'lightgray' : 'deeppink',
+          backgroundColor: FollowButtonStyle.backgroundColor(followed),
         },
         styles.buttonContainer,
       ]}
@@ -56,11 +57,12 @@ const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
       }}>
       <>
         <FontAwesomeIcon
-          color={followed ? 'gray' : 'white'}
+          color={FollowButtonStyle.textColor(followed)}
           size={14}
           icon={followed ? faBars : faHeart}
         />
-        <Text style={[styles.text, {color: followed ? 'gray' : 'white'}]}>
+        <Text
+          style={[styles.text, {color: FollowButtonStyle.textColor(followed)}]}>
           {followed ? '已' : ''}追番
         </Text>
       </>

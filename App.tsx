@@ -57,6 +57,7 @@ const TabPage = () => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
+        tabBarStyle:{height: 50, paddingTop: 10},
         tabBarIcon: ({focused, color, size}) => {
           let icon = icons[route.name as keyof typeof icons];
           // You can return any component that you like here!
@@ -64,7 +65,7 @@ const TabPage = () => {
             <FontAwesomeIcon
               icon={icon}
               size={18}
-              color={focused ? 'deeppink' : 'grey'}
+              color={focused ? 'red' : 'grey'}
             />
           );
         },
@@ -75,7 +76,7 @@ const TabPage = () => {
               style={{
                 paddingBottom: 8,
                 fontSize: 10,
-                color: focused ? 'deeppink' : 'grey',
+                color: focused ? 'red' : 'grey',
               }}>
               {texts[route.name as keyof typeof texts]}
             </Text>

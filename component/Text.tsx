@@ -43,18 +43,13 @@ const SubTitleBold: React.FC<Props> = ({title, style}) => {
 const SubTitle: React.FC<Props> = ({
   numberOfLines = 0,
   title,
-  active,
   style,
 }) => {
-  let color = active ? 'deeppink' : 'black';
   return (
     <Text
       ellipsizeMode="tail"
       numberOfLines={numberOfLines}
-      style={[
-        {fontSize: 15, color, fontWeight: '400'},
-        style,
-      ]}>
+      style={[{fontSize: 15, fontWeight: '400', color:'black'}, style]}>
       {title}
     </Text>
   );

@@ -20,6 +20,7 @@ import {LoadingBox} from '../../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
 import {useIsFocused, useNavigationState} from '@react-navigation/native';
+import theme from '../../../../theme';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -254,6 +255,7 @@ const Player: React.FC<PlayerProps> = ({
     setPlayRate(prePlayRate.current);
   };
 
+  const {VideoStyle} = theme['red']
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (
@@ -328,8 +330,8 @@ const Player: React.FC<PlayerProps> = ({
                 onSlidingStart={onSlidingStart}
                 onSlidingComplete={onSlidingComplete}
                 totalDuration={duration}
-                trackColor="deeppink"
-                scrubbedColor="deeppink"
+                trackColor={VideoStyle.textColor(true)}
+                scrubbedColor={VideoStyle.textColor(true)}
                 displayValues={false}
               />
             </View>

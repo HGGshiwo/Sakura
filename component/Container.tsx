@@ -1,8 +1,8 @@
 import {useRoute} from '@react-navigation/native';
-import {ReactNode} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {View, StatusBar, useColorScheme, StatusBarStyle} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
+import theme from '../theme';
 type ContainerProps = {
   children: ReactNode;
 };
@@ -11,23 +11,28 @@ const Container = ({children}: ContainerProps) => {
   const route = useRoute();
   const {name} = route;
   const isDarkMode = useColorScheme() === 'dark';
-  let backgroundColor = 'white';
   let barStyle: StatusBarStyle = isDarkMode ? 'light-content' : 'dark-content';
-  switch (name) {
-    case 'Video':
-      backgroundColor = 'black';
-      barStyle = 'light-content';
-      break;
-    case 'Tab':
-    case 'User':
-    case 'Anime':
-      backgroundColor = '#ff4081';
-      break;
-  }
+  const themeName = 'red';
+  const {HeaderStyle, ContainerStyle} = theme[themeName]
+  const [backgroundColor, setBackgroundColor] = useState('white')
+  useEffect(() => {
+    switch (name) {
+      case 'Video':
+        setBackgroundColor('black')
+        barStyle = 'light-content';
+        break;
+      case 'Tab':
+      case 'User':
+      case 'Anime':
+        setBackgroundColor(HeaderStyle.backgroundColor);
+        break;
+    }
+  }, [themeName]);
+
   return (
     <View
       style={{
-        backgroundColor: 'white',
+        backgroundColor: ContainerStyle.backgroundColor,
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
         paddingLeft: insets.left,

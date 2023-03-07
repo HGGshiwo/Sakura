@@ -27,6 +27,7 @@ import {TabBar, TabView} from 'react-native-tab-view';
 import Profile from './Profile';
 import MultiItemRow from '../../../component/MultiItemRow';
 import {LoadingContainer} from '../../../component/Loading';
+import theme from '../../../theme';
 const {useRealm} = Context;
 
 const emptyInfoSub = {
@@ -118,7 +119,7 @@ const VideoPage: React.FC<{}> = () => {
                     <View style={styles.itemContainer2}>
                       <SubTitle
                         title={item.title}
-                        active={anthologyIndex === index}
+                        style={{color: VideoStyle.textColor(anthologyIndex === index)}}
                       />
                     </View>
                   </Pressable>
@@ -273,6 +274,8 @@ const VideoPage: React.FC<{}> = () => {
     });
   };
 
+  const {VideoStyle} = theme['red']
+
   return (
     <Container>
       <Player
@@ -351,12 +354,12 @@ const VideoPage: React.FC<{}> = () => {
           <TabBar
             scrollEnabled
             {...props}
-            indicatorStyle={{backgroundColor: 'deeppink'}}
+            indicatorStyle={{backgroundColor: VideoStyle.indicatorColor, width: 0.5}}
             renderLabel={({route, focused, color}) => (
               <InfoText
                 title={route.title!}
                 style={{
-                  color: focused ? 'deeppink' : 'black',
+                  color: VideoStyle.textColor(focused),
                   paddingHorizontal: 5,
                   fontWeight: focused ? 'bold' : 'normal',
                 }}

@@ -11,7 +11,7 @@ import Context from '../../models';
 import HistoryInfo from '../../type/HistoryInfo';
 
 import Anime from '../../models/Anime';
-import {Title} from '../../component/Text';
+import {InfoText, Title} from '../../component/Text';
 import Follow from '../../models/Follow';
 import {RecommandInfo} from '../../type/RecommandInfo';
 const {useRealm, useQuery} = Context;
@@ -20,6 +20,7 @@ import {useNavigation} from '@react-navigation/native';
 import {UserPageProps} from '../../type/route';
 import Container from '../../component/Container';
 import {Divider} from '@rneui/themed';
+import theme from '../../theme';
 
 const UserPage: React.FC<{}> = () => {
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
@@ -152,6 +153,7 @@ const UserPage: React.FC<{}> = () => {
   });
 
   const layout = useWindowDimensions();
+  const {HeaderStyle} = theme['red']
 
   return (
     <Container>
@@ -160,26 +162,37 @@ const UserPage: React.FC<{}> = () => {
           flexDirection: 'row',
           alignItems: 'center',
           paddingHorizontal: 10,
-          backgroundColor: '#ff4081',
+          backgroundColor: HeaderStyle.backgroundColor,
         }}>
         <View
           style={{
             marginTop: 20,
             height: 40,
             width: '100%',
-            backgroundColor: '#ff4081',
+            backgroundColor: HeaderStyle.backgroundColor,
           }}>
-          <Title style={{color: 'white'}} title="我的" />
+          <Title title="我的" style={{color: HeaderStyle.textColor(false)}} />
         </View>
       </View>
       <TabView
         renderTabBar={props => (
           <TabBar
-            {...props}
-            indicatorStyle={{backgroundColor: 'white'}}
-            style={{backgroundColor: '#ff4081'}}
-            tabStyle={{width: 'auto'}}
-          />
+          scrollEnabled
+          {...props}
+          indicatorStyle={{backgroundColor: HeaderStyle.indicatorColor, width: 0.5}}
+          renderLabel={({route, focused, color}) => (
+            <InfoText
+              title={route.title}
+              style={{
+                color: HeaderStyle.textColor(focused),
+                paddingHorizontal: 5,
+                fontWeight: focused ? '900' : 'normal',
+              }}
+            />
+          )}
+          style={{backgroundColor: HeaderStyle.backgroundColor}}
+          tabStyle={{width: 'auto'}}
+        />
         )}
         navigationState={{index, routes}}
         renderScene={renderScene}

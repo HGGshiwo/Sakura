@@ -10,6 +10,7 @@ import {InfoText, SubTitleBold} from '../../component/Text';
 import {NoParamProps} from '../../type/route';
 import DailyInfo from '../../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
+import theme from '../../theme';
 
 const routes = [
   {key: '0', title: '星期一'},
@@ -64,6 +65,8 @@ const SchedulePage: React.FC<{}> = () => {
     });
   }, []);
 
+  const {TabBarStyle} = theme['red']
+
   return (
     <Container>
       <HeadBar
@@ -74,19 +77,19 @@ const SchedulePage: React.FC<{}> = () => {
         <SubTitleBold title="时间表" />
       </HeadBar>
       <Divider />
-      <LoadingContainer loading={loading}>
+      <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
         <TabView
           lazy
           renderTabBar={props => (
             <TabBar
               scrollEnabled
               {...props}
-              indicatorStyle={{backgroundColor: 'deeppink'}}
+              indicatorStyle={{backgroundColor: TabBarStyle.indicatorColor, width: 0.5}}
               renderLabel={({route, focused, color}) => (
                 <InfoText
                   title={route.title!}
                   style={{
-                    color: focused ? 'deeppink' : 'black',
+                    color: TabBarStyle.textColor(focused),
                     paddingHorizontal: 5,
                     fontWeight: focused ? 'bold' : 'normal',
                   }}

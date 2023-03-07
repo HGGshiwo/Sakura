@@ -11,6 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {useNavigation} from '@react-navigation/native';
 import {NoParamProps} from '../type/route';
+import theme from '../theme';
 
 type Data = {
   title: string;
@@ -49,6 +50,8 @@ const NavBar: React.FC<{}> = () => {
     }
   };
 
+  const {NavBarStyle} = theme['red']
+
   return (
     <FlatList
       horizontal
@@ -59,7 +62,7 @@ const NavBar: React.FC<{}> = () => {
         return (
           <Pressable onPress={() => onPress(item)}>
             <View style={styles.itemContainer}>
-              <FontAwesomeIcon color="deeppink" size={25} icon={item.icon} />
+              <FontAwesomeIcon color={NavBarStyle.color} size={25} icon={item.icon} />
               <Text
                 style={{fontSize: 12, paddingTop: 5}}>{`${item.title}`}</Text>
             </View>

@@ -9,6 +9,7 @@ import Container from '../../../component/Container';
 import {useNavigation} from '@react-navigation/native';
 import {AnimePageProps} from '../../../type/route';
 import {InfoText} from '../../../component/Text';
+import theme from '../../../theme';
 
 const url = {
   rbdm: {url: 'ribendongman/', title: '日本动漫'},
@@ -39,6 +40,7 @@ const AnimePage: React.FC<{}> = () => {
   ]);
 
   const [index, setIndex] = useState(0);
+  const {HeaderStyle} = theme['red']
 
   return (
     <Container>
@@ -47,7 +49,7 @@ const AnimePage: React.FC<{}> = () => {
           flexDirection: 'row',
           alignItems: 'center',
           paddingHorizontal: 10,
-          backgroundColor: '#ff4081',
+          backgroundColor: HeaderStyle.backgroundColor,
         }}>
         <SearchBar
           placeholder="查找关键词"
@@ -63,18 +65,18 @@ const AnimePage: React.FC<{}> = () => {
           <TabBar
             scrollEnabled
             {...props}
-            indicatorStyle={{backgroundColor: 'white'}}
+            indicatorStyle={{backgroundColor: HeaderStyle.indicatorColor, width: 0.5}}
             renderLabel={({route, focused, color}) => (
               <InfoText
                 title={route.title}
                 style={{
-                  color,
+                  color: HeaderStyle.textColor(focused),
                   paddingHorizontal: 5,
-                  fontWeight: focused ? 'bold' : 'normal',
+                  fontWeight: focused ? '900' : 'normal',
                 }}
               />
             )}
-            style={{backgroundColor: '#ff4081'}}
+            style={{backgroundColor: HeaderStyle.backgroundColor, shadowColor: HeaderStyle.shadowColor}}
             tabStyle={{width: 'auto'}}
           />
         )}

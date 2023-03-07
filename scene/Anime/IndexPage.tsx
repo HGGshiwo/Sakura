@@ -37,7 +37,7 @@ const IndexPage: React.FC<{}> = () => {
         <SubTitleBold title={title} />
       </HeadBar>
       <Divider />
-      <LoadingContainer loading={loading}>
+      <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
         <FlatList
           contentContainerStyle={{paddingHorizontal: 15}}
           keyExtractor={item => item.href}

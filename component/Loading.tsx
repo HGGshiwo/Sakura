@@ -1,6 +1,7 @@
 import {FAB} from '@rneui/base';
 import {ReactNode} from 'react';
 import {View, ViewStyle, ActivityIndicator} from 'react-native';
+import theme from '../theme';
 import {LoadingText} from './Text';
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
   color?: string;
   backgroundColor?: string;
 }
+const {LoadingStyle} = theme['red']
+
 const LoadingBox: React.FC<Props> = ({
   text='加载中...',
   style,
@@ -38,7 +41,6 @@ interface ContainerProps extends Props {
 const LoadingContainer: React.FC<ContainerProps> = ({
   text = '加载中...',
   style,
-  color = 'deeppink',
   loading = false,
   children,
 }) => {
@@ -50,7 +52,7 @@ const LoadingContainer: React.FC<ContainerProps> = ({
         <LoadingBox
           text={text}
           style={style}
-          color={color}
+          color={LoadingStyle.color}
         />
       )}
     </View>

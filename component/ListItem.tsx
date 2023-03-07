@@ -32,7 +32,7 @@ const V1RecommandInfoItem = ({
           source={{uri: item.img}}
         />
         <View style={styles.infoContainer}>
-          <SubTitle title={item.title} />
+          <SubTitle style={{color: 'black'}} title={item.title} />
           <SubInfoText title={item.state} />
         </View>
         <View style={styles.rateContainer}>{children}</View>

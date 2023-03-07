@@ -49,7 +49,7 @@ const RankingPage: React.FC<{}> = () => {
         <SubTitleBold title="排行榜" />
       </HeadBar>
       <Divider />
-      <LoadingContainer loading={loading}>
+      <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
         <FlatList
           contentContainerStyle={{paddingHorizontal: 15}}
           keyExtractor={item => item.href}
