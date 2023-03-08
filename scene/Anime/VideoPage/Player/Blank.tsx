@@ -14,6 +14,7 @@ type Props = {
   onMoveX?: (x: number) => void;
   onLeftMoveY?: (y: number) => void;
   onRightMoveY?: (y: number) => void;
+  onMoveXOut: () => void;
 };
 
 enum State {
@@ -31,15 +32,14 @@ const Blank: React.FC<Props> = ({
   onMoveX,
   onRightMoveY,
   onLeftMoveY,
+  onMoveXOut,
 }) => {
   const [longPressOut, setLongPressOut] = useState(false); //是否是longpress out
   const timer = useRef(-1);
-  const lastTime = useRef(0);
   const delay = 200;
   const granted = useRef(true); //是否已经开始相应
   const state = useRef(State.press); //目前的状态
   const lastReleaseTime = useRef(0); //上一次释放的时间
-  const lastPosition = useRef({moveX: 0, moveY: 0});
   const layout = useWindowDimensions();
   const panResponder = useRef(
     PanResponder.create({
@@ -63,7 +63,7 @@ const Blank: React.FC<Props> = ({
         const {moveX, moveY, x0, y0} = gestureState;
         //按动时间过长，改变状态
         if (state.current === State.press) {
-          if (moveX === x0 && moveY === y0) {
+          if (Math.abs(moveX - x0) < 1 && Math.abs(moveY - y0) < 1) {
             state.current = State.longPress;
           } else if (Math.abs(moveX - x0) > Math.abs(moveY - y0)) {
             state.current = State.moveX;
@@ -71,17 +71,20 @@ const Blank: React.FC<Props> = ({
             state.current = State.moveY;
           }
         }
+        if (state.current === State.longPress && onLongPress) {
+          console.log('long press');
+          onLongPress();
+        }
         if (state.current === State.moveX && onMoveX) {
-          onMoveX(moveX - lastPosition.current.moveX);
+          onMoveX(moveX - x0);
         }
         if (state.current === State.moveY) {
           if (moveX < layout.width / 2 && onLeftMoveY) {
-            onLeftMoveY(moveY - lastPosition.current.moveY);
+            onLeftMoveY(moveY - y0);
           } else if (moveX >= layout.width && onRightMoveY) {
-            onRightMoveY(moveY - lastPosition.current.moveY);
+            onRightMoveY(moveY - y0);
           }
         }
-        lastPosition.current = {moveX, moveY};
       },
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
@@ -96,10 +99,10 @@ const Blank: React.FC<Props> = ({
               timer.current = -1;
             }
             //双击事件
-            console.log('db')
+            console.log('db');
             if (onDbPress) onDbPress();
           } else {
-            //单机事件
+            //单击事件
             lastReleaseTime.current = evt.timeStamp;
             timer.current = setTimeout(() => {
               if (onPress) onPress();
@@ -107,8 +110,10 @@ const Blank: React.FC<Props> = ({
               timer.current = -1;
             }, delay);
           }
-        } else {
+        } else if (state.current === State.longPress) {
           if (onLongPressOut) onLongPressOut(); //长按事件结束
+        } else if (state.current === State.moveX) {
+          if (onMoveXOut) onMoveXOut(); //移动事件结束
         }
       },
       onPanResponderTerminate: (evt, gestureState) => {
@@ -129,11 +134,6 @@ const Blank: React.FC<Props> = ({
       }
     };
   }, []);
-
-  const _onLongPress = () => {
-    setLongPressOut(true);
-    if (onLongPress) onLongPress();
-  };
 
   return (
     <View

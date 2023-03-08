@@ -1,4 +1,10 @@
-import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
+import {
+  Dimensions,
+  StatusBar,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import Scrubber from '../Scrubber';
 import Video, {
   OnBandwidthUpdateData,
@@ -99,8 +105,9 @@ const Player: React.FC<PlayerProps> = ({
   const progressRef = useRef(0); //进度条记录
   const durationRef = useRef(0); //时长记录
   const isFocused = useIsFocused(); //页面是否隐藏，隐藏则暂停播放
-  const controlVisibleRef = useRef(false) //control是否可见
-  const pausedRef = useRef(false) //是否暂停
+  const controlVisibleRef = useRef(false); //control是否可见
+  const pausedRef = useRef(false); //是否暂停
+  const layout = useWindowDimensions();
 
   useEffect(() => {
     if (videoUrlAvailable) {
@@ -108,13 +115,13 @@ const Player: React.FC<PlayerProps> = ({
       setErring(false);
     } else {
       setPaused(true);
-      pausedRef.current = true
+      pausedRef.current = true;
     }
   }, [videoUrlAvailable]);
 
   useEffect(() => {
     setPaused(!isFocused || pausedRef.current);
-    pausedRef.current = !isFocused || pausedRef.current
+    pausedRef.current = !isFocused || pausedRef.current;
   }, [isFocused]);
 
   useEffect(() => {
@@ -149,7 +156,7 @@ const Player: React.FC<PlayerProps> = ({
     setDuration(data.duration);
     durationRef.current = data.duration;
     setPaused(false);
-    pausedRef.current = false
+    pausedRef.current = false;
     onSlidingComplete(defaultProgress);
     waitCloseControl();
   };
@@ -174,6 +181,7 @@ const Player: React.FC<PlayerProps> = ({
     seekingRef.current = true;
   };
 
+  //video.seek()结束之后调用
   const onSeek = () => {
     seekingRef.current = false;
   };
@@ -187,7 +195,7 @@ const Player: React.FC<PlayerProps> = ({
     if (!seekingRef.current) {
       controlTimer.current = setTimeout(() => {
         setControlVisible(false);
-        controlVisibleRef.current = false
+        controlVisibleRef.current = false;
       }, 3000);
     }
   };
@@ -195,7 +203,7 @@ const Player: React.FC<PlayerProps> = ({
   //打开control并在一段时间之后关闭
   const openControl = () => {
     setControlVisible(true);
-    controlVisibleRef.current = true
+    controlVisibleRef.current = true;
     waitCloseControl();
   };
 
@@ -209,18 +217,18 @@ const Player: React.FC<PlayerProps> = ({
         controlTimer.current = -1;
       }
       setControlVisible(false);
-      controlVisibleRef.current = false
+      controlVisibleRef.current = false;
     } else {
-      console.log('open')
+      console.log('open');
       openControl();
     }
   };
 
   //点击播放按钮
   const handlePlay = () => {
-    console.log(paused)
+    console.log(paused);
     setPaused(!pausedRef.current);
-    pausedRef.current = !pausedRef.current
+    pausedRef.current = !pausedRef.current;
     openControl();
   };
 
@@ -265,7 +273,7 @@ const Player: React.FC<PlayerProps> = ({
     setPlayRate(prePlayRate.current);
   };
 
-  const {VideoStyle} = theme['red']
+  const {VideoStyle} = theme['red'];
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (
@@ -295,6 +303,12 @@ const Player: React.FC<PlayerProps> = ({
             onLongPress={onLongPress}
             onLongPressOut={onLongPressOut}
             onDbPress={handlePlay}
+            onMoveX={dprogress => {
+              seekingRef.current = true;
+              progressRef.current = progressRef.current + (dprogress / layout.width) * 100; //必须使用progress，否则更新对不上
+              setProgress(progressRef.current);
+            }}
+            onMoveXOut={() => onSlidingComplete(progressRef.current)}
           />
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
@@ -372,8 +386,8 @@ const Player: React.FC<PlayerProps> = ({
                   onSlidingStart={onSlidingStart}
                   onSlidingComplete={onSlidingComplete}
                   totalDuration={duration}
-                  trackColor="deeppink"
-                  scrubbedColor="deeppink"
+                  trackColor={VideoStyle.textColor(true)}
+                  scrubbedColor={VideoStyle.textColor(true)}
                   displayValues={false}
                 />
               </View>
