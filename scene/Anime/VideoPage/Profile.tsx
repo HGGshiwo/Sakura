@@ -19,6 +19,9 @@ import Context from '../../../models';
 import {ReactNode, useEffect, useState} from 'react';
 import EndLine from '../../../component/EndLine';
 import Toast from 'react-native-root-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faCloudArrowDown, faFileDownload, faShare } from '@fortawesome/free-solid-svg-icons';
+import ToolBar from '../../../component/ToolBar';
 
 type Props = {
   url: string;
@@ -104,6 +107,7 @@ const Profile: React.FC<Props> = ({
               author={infoSub.author}
               onPress={() => setDetailSheetVisible(true)}
             />
+            <ToolBar />
             <ListTitleLine
               title={'选集'}
               buttonText={infoSub?.state}

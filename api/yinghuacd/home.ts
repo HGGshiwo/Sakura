@@ -29,15 +29,14 @@ function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: s
       })
 
       const carousels = carouselsaa.flat()
-      const hrefs = ['ribendongman/', 'guochandongman/', 'meiguodongman/', 'ribendongman/', 'ribendongman/']
       //获取最近更新/日本动漫/国产动漫/美国动漫/动漫电影
       let first_l = document.getElementsByClassName('firs l')![0]
       let imgs = first_l.getElementsByClassName('img')!
-      const sections = first_l.getElementsByClassName('dtit')!.slice(1)
+      const sections = first_l.getElementsByClassName('dtit')!
         .map((dtitDom, index) => {
           return {
             title: dtitDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
-            href: hrefs[index],//dtitDom.getElementsByTagName('span')[0].getElementsByTagName('a')[0].href,
+            href: dtitDom.getElementsByTagName('span')![0].getElementsByTagName('a')![0].href?.substring(1),
             data: imgs[index].getElementsByTagName('li')!
               .map((liDom, index) => {
                 let aDoms = liDom.getElementsByTagName('p')![1].getElementsByTagName('a')!

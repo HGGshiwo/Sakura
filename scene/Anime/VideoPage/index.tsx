@@ -423,7 +423,7 @@ const VideoPage: React.FC<{}> = () => {
                   key={index}>
                   <View style={styles.itemContainer}>
                     <SubTitle
-                      title={item.title}
+                      title={info.title}
                       active={index === anthologyIndex}
                     />
                   </View>

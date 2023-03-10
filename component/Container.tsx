@@ -11,15 +11,15 @@ const Container = ({children}: ContainerProps) => {
   const route = useRoute();
   const {name} = route;
   const isDarkMode = useColorScheme() === 'dark';
-  let barStyle: StatusBarStyle = isDarkMode ? 'light-content' : 'dark-content';
   const themeName = 'red';
   const {HeaderStyle, ContainerStyle} = theme[themeName]
   const [backgroundColor, setBackgroundColor] = useState('white')
+  const [barStyle, setBarStyle] = useState<StatusBarStyle>(isDarkMode ? 'light-content' : 'dark-content')
   useEffect(() => {
     switch (name) {
       case 'Video':
         setBackgroundColor('black')
-        barStyle = 'light-content';
+        setBarStyle('light-content')
         break;
       case 'Tab':
       case 'User':
@@ -27,7 +27,7 @@ const Container = ({children}: ContainerProps) => {
         setBackgroundColor(HeaderStyle.backgroundColor);
         break;
     }
-  }, [themeName]);
+  }, [themeName, name]);
 
   return (
     <View

@@ -137,9 +137,11 @@ const Home: React.FC<{}> = () => {
           <ListTitleLine
             title={title}
             buttonText="更多"
-            onPress={() => {
-              navigation.navigate('Index', {url: 'japan/', title});
-            }}
+            onPress={() =>
+              title === '最新更新'
+                ? navigation.navigate('Schedule')
+                : navigation.navigate('Index', {url: href, title})
+            }
           />
         )}
       />
