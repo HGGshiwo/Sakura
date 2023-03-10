@@ -80,8 +80,8 @@ const VideoPage: React.FC<{}> = () => {
   const [loading, setLoading] = useState(true); //页面是否在加载中
   const history = useRef<History | null>();
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
-  const VideoAnthologyListRef = createRef<FlatList<ListItemInfo>>()
-  
+  const VideoAnthologyListRef = createRef<FlatList<ListItemInfo>>();
+
   const renderScene = ({route}: any) => {
     switch (route.key) {
       case 'profile':
@@ -119,7 +119,9 @@ const VideoPage: React.FC<{}> = () => {
                     <View style={styles.itemContainer2}>
                       <SubTitle
                         title={item.title}
-                        style={{color: VideoStyle.textColor(anthologyIndex === index)}}
+                        style={{
+                          color: VideoStyle.textColor(anthologyIndex === index),
+                        }}
                       />
                     </View>
                   </Pressable>
@@ -221,7 +223,7 @@ const VideoPage: React.FC<{}> = () => {
       });
     }
   }, [VideoAnthologyListRef]);
-  
+
   //切换视频选集
   const changeAnthology = (index: number) => {
     //更新数据库, 记录下当前的位置
@@ -274,7 +276,7 @@ const VideoPage: React.FC<{}> = () => {
     });
   };
 
-  const {VideoStyle} = theme['red']
+  const {VideoStyle} = theme['red'];
 
   return (
     <Container>
@@ -293,7 +295,10 @@ const VideoPage: React.FC<{}> = () => {
         toNextVideo={toNextVideo}
         onProgress={onVideoUnMounted}
         defaultProgress={defaultProgress}
-        renderAnthologys={(show: boolean, setVisible:(visible: boolean)=>void) => (
+        renderAnthologys={(
+          show: boolean,
+          setVisible: (visible: boolean) => void,
+        ) => (
           <View
             style={{
               display: show ? 'flex' : 'none',
@@ -317,7 +322,10 @@ const VideoPage: React.FC<{}> = () => {
               renderItem={({item, index}) => (
                 <Pressable
                   style={{flex: 1}}
-                  onPress={() => {changeAnthology(index); setVisible(false)}}>
+                  onPress={() => {
+                    changeAnthology(index);
+                    setVisible(false);
+                  }}>
                   <View
                     style={{
                       borderWidth: 2,
@@ -329,15 +337,18 @@ const VideoPage: React.FC<{}> = () => {
                       justifyContent: 'center',
                       backgroundColor: 'rgba(0,0,0,0.5)',
                       borderRadius: 5,
-                      borderColor:
-                        index === anthologyIndex ? 'deeppink' : 'lightgrey',
+                      borderColor: VideoStyle.playerTextColor(
+                        index === anthologyIndex,
+                      ),
                     }}>
                     <InfoText
                       title={item.title}
                       style={{
                         fontWeight:
                           index === anthologyIndex ? 'bold' : 'normal',
-                        color: index === anthologyIndex ? 'deeppink' : 'white',
+                        color: VideoStyle.playerTextColor(
+                          index === anthologyIndex,
+                        ),
                       }}
                     />
                   </View>
@@ -354,7 +365,10 @@ const VideoPage: React.FC<{}> = () => {
           <TabBar
             scrollEnabled
             {...props}
-            indicatorStyle={{backgroundColor: VideoStyle.indicatorColor, width: 0.5}}
+            indicatorStyle={{
+              backgroundColor: VideoStyle.indicatorColor,
+              width: 0.5,
+            }}
             renderLabel={({route, focused, color}) => (
               <InfoText
                 title={route.title!}

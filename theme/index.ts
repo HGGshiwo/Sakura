@@ -18,6 +18,7 @@ const theme = {
     VideoStyle: {
       textColor: (focused: boolean) => focused ? 'red' : 'black',
       indicatorColor: 'red',
+      playerTextColor: (focused: boolean) => focused ? 'red' : 'white'
     },
     FollowButtonStyle: {
       backgroundColor: (followed: boolean) => followed ? 'lightgray' : 'red',

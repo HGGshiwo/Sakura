@@ -13,10 +13,10 @@ import Video, {
   OnSeekData,
 } from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faExpand} from '@fortawesome/free-solid-svg-icons';
+import {faExpand, faForwardFast} from '@fortawesome/free-solid-svg-icons';
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
-import {Pressable} from 'react-native';
+import {Pressable, Text} from 'react-native';
 import {LoadingText} from '../../../../component/Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
@@ -95,7 +95,7 @@ const Player: React.FC<PlayerProps> = ({
   const [rateSheetVisible, setRateSheetVisible] = useState(false); //速度sheet是否可见
   const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false); //选集消息是否可见
-
+  const [progressMessageVisible, setProgressMessageVisible] = useState(false)
   //速度控制
   const [rateText, setRateText] = useState('倍速');
   const [playRate, setPlayRate] = useState(1); //当前播放速度
@@ -103,6 +103,7 @@ const Player: React.FC<PlayerProps> = ({
   const prePlayRate = useRef(1); //长按前的播放速度
 
   const progressRef = useRef(0); //进度条记录
+  const baseProgressRef = useRef(0); //移动进度条时的原始路径
   const durationRef = useRef(0); //时长记录
   const isFocused = useIsFocused(); //页面是否隐藏，隐藏则暂停播放
   const controlVisibleRef = useRef(false); //control是否可见
@@ -118,6 +119,10 @@ const Player: React.FC<PlayerProps> = ({
       pausedRef.current = true;
     }
   }, [videoUrlAvailable]);
+
+  useEffect(() => {
+    setFmtProgress(sec_to_time(progressRef.current));
+  }, [progressRef.current]);
 
   useEffect(() => {
     setPaused(!isFocused || pausedRef.current);
@@ -140,6 +145,7 @@ const Player: React.FC<PlayerProps> = ({
     return () => {
       // This would be inside componentWillUnmount()
       clearInterval(interval);
+      Orientation.lockToPortrait()
       Orientation.removeOrientationListener(handleOrientation);
     };
   }, []);
@@ -162,28 +168,29 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   const _onProgress = (data: OnProgressData) => {
-    setFmtProgress(sec_to_time(data.currentTime));
     setCache(data.playableDuration);
     if (!seekingRef.current) {
-      //当seek时由video更新progress
+      //当seek时由slider更新progress
       setProgress(data.currentTime);
       progressRef.current = data.currentTime;
     }
   };
 
   const onSlidingComplete = (data: number) => {
+    seekingRef.current = false;
     setProgress(data); //当seek时，由slide自己更新
+    setLoading(true);
     videoRef.current?.seek(data);
     waitCloseControl();
   };
 
-  const onSlidingStart = () => {
-    seekingRef.current = true;
+  const onSeek = () => {
+    //加载完成
+    setLoading(false);
   };
 
-  //video.seek()结束之后调用
-  const onSeek = () => {
-    seekingRef.current = false;
+  const onSlidingStart = () => {
+    seekingRef.current = true;
   };
 
   //等待control消失的计时器
@@ -192,12 +199,13 @@ const Player: React.FC<PlayerProps> = ({
       clearTimeout(controlTimer.current);
       controlTimer.current = -1;
     }
-    if (!seekingRef.current) {
-      controlTimer.current = setTimeout(() => {
+    controlTimer.current = setTimeout(() => {
+      console.log(seekingRef.current);
+      if (!seekingRef.current) {
         setControlVisible(false);
         controlVisibleRef.current = false;
-      }, 3000);
-    }
+      }
+    }, 3000);
   };
 
   //打开control并在一段时间之后关闭
@@ -273,6 +281,23 @@ const Player: React.FC<PlayerProps> = ({
     setPlayRate(prePlayRate.current);
   };
 
+  const onMoveXStart = () => {
+    baseProgressRef.current = progressRef.current;
+    seekingRef.current = true;
+    setProgressMessageVisible(true)
+  };
+
+  const onMoveX = (dprogress: number) => {
+    progressRef.current =
+      baseProgressRef.current + (dprogress / layout.width) * 300; //必须使用progress，否则更新对不上
+    setProgress(progressRef.current);
+  };
+
+  const onMoveXComplete = () => {
+    setProgressMessageVisible(false)
+    onSlidingComplete(progressRef.current);
+  };
+
   const {VideoStyle} = theme['red'];
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
@@ -303,12 +328,9 @@ const Player: React.FC<PlayerProps> = ({
             onLongPress={onLongPress}
             onLongPressOut={onLongPressOut}
             onDbPress={handlePlay}
-            onMoveX={dprogress => {
-              seekingRef.current = true;
-              progressRef.current = progressRef.current + (dprogress / layout.width) * 100; //必须使用progress，否则更新对不上
-              setProgress(progressRef.current);
-            }}
-            onMoveXOut={() => onSlidingComplete(progressRef.current)}
+            onMoveX={onMoveX}
+            onMoveXStart={onMoveXStart}
+            onMoveXComplete={onMoveXComplete}
           />
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
@@ -412,7 +434,17 @@ const Player: React.FC<PlayerProps> = ({
             </View>
           </View>
 
-          <RateMessage show={rateMessageVisible} />
+          <RateMessage show={rateMessageVisible}>
+            <FontAwesomeIcon color="white" icon={faForwardFast} />
+            <LoadingText style={{paddingLeft: 10}} title="倍速播放中" />
+          </RateMessage>
+
+          <RateMessage show={progressMessageVisible}>
+            <LoadingText
+              style={{paddingLeft: 10}}
+              title={`${fmtProgress}/${fmtDuration}`}
+            />
+          </RateMessage>
 
           {/* rate sheet  */}
           <RateSheet

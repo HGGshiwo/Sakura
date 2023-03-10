@@ -12,9 +12,10 @@ type Props = {
   onLongPressOut?: () => void;
   onDbPress?: () => void;
   onMoveX?: (x: number) => void;
+  onMoveXStart:()=>void;
+  onMoveXComplete:()=>void;
   onLeftMoveY?: (y: number) => void;
   onRightMoveY?: (y: number) => void;
-  onMoveXOut: () => void;
 };
 
 enum State {
@@ -29,10 +30,11 @@ const Blank: React.FC<Props> = ({
   onLongPressOut,
   onLongPress,
   onDbPress,
+  onMoveXStart,
   onMoveX,
+  onMoveXComplete,
   onRightMoveY,
   onLeftMoveY,
-  onMoveXOut,
 }) => {
   const [longPressOut, setLongPressOut] = useState(false); //是否是longpress out
   const timer = useRef(-1);
@@ -67,6 +69,7 @@ const Blank: React.FC<Props> = ({
             state.current = State.longPress;
           } else if (Math.abs(moveX - x0) > Math.abs(moveY - y0)) {
             state.current = State.moveX;
+            if(onMoveXStart) onMoveXStart()
           } else {
             state.current = State.moveY;
           }
@@ -113,7 +116,7 @@ const Blank: React.FC<Props> = ({
         } else if (state.current === State.longPress) {
           if (onLongPressOut) onLongPressOut(); //长按事件结束
         } else if (state.current === State.moveX) {
-          if (onMoveXOut) onMoveXOut(); //移动事件结束
+          if (onMoveXComplete) onMoveXComplete(); //移动事件结束
         }
       },
       onPanResponderTerminate: (evt, gestureState) => {

@@ -1,12 +1,14 @@
 import {faForwardFast} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import { ReactNode } from 'react';
 import {Text, View} from 'react-native';
 
 interface Props {
   show: boolean;
+  children: ReactNode;
 }
 
-const RateMessage: React.FC<Props> = ({show}) => {
+const RateMessage: React.FC<Props> = ({show, children}) => {
   return (
     <View
       style={{
@@ -24,8 +26,7 @@ const RateMessage: React.FC<Props> = ({show}) => {
           alignItems:'center',
           borderRadius: 5,
         }}>
-        <FontAwesomeIcon color='white' icon={faForwardFast} />
-        <Text style={{color: 'white', paddingLeft: 10}}>倍速播放中</Text>
+       {children}
       </View>
     </View>
   );

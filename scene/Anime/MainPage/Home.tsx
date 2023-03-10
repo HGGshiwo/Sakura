@@ -33,20 +33,22 @@ const Home: React.FC<{}> = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    let historys = [..._historys.sorted('time', true)].slice(0,10).map(_history => {
-      const _animes = realm.objectForPrimaryKey(Anime, _history.href);
-      return {
-        href: _history.href,
-        progress: _history.progress,
-        progressPer: _history.progressPer,
-        anthologyIndex: _history.anthologyIndex,
-        anthologyTitle: _history.anthologyTitle,
-        time: _history.time,
-        img: _animes!.img,
-        title: _animes!.title,
-        state: _animes!.state,
-      };
-    });
+    let historys = [..._historys.sorted('time', true)]
+      .slice(0, 10)
+      .map(_history => {
+        const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+        return {
+          href: _history.href,
+          progress: _history.progress,
+          progressPer: _history.progressPer,
+          anthologyIndex: _history.anthologyIndex,
+          anthologyTitle: _history.anthologyTitle,
+          time: _history.time,
+          img: _animes!.img,
+          title: _animes!.title,
+          state: _animes!.state,
+        };
+      });
     setHistorys(historys);
   }, [_historys]);
 
@@ -58,16 +60,18 @@ const Home: React.FC<{}> = () => {
         setSections(sections);
         setLoading(false);
         setRefreshing(false);
-        Toast.show(`刷新成功`, {
-          backgroundColor: 'black',
-          textStyle: {fontSize: 14, color: 'white'},
-          duration: Toast.durations.SHORT,
-          position: -100,
-          shadow: true,
-          animation: true,
-          hideOnPress: true,
-          delay: 0,
-        });
+        if (!loading) {
+          Toast.show(`刷新成功`, {
+            backgroundColor: 'black',
+            textStyle: {fontSize: 14, color: 'white'},
+            duration: 1000,
+            position: -100,
+            shadow: true,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,
+          });
+        }
       },
       (err: string) => {
         setText(err);
