@@ -51,12 +51,23 @@
     <tr>
     <td align=center>全部动漫</td>
     <td align=center>追番</td>
-    <td align=center>索引</td>
+    <td align=center>时间表</td>
   </tr>
   <tr>
     <td><img src="./img/all.jpg" width=270 ></td>
     <td><img src="./img/follow.jpg" width=270 ></td>
-    <td align=center>todo</td>
+    <td><img src="./img/schedule.jpg" width=270 ></td>
+  </tr>
+    </tr>
+    <tr>
+    <td align=center>排行榜</td>
+    <!-- <td align=center>追番</td>
+    <td align=center>时间表</td> -->
+  </tr>
+    <tr>
+    <td><img src="./img/ranking.jpg" width=270 ></td>
+    <!-- <td><img src="./img/follow.jpg" width=270 ></td>
+    <td><img src="./img/schedule.jpg" width=270 ></td> -->
   </tr>
  </table>
 
