@@ -6727,6 +6727,11 @@ react-is@^17.0.1:
   resolved "https://registry.npmmirror.com/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-battery@^0.1.18:
+  version "0.1.18"
+  resolved "https://registry.npmmirror.com/react-native-battery/-/react-native-battery-0.1.18.tgz#30cdea918ff30efc3f640365577464a407e63aeb"
+  integrity sha512-m+NJLYTzksJieQtVuARq1/cX0A4IKsv27QFRdOnBaCjD4L9nbtDbsAfpX/9c7w7eQwB7obwvu2kRdMjFbWawlA==
+
 react-native-codegen@^0.71.5:
   version "0.71.5"
   resolved "https://registry.npmmirror.com/react-native-codegen/-/react-native-codegen-0.71.5.tgz"
@@ -6771,6 +6776,13 @@ react-native-popup-dialog@^0.18.3:
     babel-plugin-flow-react-proptypes "^9.1.1"
     prop-types "^15.6.0"
     react-native-root-siblings "^3.2.1"
+
+react-native-progress@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmmirror.com/react-native-progress/-/react-native-progress-5.0.0.tgz#f5ac6ceaeee27f184c660b00f29419e82a9d0ab0"
+  integrity sha512-KjnGIt3r9i5Kn2biOD9fXLJocf0bwxPRxOyAgXEnZTJQU2O+HyzgGFRCbM5h3izm9kKIkSc1txh8aGmMafCD9A==
+  dependencies:
+    prop-types "^15.7.2"
 
 react-native-ratings@^8.1.0:
   version "8.1.0"
@@ -6856,6 +6868,11 @@ react-native-svg@^13.8.0:
   dependencies:
     css-select "^5.1.0"
     css-tree "^1.1.3"
+
+react-native-system-setting@^1.7.6:
+  version "1.7.6"
+  resolved "https://registry.npmmirror.com/react-native-system-setting/-/react-native-system-setting-1.7.6.tgz#43633604ac1bd5fd906acdbffa627a1998d2345a"
+  integrity sha512-nBnIK5Xnyu8XRRA3BMzRI54oYlSBKc0oOTQdZOCEeOvn4ltS1nk2shj/vtMQe6khXvuhai3vIc+g7DcsOcr5+w==
 
 react-native-tab-view@^3.5.1:
   version "3.5.1"

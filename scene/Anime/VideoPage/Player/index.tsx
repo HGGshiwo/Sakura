@@ -13,7 +13,12 @@ import Video, {
   OnSeekData,
 } from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faExpand, faForwardFast} from '@fortawesome/free-solid-svg-icons';
+import {
+  faExpand,
+  faForwardFast,
+  faSun,
+  faVolumeHigh,
+} from '@fortawesome/free-solid-svg-icons';
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable, Text} from 'react-native';
@@ -27,6 +32,8 @@ import RateSheet from './RateSheet';
 import Blank from './Blank';
 import {useIsFocused, useNavigationState} from '@react-navigation/native';
 import theme from '../../../../theme';
+import SystemSetting from 'react-native-system-setting';
+import {Bar} from 'react-native-progress';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -95,20 +102,28 @@ const Player: React.FC<PlayerProps> = ({
   const [rateSheetVisible, setRateSheetVisible] = useState(false); //速度sheet是否可见
   const [rateMessageVisible, setRateMessageVisible] = useState(false); //加速消息是否可见
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false); //选集消息是否可见
-  const [progressMessageVisible, setProgressMessageVisible] = useState(false)
-  //速度控制
-  const [rateText, setRateText] = useState('倍速');
+  const [progressMessageVisible, setProgressMessageVisible] = useState(false);
+  const [brightMessageVisible, setBrightMessageVisible] = useState(false);
+  const [volumeMessageVisible, setVolumeMessageVisible] = useState(false);
+
+  const [rateText, setRateText] = useState('倍速'); //速度控制
   const [playRate, setPlayRate] = useState(1); //当前播放速度
   const [rateId, setRateId] = useState(2); //播放速度id
   const prePlayRate = useRef(1); //长按前的播放速度
 
   const progressRef = useRef(0); //进度条记录
   const baseProgressRef = useRef(0); //移动进度条时的原始路径
+  const baseVolumeRef = useRef(0); //音量原始大小
+  const baseBrightRef = useRef(0);
+
   const durationRef = useRef(0); //时长记录
   const isFocused = useIsFocused(); //页面是否隐藏，隐藏则暂停播放
   const controlVisibleRef = useRef(false); //control是否可见
   const pausedRef = useRef(false); //是否暂停
   const layout = useWindowDimensions();
+
+  const [bright, setBright] = useState(0); //亮度
+  const [volume, setVolume] = useState(0); //声音
 
   useEffect(() => {
     if (videoUrlAvailable) {
@@ -145,7 +160,7 @@ const Player: React.FC<PlayerProps> = ({
     return () => {
       // This would be inside componentWillUnmount()
       clearInterval(interval);
-      Orientation.lockToPortrait()
+      Orientation.lockToPortrait();
       Orientation.removeOrientationListener(handleOrientation);
     };
   }, []);
@@ -284,7 +299,7 @@ const Player: React.FC<PlayerProps> = ({
   const onMoveXStart = () => {
     baseProgressRef.current = progressRef.current;
     seekingRef.current = true;
-    setProgressMessageVisible(true)
+    setProgressMessageVisible(true);
   };
 
   const onMoveX = (dprogress: number) => {
@@ -294,8 +309,49 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   const onMoveXComplete = () => {
-    setProgressMessageVisible(false)
+    setProgressMessageVisible(false);
     onSlidingComplete(progressRef.current);
+  };
+
+  //调整亮度
+  const onLeftMoveYStart = () => {
+    SystemSetting.getAppBrightness().then(brightness => {
+      setBright(brightness);
+      baseBrightRef.current = brightness;
+      setBrightMessageVisible(true);
+    });
+  };
+
+  const onLeftMoveY = (dy: number) => {
+    let _bright = baseBrightRef.current - dy * 0.002;
+    _bright = Math.max(Math.min(1, _bright), 0);
+    setBright(_bright);
+    console.log(_bright)
+    SystemSetting.setAppBrightness(_bright);
+  };
+
+  const onLeftMoveYComplete = () => {
+    setBrightMessageVisible(false);
+  };
+
+  //调整音量
+  const onRightMoveYStart = () => {
+    SystemSetting.getVolume().then(volume => {
+      setVolume(volume);
+      baseVolumeRef.current = volume;
+      setVolumeMessageVisible(true);
+    });
+  };
+
+  const onRightMoveY = (dy: number) => {
+    let _volume = baseVolumeRef.current - dy * 0.002;
+    _volume = Math.max(Math.min(1, _volume), 0);
+    setVolume(_volume);
+    SystemSetting.setVolume(_volume);
+  };
+
+  const onRightMoveYComplete = () => {
+    setVolumeMessageVisible(false);
   };
 
   const {VideoStyle} = theme['red'];
@@ -331,6 +387,12 @@ const Player: React.FC<PlayerProps> = ({
             onMoveX={onMoveX}
             onMoveXStart={onMoveXStart}
             onMoveXComplete={onMoveXComplete}
+            onLeftMoveYStart={onLeftMoveYStart}
+            onLeftMoveY={onLeftMoveY}
+            onLeftMoveYComplete={onLeftMoveYComplete}
+            onRightMoveYStart={onRightMoveYStart}
+            onRightMoveY={onRightMoveY}
+            onRightMoveYComplete={onRightMoveYComplete}
           />
 
           {erring ? <LoadingText title="视频源不可用..." /> : null}
@@ -434,15 +496,46 @@ const Player: React.FC<PlayerProps> = ({
             </View>
           </View>
 
+          {/* 倍速播放信息 */}
           <RateMessage show={rateMessageVisible}>
             <FontAwesomeIcon color="white" icon={faForwardFast} />
             <LoadingText style={{paddingLeft: 10}} title="倍速播放中" />
           </RateMessage>
 
+          {/* 进度跳拖动信息 */}
           <RateMessage show={progressMessageVisible}>
             <LoadingText
               style={{paddingLeft: 10}}
               title={`${fmtProgress}/${fmtDuration}`}
+            />
+          </RateMessage>
+
+          {/* 亮度 */}
+
+          <RateMessage show={brightMessageVisible}>
+            <FontAwesomeIcon color='white' icon={faSun} />
+            <Bar
+              style={{marginLeft: 10}}
+              borderWidth={0}
+              color={VideoStyle.indicatorColor}
+              unfilledColor="lightgrey"
+              progress={bright}
+              width={100}
+              height={5}
+            />
+          </RateMessage>
+
+          {/* 声音 */}
+          <RateMessage show={volumeMessageVisible}>
+            <FontAwesomeIcon color='white' icon={faVolumeHigh} />
+            <Bar
+              style={{marginLeft: 10}}
+              borderWidth={0}
+              color={VideoStyle.indicatorColor}
+              unfilledColor="lightgrey"
+              progress={volume}
+              width={100}
+              height={5}
             />
           </RateMessage>
 

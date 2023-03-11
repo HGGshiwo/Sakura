@@ -12,17 +12,22 @@ type Props = {
   onLongPressOut?: () => void;
   onDbPress?: () => void;
   onMoveX?: (x: number) => void;
-  onMoveXStart:()=>void;
-  onMoveXComplete:()=>void;
+  onMoveXStart: () => void;
+  onMoveXComplete: () => void;
+  onLeftMoveYStart: () => void;
   onLeftMoveY?: (y: number) => void;
+  onLeftMoveYComplete: () => void;
+  onRightMoveYStart: () => void;
   onRightMoveY?: (y: number) => void;
+  onRightMoveYComplete: () => void;
 };
 
 enum State {
   press, //短按
   longPress, //长按
   moveX, //沿着x轴移动
-  moveY, //沿着y轴移动
+  leftMoveY, //沿着y轴移动
+  rightMoveY,
 }
 
 const Blank: React.FC<Props> = ({
@@ -33,8 +38,12 @@ const Blank: React.FC<Props> = ({
   onMoveXStart,
   onMoveX,
   onMoveXComplete,
+  onRightMoveYStart,
   onRightMoveY,
+  onRightMoveYComplete,
+  onLeftMoveYStart,
   onLeftMoveY,
+  onLeftMoveYComplete,
 }) => {
   const [longPressOut, setLongPressOut] = useState(false); //是否是longpress out
   const timer = useRef(-1);
@@ -69,24 +78,26 @@ const Blank: React.FC<Props> = ({
             state.current = State.longPress;
           } else if (Math.abs(moveX - x0) > Math.abs(moveY - y0)) {
             state.current = State.moveX;
-            if(onMoveXStart) onMoveXStart()
+            if (onMoveXStart) onMoveXStart();
+          } else if (moveX < layout.width / 2) {
+            state.current = State.leftMoveY;
+            if (onLeftMoveY) onLeftMoveYStart();
           } else {
-            state.current = State.moveY;
+            state.current = State.rightMoveY;
+            if (onRightMoveY) onRightMoveYStart();
           }
         }
         if (state.current === State.longPress && onLongPress) {
-          console.log('long press');
           onLongPress();
         }
         if (state.current === State.moveX && onMoveX) {
           onMoveX(moveX - x0);
         }
-        if (state.current === State.moveY) {
-          if (moveX < layout.width / 2 && onLeftMoveY) {
-            onLeftMoveY(moveY - y0);
-          } else if (moveX >= layout.width && onRightMoveY) {
-            onRightMoveY(moveY - y0);
-          }
+        if (state.current === State.leftMoveY && onLeftMoveY) {
+          onLeftMoveY(moveY - y0);
+        }
+        if (state.current === State.rightMoveY && onRightMoveY) {
+          onRightMoveY(moveY - y0);
         }
       },
       onPanResponderTerminationRequest: (evt, gestureState) => true,
@@ -117,6 +128,10 @@ const Blank: React.FC<Props> = ({
           if (onLongPressOut) onLongPressOut(); //长按事件结束
         } else if (state.current === State.moveX) {
           if (onMoveXComplete) onMoveXComplete(); //移动事件结束
+        } else if (state.current === State.leftMoveY) {
+          if (onLeftMoveYComplete) onLeftMoveYComplete(); //移动事件结束
+        } else if (state.current === State.rightMoveY) {
+          if (onRightMoveY) onRightMoveYComplete(); //移动事件结束
         }
       },
       onPanResponderTerminate: (evt, gestureState) => {
