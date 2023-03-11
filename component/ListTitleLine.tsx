@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ViewStyle} from 'react-native';
 import {SubTitleBold} from './Text';
 import {TextButton} from './Button';
 
@@ -7,6 +7,7 @@ type listTitleLineProps = {
   buttonText: string;
   onPress: (event: any) => void;
   show?: boolean;
+  style?: ViewStyle;
 };
 
 const ListTitleLine = ({
@@ -14,9 +15,10 @@ const ListTitleLine = ({
   buttonText,
   onPress,
   show = true,
+  style
 }: listTitleLineProps) => {
   return (
-    <View style={[styles.container, {display: show ? 'flex' : 'none'}]}>
+    <View style={[styles.container, {display: show ? 'flex' : 'none'}, style]}>
       <SubTitleBold title={title} />
       <TextButton onPress={onPress} title={buttonText} />
     </View>

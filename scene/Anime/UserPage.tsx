@@ -21,6 +21,8 @@ import {UserPageProps} from '../../type/route';
 import Container from '../../component/Container';
 import {Divider} from '@rneui/themed';
 import theme from '../../theme';
+import {StyleSheet} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const UserPage: React.FC<{}> = () => {
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
@@ -36,6 +38,7 @@ const UserPage: React.FC<{}> = () => {
     {key: 'first', title: '番剧'},
     {key: 'second', title: '小说'},
     {key: 'third', title: '漫画'},
+    {key: 'forth', title: '设置'},
   ]);
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
@@ -72,88 +75,97 @@ const UserPage: React.FC<{}> = () => {
   }, [_follows]);
 
   const FirstRoute = () => (
-    <View style={{paddingHorizontal: 10}}>
-      <ListTitleLine
-        title="历史记录"
-        buttonText="更多"
-        onPress={() => {
-          navigation.navigate('History');
-        }}
-      />
-      <FlatList
-        horizontal
-        data={historys}
-        renderItem={({item, index}) => (
-          <H1HistoryInfoItem
-            item={item}
-            index={index}
-            onPress={item => {
-              navigation.push('Video', {url: item.href});
-            }}
-          />
-        )}
-        ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
-      />
-      <Divider />
-      <ListTitleLine
-        title="追番"
-        buttonText="更多"
-        onPress={() => {
-          navigation.navigate('Follow');
-        }}
-      />
-      <FlatList
-        horizontal
-        data={follows}
-        renderItem={({item, index}) => (
-          <H1RecommandInfoItem
-            item={item}
-            index={index}
-            onPress={item => {
-              navigation.push('Video', {url: item.href});
-            }}
-          />
-        )}
-        ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
-      />
-      <Divider />
-      <ListTitleLine
-        title="下载管理"
-        buttonText="更多"
-        onPress={() => {
-          navigation.navigate('Follow');
-        }}
-      />
-      <FlatList
-        horizontal
-        data={[]}
-        renderItem={({item, index}) => (
-          <H1RecommandInfoItem
-            item={item}
-            index={index}
-            onPress={item => {
-              navigation.push('Video', {url: item.href});
-            }}
-          />
-        )}
-        ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
-      />
-      <Divider />
-    </View>
+    <ScrollView style={{flex: 1}}>
+      <View style={styles.cardContainer}>
+        <ListTitleLine
+          title="历史记录"
+          buttonText="更多"
+          onPress={() => {
+            navigation.navigate('History');
+          }}
+        />
+        <Divider />
+        <FlatList
+          horizontal
+          data={historys}
+          renderItem={({item, index}) => (
+            <H1HistoryInfoItem
+              item={item}
+              index={index}
+              onPress={item => {
+                navigation.push('Video', {url: item.href});
+              }}
+            />
+          )}
+          ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+        />
+      </View>
+      <View style={styles.cardContainer}>
+        <ListTitleLine
+          title="追番"
+          buttonText="更多"
+          onPress={() => {
+            navigation.navigate('Follow');
+          }}
+        />
+        <Divider />
+        <FlatList
+          horizontal
+          data={follows}
+          renderItem={({item, index}) => (
+            <H1RecommandInfoItem
+              item={item}
+              index={index}
+              onPress={item => {
+                navigation.push('Video', {url: item.href});
+              }}
+            />
+          )}
+          ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+        />
+      </View>
+      <View style={styles.cardContainer}>
+        <ListTitleLine
+          title="下载管理"
+          buttonText="更多"
+          onPress={() => {
+            navigation.navigate('Follow');
+          }}
+        />
+        <Divider />
+        <FlatList
+          horizontal
+          data={[]}
+          renderItem={({item, index}) => (
+            <H1RecommandInfoItem
+              item={item}
+              index={index}
+              onPress={item => {
+                navigation.push('Video', {url: item.href});
+              }}
+            />
+          )}
+          ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+        />
+      </View>
+    </ScrollView>
   );
 
   const SecondRoute = () => <View style={{flex: 1}} />;
 
   const thirdRoute = () => <View style={{flex: 1}} />;
 
+  const forthRoute = () => <View style={{flex: 1}} />;
+
   const renderScene = SceneMap({
     first: FirstRoute,
     second: SecondRoute,
     third: thirdRoute,
+    forth: forthRoute,
   });
 
   const layout = useWindowDimensions();
-  const {HeaderStyle} = theme['red']
+  const {HeaderStyle} = theme['red'];
 
   return (
     <Container>
@@ -177,22 +189,25 @@ const UserPage: React.FC<{}> = () => {
       <TabView
         renderTabBar={props => (
           <TabBar
-          scrollEnabled
-          {...props}
-          indicatorStyle={{backgroundColor: HeaderStyle.indicatorColor, width: 0.5}}
-          renderLabel={({route, focused, color}) => (
-            <InfoText
-              title={route.title}
-              style={{
-                color: HeaderStyle.textColor(focused),
-                paddingHorizontal: 5,
-                fontWeight: focused ? '900' : 'normal',
-              }}
-            />
-          )}
-          style={{backgroundColor: HeaderStyle.backgroundColor}}
-          tabStyle={{width: 'auto'}}
-        />
+            scrollEnabled
+            {...props}
+            indicatorStyle={{
+              backgroundColor: HeaderStyle.indicatorColor,
+              width: 0.5,
+            }}
+            renderLabel={({route, focused, color}) => (
+              <InfoText
+                title={route.title}
+                style={{
+                  color: HeaderStyle.textColor(focused),
+                  paddingHorizontal: 5,
+                  fontWeight: focused ? '900' : 'normal',
+                }}
+              />
+            )}
+            style={{backgroundColor: HeaderStyle.backgroundColor}}
+            tabStyle={{width: 'auto'}}
+          />
         )}
         navigationState={{index, routes}}
         renderScene={renderScene}
@@ -203,4 +218,19 @@ const UserPage: React.FC<{}> = () => {
   );
 };
 
+const styles = StyleSheet.create({
+  cardContainer: {
+    borderRadius: 5,
+    borderWidth: 1,
+    padding: 10,
+    borderColor: 'lightgrey',
+    margin: 10,
+    backgroundColor: 'white',
+    elevation: 1.5,
+    shadowColor: '#999',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 1,
+    shadowRadius: 1.5,
+  },
+});
 export default UserPage;
