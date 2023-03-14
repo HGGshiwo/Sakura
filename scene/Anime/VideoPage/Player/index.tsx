@@ -192,7 +192,6 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   const onSlidingComplete = (data: number) => {
-    seekingRef.current = false;
     setProgress(data); //当seek时，由slide自己更新
     setLoading(true);
     videoRef.current?.seek(data);
@@ -202,6 +201,7 @@ const Player: React.FC<PlayerProps> = ({
   const onSeek = () => {
     //加载完成
     setLoading(false);
+    seekingRef.current = false;
   };
 
   const onSlidingStart = () => {
