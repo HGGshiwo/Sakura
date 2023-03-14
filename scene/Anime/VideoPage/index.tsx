@@ -424,7 +424,7 @@ const VideoPage: React.FC<{}> = () => {
                   <View style={styles.itemContainer}>
                     <SubTitle
                       title={info.title}
-                      active={index === anthologyIndex}
+                      style={{color: VideoStyle.textColor(index === anthologyIndex) }}
                     />
                   </View>
                 </Pressable>
