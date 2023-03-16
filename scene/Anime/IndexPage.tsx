@@ -34,7 +34,7 @@ const IndexPage: React.FC<{}> = () => {
           navigation.navigate('Tab');
         }}
         style={{paddingVertical: 20}}>
-        <SubTitleBold title={title} />
+        <SubTitleBold style={{marginLeft: 10}} title={title} />
       </HeadBar>
       <Divider />
       <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>

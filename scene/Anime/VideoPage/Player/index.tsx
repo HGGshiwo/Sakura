@@ -322,10 +322,10 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   const onLeftMoveY = (dy: number) => {
-    let _bright = baseBrightRef.current - dy * 0.002;
-    _bright = Math.max(Math.min(1, _bright), 0);
+    const ratio = fullscreen ? layout.height : layout.width * 0.56;
+    let _bright = baseBrightRef.current - dy / ratio;
+    _bright = Math.round(Math.max(Math.min(1, _bright), 0) * 1000) / 1000;
     setBright(_bright);
-    console.log(_bright)
     SystemSetting.setAppBrightness(_bright);
   };
 
@@ -343,8 +343,9 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   const onRightMoveY = (dy: number) => {
-    let _volume = baseVolumeRef.current - dy * 0.002;
-    _volume = Math.max(Math.min(1, _volume), 0);
+    const ratio = fullscreen ? layout.height : layout.width * 0.56;
+    let _volume = baseVolumeRef.current - dy / ratio;
+    _volume = Math.round(Math.max(Math.min(1, _volume), 0)* 1000) / 1000;
     setVolume(_volume);
     SystemSetting.setVolume(_volume);
   };
@@ -353,7 +354,7 @@ const Player: React.FC<PlayerProps> = ({
     setVolumeMessageVisible(false);
   };
 
-  const {VideoStyle} = useContext(ThemeContext).theme
+  const {VideoStyle} = useContext(ThemeContext).theme;
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (
@@ -512,7 +513,7 @@ const Player: React.FC<PlayerProps> = ({
           {/* 亮度 */}
 
           <RateMessage show={brightMessageVisible}>
-            <FontAwesomeIcon color='white' icon={faSun} />
+            <FontAwesomeIcon color="white" icon={faSun} />
             <Bar
               style={{marginLeft: 10}}
               borderWidth={0}
@@ -526,7 +527,7 @@ const Player: React.FC<PlayerProps> = ({
 
           {/* 声音 */}
           <RateMessage show={volumeMessageVisible}>
-            <FontAwesomeIcon color='white' icon={faVolumeHigh} />
+            <FontAwesomeIcon color="white" icon={faVolumeHigh} />
             <Bar
               style={{marginLeft: 10}}
               borderWidth={0}

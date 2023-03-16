@@ -74,7 +74,7 @@ const Blank: React.FC<Props> = ({
         const {moveX, moveY, x0, y0} = gestureState;
         //按动时间过长，改变状态
         if (state.current === State.press) {
-          if (Math.abs(moveX - x0) < 1 && Math.abs(moveY - y0) < 1) {
+          if (Math.abs(moveX - x0) < 0.1 && Math.abs(moveY - y0) < 0.1) {
             state.current = State.longPress;
           } else if (Math.abs(moveX - x0) > Math.abs(moveY - y0)) {
             state.current = State.moveX;

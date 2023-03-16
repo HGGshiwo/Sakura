@@ -117,16 +117,11 @@ const UserPage: React.FC<{}> = () => {
     {title: '我的追番', icon: faHeart, data: 'Follow'},
   ];
 
-  const settings = [
-    {
-      title: '用户主题',
-      data: [
-        {name: 'red', color: 'red'},
-        {name: 'blue', color: 'dodgerblue'},
-        {name: 'black', color: 'black'},
-        {name: 'gold', color: 'gold'},
-      ],
-    },
+  const themes = [
+    {name: 'red', color: 'red'},
+    {name: 'blue', color: 'dodgerblue'},
+    {name: 'black', color: 'black'},
+    {name: 'gold', color: 'gold'},
   ];
 
   useEffect(() => {
@@ -156,6 +151,7 @@ const UserPage: React.FC<{}> = () => {
           datas={data}>
           {(index, item) => (
             <NavBarButton
+              key={index}
               onPress={() => onPress(item)}
               title={item.title}
               icon={item.icon}
@@ -280,31 +276,32 @@ const UserPage: React.FC<{}> = () => {
 
   const forthRoute = () => {
     return (
-      <SectionList
-        contentContainerStyle={{padding: 10}}
-        sections={settings}
-        renderSectionHeader={({section: {title}}) => (
-          <SubTitleBold title={title} />
-        )}
-        renderItem={({section: {data}, index}) => (
-          <MultiItemRow index={index} numberOfItem={4} datas={data}>
-            {(index, item) => (
+      <View style={{padding: 10}}>
+        <View style={styles.cardContainer}>
+          <SubTitleBold style={{marginVertical: 10}} title="用户主题" />
+          <Divider />
+          <FlatList
+            horizontal
+            data={themes}
+            renderItem={({item, index}) => (
               <Pressable
-                key={`${index}`}
-                onPress={() => {changeTheme(item.name); alert('切换主题成功')}}
+                onPress={() => {
+                  changeTheme(item.name as any);
+                  alert('切换主题成功');
+                }}
                 style={{
                   height: 40,
-                  flex: 1,
+                  width: 40,
                   backgroundColor: item.color,
                   margin: 20,
                   borderWidth: 2,
-                  borderColor: item.name === themeName ? 'brown' :'lightgrey' ,
+                  borderColor: item.name === themeName ? 'brown' : 'lightgrey',
                 }}
               />
             )}
-          </MultiItemRow>
-        )}
-      />
+          />
+        </View>
+      </View>
     );
   };
   const renderScene = SceneMap({

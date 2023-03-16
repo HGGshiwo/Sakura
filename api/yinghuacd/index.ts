@@ -1,4 +1,3 @@
-import { index } from "realm";
 import { RecommandInfo } from "../../type/RecommandInfo";
 import { Dom, getDomFromString } from "../Dom";
 

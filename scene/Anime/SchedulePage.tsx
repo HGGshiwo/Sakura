@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, FlatList, useWindowDimensions, Pressable} from 'react-native';
 import loadPage from '../../api/yinghuacd/home';
 import Container from '../../component/Container';
@@ -11,6 +11,7 @@ import {NoParamProps} from '../../type/route';
 import DailyInfo from '../../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
 import theme from '../../theme';
+import ThemeContext from '../../theme';
 
 const routes = [
   {key: '0', title: '星期一'},
@@ -65,7 +66,7 @@ const SchedulePage: React.FC<{}> = () => {
     });
   }, []);
 
-  const {TabBarStyle} = theme['red']
+  const {TabBarStyle} = useContext(ThemeContext).theme
 
   return (
     <Container>
@@ -74,7 +75,7 @@ const SchedulePage: React.FC<{}> = () => {
           navigation.navigate('Tab');
         }}
         style={{paddingVertical: 20}}>
-        <SubTitleBold title="时间表" />
+        <SubTitleBold style={{marginLeft: 10}} title="时间表" />
       </HeadBar>
       <Divider />
       <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
