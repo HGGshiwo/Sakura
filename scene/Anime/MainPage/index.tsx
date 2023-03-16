@@ -1,6 +1,6 @@
 import {View, useWindowDimensions} from 'react-native';
 
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {SearchBar} from '../../../component/SearchBar';
 import {TabBar, TabView} from 'react-native-tab-view';
 import Home from './Home';
@@ -10,6 +10,7 @@ import {useNavigation} from '@react-navigation/native';
 import {AnimePageProps} from '../../../type/route';
 import {InfoText} from '../../../component/Text';
 import theme from '../../../theme';
+import ThemeContext from '../../../theme';
 
 const url = {
   rbdm: {url: 'ribendongman/', title: '日本动漫'},
@@ -40,7 +41,7 @@ const AnimePage: React.FC<{}> = () => {
   ]);
 
   const [index, setIndex] = useState(0);
-  const {HeaderStyle} = theme['red']
+  const {HeaderStyle} = useContext(ThemeContext).theme
 
   return (
     <Container>

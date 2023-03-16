@@ -3,7 +3,7 @@ import {View, Pressable} from 'react-native';
 import {Divider} from '@rneui/themed';
 import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
-import {InfoText, SubTitleBold} from '../../component/Text';
+import {SubTitleBold} from '../../component/Text';
 import {HistoryPageProps} from '../../type/route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
@@ -11,16 +11,14 @@ import {FlatList} from 'react-native-gesture-handler';
 import {V1HistoryInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import History from '../../models/History';
-import {useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import Anime from '../../models/Anime';
 import HistoryInfo from '../../type/HistoryInfo';
-import Dialog, {
-  DialogContent,
-  DialogFooter,
-  DialogButton,
-} from 'react-native-popup-dialog';
+import Dialog from 'react-native-dialog';
 import EndLine from '../../component/EndLine';
 import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
+import alert from '../../component/Toast';
+import ThemeContext from '../../theme';
 
 const {useRealm, useQuery} = Context;
 
@@ -31,6 +29,7 @@ const HistoryPage: React.FC<{}> = () => {
   const curItem = useRef<HistoryInfo>();
   const realm = useRealm();
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
+  const {DialogStyle} = useContext(ThemeContext).theme
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
@@ -57,39 +56,29 @@ const HistoryPage: React.FC<{}> = () => {
 
   const onOK = () => {
     const item = curItem.current;
+    setDialogVisible(false);
     realm.write(() => {
       const history = realm.objectForPrimaryKey(History, item!.href);
       realm.delete(history);
     });
-    setDialogVisible(false);
+    alert('删除成功')
   };
 
   return (
     <Container>
-      <Dialog
-        visible={dialogVisible}
-        width={0.8}
-        footer={
-          <DialogFooter>
-            <DialogButton
-              textStyle={{fontSize: 14, color: 'deeppink'}}
-              text="取消"
-              onPress={() => setDialogVisible(false)}
-            />
-            <DialogButton
-              textStyle={{fontSize: 14, color: 'deeppink'}}
-              text="好的"
-              onPress={onOK}
-            />
-          </DialogFooter>
-        }>
-        <DialogContent>
-          <InfoText
-            style={{alignSelf: 'center', paddingTop: 20}}
-            title="确定删除吗?"
-          />
-        </DialogContent>
-      </Dialog>
+      <Dialog.Container visible={dialogVisible}>
+        <Dialog.Description>{'确定删除吗?'}</Dialog.Description>
+        <Dialog.Button
+          color={DialogStyle.textColor}
+          label="取消"
+          onPress={() => setDialogVisible(false)}
+        />
+        <Dialog.Button
+          color={DialogStyle.textColor}
+          label="好的"
+          onPress={onOK}
+        />
+      </Dialog.Container>
       <HeadBar
         onPress={() => {
           navigation.navigate('Tab');
@@ -112,7 +101,7 @@ const HistoryPage: React.FC<{}> = () => {
       <Divider />
       <FlatList
         data={historys}
-        ItemSeparatorComponent={()=><Divider />}
+        ItemSeparatorComponent={() => <Divider />}
         renderItem={({item, index}) => (
           <V1HistoryInfoItem
             item={item}

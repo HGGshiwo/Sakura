@@ -29,7 +29,7 @@ const SearchBar: React.FC<Props> = ({
       <View style={[styles.container, style]}>
         <FontAwesomeIcon
           color="lightgrey"
-          icon={loading ? faSpinner : faMagnifyingGlass}
+          icon={faMagnifyingGlass}
         />
         {isButton ? (
           <Text style={{paddingLeft: 10}}>{placeholder}</Text>

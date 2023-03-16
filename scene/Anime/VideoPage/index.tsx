@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, createRef} from 'react';
+import React, {useState, useEffect, useRef, createRef, useContext} from 'react';
 import {
   View,
   useWindowDimensions,
@@ -28,6 +28,7 @@ import Profile from './Profile';
 import MultiItemRow from '../../../component/MultiItemRow';
 import {LoadingContainer} from '../../../component/Loading';
 import theme from '../../../theme';
+import ThemeContext from '../../../theme';
 const {useRealm} = Context;
 
 const emptyInfoSub = {
@@ -276,7 +277,7 @@ const VideoPage: React.FC<{}> = () => {
     });
   };
 
-  const {VideoStyle} = theme['red'];
+  const {VideoStyle} = useContext(ThemeContext).theme
 
   return (
     <Container>

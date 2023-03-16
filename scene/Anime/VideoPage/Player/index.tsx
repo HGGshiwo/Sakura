@@ -10,7 +10,6 @@ import Video, {
   OnBandwidthUpdateData,
   OnLoadData,
   OnProgressData,
-  OnSeekData,
 } from 'react-native-video';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
@@ -19,9 +18,9 @@ import {
   faSun,
   faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
-import {Pressable, Text} from 'react-native';
+import {Pressable} from 'react-native';
 import {LoadingText} from '../../../../component/Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
@@ -30,10 +29,10 @@ import {BackButton} from '../../../../component/Button';
 import {LoadingBox} from '../../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
-import {useIsFocused, useNavigationState} from '@react-navigation/native';
-import theme from '../../../../theme';
+import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
+import ThemeContext from '../../../../theme';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -354,7 +353,7 @@ const Player: React.FC<PlayerProps> = ({
     setVolumeMessageVisible(false);
   };
 
-  const {VideoStyle} = theme['red'];
+  const {VideoStyle} = useContext(ThemeContext).theme
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (

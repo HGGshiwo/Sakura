@@ -1,6 +1,6 @@
 import VideoPage from '../Anime/VideoPage'; 
 import AnimePage from '../Anime/MainPage';
-import SearchPage from '../Anime/SearchPaeg';
+import SearchPage from './SearchPage';
 import CategoryPage from '../Anime/CategoryPage';
 import IndexPage from '../Anime/IndexPage';
 import UserPage from '../Anime/UserPage';

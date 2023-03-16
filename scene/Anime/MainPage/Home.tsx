@@ -18,7 +18,7 @@ import Anime from '../../../models/Anime';
 import {useNavigation} from '@react-navigation/native';
 import {AnimeHomeProps} from '../../../type/route';
 import loadPage from '../../../api/yinghuacd/home';
-import Toast from 'react-native-root-toast';
+import alert from '../../../component/Toast';
 const {useRealm, useQuery} = Context;
 
 const Home: React.FC<{}> = () => {
@@ -61,16 +61,7 @@ const Home: React.FC<{}> = () => {
         setLoading(false);
         setRefreshing(false);
         if (!loading) {
-          Toast.show(`刷新成功`, {
-            backgroundColor: 'black',
-            textStyle: {fontSize: 14, color: 'white'},
-            duration: 1000,
-            position: -100,
-            shadow: true,
-            animation: true,
-            hideOnPress: true,
-            delay: 0,
-          });
+          alert('刷新成功')
         }
       },
       (err: string) => {

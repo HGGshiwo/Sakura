@@ -1,12 +1,14 @@
-import {View} from 'react-native';
+import {View, Text} from 'react-native';
 
 import React, {ReactNode} from 'react';
+import {ViewStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 
 interface ItemProps<T> {
   index: number;
   datas: T[];
   children: (index: number, info: T, onPress?: Function) => ReactNode;
   numberOfItem: number; //一行几个元素
+  containerStyle?: ViewStyle;
 }
 
 const MultiItemRow: React.FC<ItemProps<any>> = ({
@@ -14,19 +16,25 @@ const MultiItemRow: React.FC<ItemProps<any>> = ({
   datas,
   children,
   numberOfItem,
+  containerStyle,
 }) => {
   if (index % numberOfItem !== 0) return <></>;
 
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
+      style={[
+        {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+        containerStyle,
+      ]}>
       {new Array(numberOfItem).fill(0).map((_, rowIndex) => {
         return index + rowIndex >= datas.length ? (
-          <View key={rowIndex} style={{flex: 1}}></View>
+          <View
+            key={rowIndex}
+            style={{flex: 1}} />
         ) : (
           children(index + rowIndex, datas[index + rowIndex])
         );

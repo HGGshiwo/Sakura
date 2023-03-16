@@ -1,8 +1,9 @@
 import {useRoute} from '@react-navigation/native';
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useContext, useEffect, useState} from 'react';
 import {View, StatusBar, useColorScheme, StatusBarStyle} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ViewStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+import ThemeContext from '../theme';
 import theme from '../theme';
 type ContainerProps = {
   children: ReactNode;
@@ -12,9 +13,9 @@ const Container = ({children, style}: ContainerProps) => {
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const {name} = route;
+  const {themeName} = useContext(ThemeContext)
   const isDarkMode = useColorScheme() === 'dark';
-  const themeName = 'red';
-  const {HeaderStyle, ContainerStyle} = theme[themeName];
+  const {HeaderStyle, ContainerStyle} = useContext(ThemeContext).theme;;
   const [backgroundColor, setBackgroundColor] = useState('white');
   const [barStyle, setBarStyle] = useState<StatusBarStyle>(
     isDarkMode ? 'light-content' : 'dark-content',
@@ -31,7 +32,7 @@ const Container = ({children, style}: ContainerProps) => {
         setBackgroundColor(HeaderStyle.backgroundColor);
         break;
     }
-  }, [themeName, name]);
+  }, [name, themeName]);
 
   return (
     <View

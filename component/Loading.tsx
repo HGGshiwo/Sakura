@@ -1,7 +1,6 @@
-import {FAB} from '@rneui/base';
-import {ReactNode} from 'react';
+import {ReactNode, useContext} from 'react';
 import {View, ViewStyle, ActivityIndicator} from 'react-native';
-import theme from '../theme';
+import ThemeContext from '../theme';
 import {LoadingText} from './Text';
 
 interface Props {
@@ -11,7 +10,6 @@ interface Props {
   color?: string;
   backgroundColor?: string;
 }
-const {LoadingStyle} = theme['red']
 
 const LoadingBox: React.FC<Props> = ({
   text='加载中...',
@@ -19,6 +17,7 @@ const LoadingBox: React.FC<Props> = ({
   color = 'white',
   show = true,
 }) => {
+  
   return (
     <View
       style={[
@@ -44,6 +43,7 @@ const LoadingContainer: React.FC<ContainerProps> = ({
   loading = false,
   children,
 }) => {
+  const {LoadingStyle} = useContext(ThemeContext).theme;
   return (
     <View style={{flex: 1}}>
       {!loading ? (

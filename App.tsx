@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {createContext, useContext, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {StatusBar, useColorScheme, Text} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -34,6 +34,7 @@ import {
   SchedulePage,
 } from './scene/Anime';
 import RankingPage from './scene/Anime/RankingPage';
+import ThemeContext, {theme} from './theme';
 
 const {RealmProvider} = Context;
 
@@ -54,10 +55,11 @@ const texts = {
   Comic: '漫画',
 };
 const TabPage = () => {
+  const {BottomStyle} = useContext(ThemeContext).theme;
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
-        tabBarStyle:{height: 50, paddingTop: 10},
+        tabBarStyle: {height: 50, paddingTop: 10},
         tabBarIcon: ({focused, color, size}) => {
           let icon = icons[route.name as keyof typeof icons];
           // You can return any component that you like here!
@@ -65,7 +67,7 @@ const TabPage = () => {
             <FontAwesomeIcon
               icon={icon}
               size={18}
-              color={focused ? 'red' : 'grey'}
+              color={BottomStyle.textColor(focused)}
             />
           );
         },
@@ -76,7 +78,7 @@ const TabPage = () => {
               style={{
                 paddingBottom: 8,
                 fontSize: 10,
-                color: focused ? 'red' : 'grey',
+                color: BottomStyle.textColor(focused),
               }}>
               {texts[route.name as keyof typeof texts]}
             </Text>
@@ -105,7 +107,8 @@ const routes = [
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-
+  const [_theme, setTheme] = useState(theme.red);
+  const [themeName, setThemeName] = useState('red');
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -114,23 +117,33 @@ function App(): JSX.Element {
 
   return (
     <SafeAreaProvider style={backgroundStyle}>
-      <NavigationContainer>
-        <GestureHandlerRootView style={{flex: 1}}>
-          <RealmProvider>
-            <RootSiblingParent>
-              <Stack.Navigator screenOptions={{headerShown: false}}>
-                {routes.map((route, index) => (
-                  <Stack.Screen
-                    key={index}
-                    name={route.name}
-                    component={route.component}
-                  />
-                ))}
-              </Stack.Navigator>
-            </RootSiblingParent>
-          </RealmProvider>
-        </GestureHandlerRootView>
-      </NavigationContainer>
+      <ThemeContext.Provider
+        value={{
+          theme: _theme,
+          themeName,
+          changeTheme: (themeName: keyof typeof theme) => {
+            setThemeName(themeName);
+            setTheme(theme[themeName]);
+          },
+        }}>
+        <NavigationContainer>
+          <GestureHandlerRootView style={{flex: 1}}>
+            <RealmProvider>
+              <RootSiblingParent>
+                <Stack.Navigator screenOptions={{headerShown: false}}>
+                  {routes.map((route, index) => (
+                    <Stack.Screen
+                      key={index}
+                      name={route.name}
+                      component={route.component}
+                    />
+                  ))}
+                </Stack.Navigator>
+              </RootSiblingParent>
+            </RealmProvider>
+          </GestureHandlerRootView>
+        </NavigationContainer>
+      </ThemeContext.Provider>
     </SafeAreaProvider>
   );
 }

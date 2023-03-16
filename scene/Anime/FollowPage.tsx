@@ -3,25 +3,23 @@ import {View, Pressable} from 'react-native';
 import {Divider} from '@rneui/themed';
 import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
-import {InfoText, SubTitleBold} from '../../component/Text';
+import {SubTitleBold} from '../../component/Text';
 import {HistoryPageProps} from '../../type/route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {FlatList} from 'react-native-gesture-handler';
 import {V1RecommandInfoItem} from '../../component/ListItem';
 import Context from '../../models';
-import {useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import Anime from '../../models/Anime';
-import Dialog, {
-  DialogContent,
-  DialogFooter,
-  DialogButton,
-} from 'react-native-popup-dialog';
+import Dialog from 'react-native-dialog';
 import Follow from '../../models/Follow';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {UpdateMode} from 'realm';
 import EndLine from '../../component/EndLine';
 import {RoundButton} from '../../component/Button';
+import alert from '../../component/Toast';
+import ThemeContext from '../../theme';
 
 const {useRealm, useQuery} = Context;
 
@@ -32,7 +30,7 @@ const FollowPage: React.FC<{}> = () => {
   const curItem = useRef<RecommandInfo>();
   const realm = useRealm();
   const [follows, setFollows] = useState<RecommandInfo[]>([]);
-
+  const {DialogStyle} = useContext(ThemeContext).theme
   useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)
@@ -67,34 +65,24 @@ const FollowPage: React.FC<{}> = () => {
       );
     });
     setDialogVisible(false);
+    alert('取消追番成功')
   };
 
   return (
     <Container>
-      <Dialog
-        visible={dialogVisible}
-        width={0.8}
-        footer={
-          <DialogFooter>
-            <DialogButton
-              textStyle={{fontSize: 14, color: 'deeppink'}}
-              text="取消"
-              onPress={() => setDialogVisible(false)}
-            />
-            <DialogButton
-              textStyle={{fontSize: 14, color: 'deeppink'}}
-              text="好的"
-              onPress={onOK}
-            />
-          </DialogFooter>
-        }>
-        <DialogContent>
-          <InfoText
-            style={{alignSelf: 'center', paddingTop: 20}}
-            title="确定删除吗?"
-          />
-        </DialogContent>
-      </Dialog>
+      <Dialog.Container visible={dialogVisible}>
+        <Dialog.Description>{'确定取消追番吗?'}</Dialog.Description>
+        <Dialog.Button
+          color={DialogStyle.textColor}
+          label="取消"
+          onPress={() => setDialogVisible(false)}
+        />
+        <Dialog.Button
+          color={DialogStyle.textColor}
+          label="好的"
+          onPress={onOK}
+        />
+      </Dialog.Container>
       <HeadBar
         onPress={() => {
           navigation.navigate('Tab');
@@ -125,7 +113,10 @@ const FollowPage: React.FC<{}> = () => {
             index={index}>
             <RoundButton style={{marginRight: 20}} text="立即观看" />
             <Pressable onPress={() => onDelete(item)}>
-              <RoundButton style={{marginVertical: 20, marginRight: 20}} text="取消追番" />
+              <RoundButton
+                style={{marginVertical: 20, marginRight: 20}}
+                text="取消追番"
+              />
             </Pressable>
           </V1RecommandInfoItem>
         )}

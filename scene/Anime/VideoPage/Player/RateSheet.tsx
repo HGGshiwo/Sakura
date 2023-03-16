@@ -1,7 +1,8 @@
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import {Text, View, Pressable} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {InfoText} from '../../../../component/Text';
+import ThemeContext from '../../../../theme';
 import theme from '../../../../theme';
 
 interface Props {
@@ -19,7 +20,7 @@ const RateSheet: React.FC<Props> = ({show, onPress, defaultActive}) => {
     {title: '1.5X', id: 4, data: 1.5},
     {title: '2.0X', id: 5, data: 2},
   ];
-  const {VideoStyle} = theme['red']
+  const {VideoStyle} = useContext(ThemeContext).theme
   return (
     <View
       style={{

@@ -3,17 +3,20 @@ import {
   faChevronRight,
   faBars,
   faChevronLeft,
+  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import {faHeart} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {ViewStyle, Pressable, StyleSheet, Text, View} from 'react-native';
-import theme from '../theme';
-const {FollowButtonStyle} = theme['red'];
+import {useContext} from 'react';
+import ThemeContext from '../theme';
 
 interface Props {
   onPress?: (event: any) => void;
   style?: ViewStyle;
   title?: string;
+  theme?: string;
+  icon?: IconDefinition;
 }
 
 const CloseButton: React.FC<Props> = ({onPress, style}) => {
@@ -43,9 +46,14 @@ interface FollowButtonProps extends Props {
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
+  const {FollowButtonStyle} = useContext(ThemeContext).theme;
   return (
     <Pressable
-      android_ripple={{color: FollowButtonStyle.rippleColor, radius: 30, borderless: false}}
+      android_ripple={{
+        color: FollowButtonStyle.rippleColor,
+        radius: 30,
+        borderless: false,
+      }}
       style={[
         {
           backgroundColor: FollowButtonStyle.backgroundColor(followed),
@@ -74,14 +82,15 @@ const RoundButton: React.FC<{text: string; style?: ViewStyle}> = ({
   text,
   style,
 }) => {
+  const {RoundButtonStyle} = useContext(ThemeContext).theme;
   return (
     <View
       style={[
         styles.buttonContainer,
-        {borderWidth: 1, borderColor: 'deeppink'},
+        {borderWidth: 1, borderColor: RoundButtonStyle.textColor},
         style,
       ]}>
-      <Text style={[{color: 'deeppink'}]}>{text}</Text>
+      <Text style={[{color: RoundButtonStyle.textColor}]}>{text}</Text>
     </View>
   );
 };
@@ -96,6 +105,18 @@ const BackButton: React.FC<{
       hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
       onPress={onPress}>
       <FontAwesomeIcon style={style} color={color} icon={faChevronLeft} />
+    </Pressable>
+  );
+};
+
+const NavBarButton: React.FC<Props> = ({onPress, title, icon}) => {
+  const {NavBarStyle} = useContext(ThemeContext).theme;
+  return (
+    <Pressable style={{flex: 1}} onPress={onPress}>
+      <View style={styles.itemContainer}>
+        <FontAwesomeIcon color={NavBarStyle.color} size={25} icon={icon!} />
+        <Text style={{fontSize: 12, paddingTop: 5}}>{`${title}`}</Text>
+      </View>
     </Pressable>
   );
 };
@@ -123,6 +144,18 @@ const styles = StyleSheet.create({
     paddingRight: 2,
     color: 'gray',
   },
+  itemContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
 });
 
-export {CloseButton, TextButton, RoundButton, FollowButton, BackButton};
+export {
+  CloseButton,
+  TextButton,
+  RoundButton,
+  FollowButton,
+  BackButton,
+  NavBarButton,
+};
