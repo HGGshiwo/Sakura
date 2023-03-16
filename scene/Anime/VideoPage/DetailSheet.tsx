@@ -2,8 +2,9 @@ import {InfoSub} from '../../../type/InfoSub';
 import {Text, Image} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {InfoText, RateText, SubTitleBold, Title} from '../../../component/Text';
-import { Tag } from '../../../component/Tag';
-import { CloseButton } from '../../../component/Button';
+import {Tag} from '../../../component/Tag';
+import {CloseButton} from '../../../component/Button';
+import {FlatList} from 'react-native-gesture-handler';
 
 type detailSheetProps = {
   height: number;
@@ -32,43 +33,47 @@ const DetailSheet = ({
     <View style={[styles.container, {height: height, top: top}]}>
       <View style={styles.headerRow}>
         <SubTitleBold title="详情" />
-        <CloseButton onPress={onPress}/>
+        <CloseButton onPress={onPress} />
       </View>
       <ScrollView>
         <View style={styles.imageRow}>
           <Image containerStyle={styles.imageContainer} source={{uri: src}} />
           <View style={styles.titleContainer}>
-            <Title title={title}/>
+            <Title title={title} />
             <View>
-              <InfoText title={infoSub.produce}/>
-              <InfoText title={infoSub.state}/>
+              <InfoText title={infoSub.produce} />
+              <InfoText title={infoSub.state} />
             </View>
           </View>
           <View style={styles.rateContainer}>
-            <RateText title='9.7'/>
+            <RateText title="9.7" />
           </View>
         </View>
         <View style={styles.nameRow}>
           <Text style={styles.nameRowText}>别名</Text>
-          <Text>{infoSub.alias}</Text>
+          <Text style={{flex: 1}}>{infoSub.alias}</Text>
         </View>
         <View style={styles.typeRow}>
           <Text style={styles.nameRowText}>风格</Text>
-          <View style={styles.typeContainer}>
-            {infoSub.type.map((type: string, index: number) => {
-              return (
-                <Tag text={type} key={index} style={styles.buttonContainer}/>
-              );
-            })}
-          </View>
+          <FlatList
+            horizontal
+            data={infoSub.type}
+            renderItem={({item, index}) => (
+              <Tag text={item} key={index} style={styles.buttonContainer} />
+            )}
+          />
         </View>
         <View style={styles.produceRow}>
-          <Title title='制作信息' style={styles.produceTitle}/>
-          <InfoText title={infoSub.author}/>
+          <Title title="制作信息" style={styles.produceTitle} />
+          <InfoText title={infoSub.author} />
         </View>
         <View style={styles.infoRow}>
-        <Title title='简介' style={styles.produceTitle}/>
-          <InfoText numberOfLines={-1} title={info} style={{paddingHorizontal: 10}}/>
+          <Title title="简介" style={styles.produceTitle} />
+          <InfoText
+            numberOfLines={-1}
+            title={info}
+            style={{paddingHorizontal: 10}}
+          />
         </View>
       </ScrollView>
     </View>
@@ -85,8 +90,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 10,
-    paddingHorizontal: 10,
+    padding: 10,
   },
   imageRow: {
     flexDirection: 'row',
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
   typeRow: {
     flexDirection: 'row',
     margin: 10,
-    alignItems:'center',
+    alignItems: 'center',
   },
   nameRow: {
     flexDirection: 'row',
@@ -124,12 +128,10 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   nameRowText: {
-    width: 50,
+    width: 40,
   },
   typeContainer: {
-    flexDirection: 'row',
     flex: 1,
-    alignItems: 'center',
   },
   buttonContainer: {
     marginHorizontal: 5,

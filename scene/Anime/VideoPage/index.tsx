@@ -20,8 +20,8 @@ import Anime from '../../../models/Anime';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../../type/route';
 import Container from '../../../component/Container';
-import loadPage, {loadVideoSrc} from '../../../api/yinghuacd/video';
-// import { loadVideoSrc } from '../../../api/scyinghua/video';
+// import loadPage, {loadVideoSrc} from '../../../api/yinghuacd/video';
+import loadPage, { loadVideoSrc } from '../../../api/scyinghua/video';
 import {InfoText, SubTitle} from '../../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
 import Profile from './Profile';
@@ -144,7 +144,8 @@ const VideoPage: React.FC<{}> = () => {
   const init = () => {
     setRefreshing(true);
     loadPage(
-      url,
+      // url,
+      '/detail/78.html',
       ({title, img, infoSub, recommands, sources, info, relatives}) => {
         const _anthologys = sources.map((_source, index) => {
           return {id: index, data: _source.data, title: _source.key};

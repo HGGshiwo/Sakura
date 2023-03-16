@@ -6,7 +6,9 @@ class Dom {
     _dom: Document;
     src: string | null;
     href: string | null;
+    title: string | null;
     "data-vid": string|null;
+    "data-src": string|null;
     innerHTML: string;
     style:string;
     

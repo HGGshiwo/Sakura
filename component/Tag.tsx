@@ -19,18 +19,19 @@ const Tag: React.FC<Props> = ({text, onPress, data, style}) => {
         style={[
           {
             height: 30,
-            width: 60,
             borderRadius: 50,
             backgroundColor: '#E7E8E9',
             justifyContent: 'space-between',
             alignItems: 'center',
-            flexDirection:'row',
+            flexDirection: 'row',
             paddingHorizontal: 8,
           },
           style,
         ]}>
-        <Text style={{color: 'gray'}}>{text}</Text>
-        <FontAwesomeIcon color='gray' icon={faChevronRight} />
+        <Text ellipsizeMode="tail" numberOfLines={1} style={{color: 'gray'}}>
+          {text}
+        </Text>
+        <FontAwesomeIcon color="gray" icon={faChevronRight} />
       </View>
     </Pressable>
   );

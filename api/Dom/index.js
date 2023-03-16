@@ -13,7 +13,7 @@ const getDomFromString = str => {
 
 class Dom {
   constructor(dom) {
-    attributes = ["src", "data-vid", "href", "style"]
+    attributes = ["src", "data-vid", "href", "style", "title", "data-src"]
     this._dom = dom;
     attributes.forEach(attribute => {
       this[attribute] = getAttributeValue(this._dom, attribute)
