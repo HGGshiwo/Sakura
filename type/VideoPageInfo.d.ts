@@ -1,4 +1,5 @@
 import { InfoSub } from "./InfoSub";
+import { ListItemInfo } from "./ListItemInfo";
 import { RecommandInfo } from "./RecommandInfo";
 import { Source } from "./Source";
 
@@ -8,7 +9,8 @@ interface VideoPageInfo {
     infoSub: InfoSub,
     recommands: RecommandInfo[],
     sources: Source[],
-    info: string
+    info: string,
+    relatives: ListItemInfo[]
 }
 
 export default VideoPageInfo;

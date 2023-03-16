@@ -93,16 +93,18 @@ const loadVideoSrc = (url:string, callback:(state:boolean, src?:string, type?: s
 }
 
 const _loadVideoSrc = (url:string, callback:(state:boolean, src?:string, type?: string)=>void, times:number) => {
-  fetch('https://www.scyinghua.com/play/397-1-1.html').then(response => response.text())
+  fetch('https://www.scyinghua.com/play/397-1-2.html').then(response => response.text())
     .then((responseText) => {
       if (responseText === '') {
         times > 0 ? _loadVideoSrc(url, callback, times - 1) : callback(false)
         return
       }
-      let document = getDomFromString(responseText)
-      let src_type = document!.getElementById('playbox')!["data-vid"]!.split('$')
-      const type = src_type[0].includes('m3u8') ? 'm3u8' : src_type[1]
-      callback(true, src_type[0], type)
+      let document = getDomFromString(responseText)!
+      let src = document.getElementsByClassName('img-box bofang_box')![0].getElementsByTagName("script")![0]._dom.children[0].data
+      let src_type = /(?<="url":").*(?=","url_next")/.exec(src)![0].replaceAll('\\','')
+      console.log(src_type)
+      const type = src_type.includes('m3u8') ? 'm3u8' : 'mp4'
+      callback(true, src_type, type)
     })
     .catch(err => {
       console.log(err)

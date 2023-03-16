@@ -17,17 +17,16 @@ import Context from '../../../models';
 import History from '../../../models/History';
 import {UpdateMode} from 'realm';
 import Anime from '../../../models/Anime';
-import Follow from '../../../models/Follow';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../../type/route';
 import Container from '../../../component/Container';
 import loadPage, {loadVideoSrc} from '../../../api/yinghuacd/video';
+// import { loadVideoSrc } from '../../../api/scyinghua/video';
 import {InfoText, SubTitle} from '../../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
 import Profile from './Profile';
 import MultiItemRow from '../../../component/MultiItemRow';
 import {LoadingContainer} from '../../../component/Loading';
-import theme from '../../../theme';
 import ThemeContext from '../../../theme';
 const {useRealm} = Context;
 
@@ -144,66 +143,70 @@ const VideoPage: React.FC<{}> = () => {
 
   const init = () => {
     setRefreshing(true);
-    loadPage(url, ({title, img, infoSub, recommands, sources, info}) => {
-      const _anthologys = sources.map((_source, index) => {
-        return {id: index, data: _source.data, title: _source.key};
-      });
+    loadPage(
+      url,
+      ({title, img, infoSub, recommands, sources, info, relatives}) => {
+        const _anthologys = sources.map((_source, index) => {
+          return {id: index, data: _source.data, title: _source.key};
+        });
 
-      let _history = realm.objectForPrimaryKey(History, url);
+        let _history = realm.objectForPrimaryKey(History, url);
 
-      //更新番剧数据库
-      realm.write(() => {
-        realm.create(
-          Anime,
-          {
-            href: url,
-            img,
-            state: infoSub.state,
-            title,
-          },
-          UpdateMode.Modified,
+        //更新番剧数据库
+        realm.write(() => {
+          realm.create(
+            Anime,
+            {
+              href: url,
+              img,
+              state: infoSub.state,
+              title,
+            },
+            UpdateMode.Modified,
+          );
+        });
+
+        //更新历史记录数据库
+        realm.write(() => {
+          history.current = realm.create(
+            History,
+            {
+              href: url,
+              time: new Date().getTime(),
+              anthologyIndex: _history ? _history.anthologyIndex : 0,
+              progress: _history ? _history.progress : 0,
+              progressPer: _history ? _history.progressPer : 0,
+              anthologyTitle: _history
+                ? _history.anthologyTitle
+                : _anthologys[0].title,
+            },
+            UpdateMode.Modified,
+          );
+        });
+
+        setTitle(title);
+        setImgUrl(img);
+        setInfoSub(infoSub);
+        setRecommands(recommands);
+        setSources(sources);
+        setRelatives(relatives);
+
+        setAnthologys(_anthologys);
+        setInfo(info);
+        setRelatives(relatives);
+        setDefaultProgress(history.current!.progress);
+
+        setLoading(false); //页面内容获取成功，页面不再加载
+        setRefreshing(false);
+        setNextVideoAvailable(
+          history.current!.anthologyIndex + 1 < _anthologys.length,
         );
-      });
-
-      //更新历史记录数据库
-      realm.write(() => {
-        history.current = realm.create(
-          History,
-          {
-            href: url,
-            time: new Date().getTime(),
-            anthologyIndex: _history ? _history.anthologyIndex : 0,
-            progress: _history ? _history.progress : 0,
-            progressPer: _history ? _history.progressPer : 0,
-            anthologyTitle: _history
-              ? _history.anthologyTitle
-              : _anthologys[0].title,
-          },
-          UpdateMode.Modified,
-        );
-      });
-
-      setTitle(title);
-      setImgUrl(img);
-      setInfoSub(infoSub);
-      setRecommands(recommands);
-      setSources(sources);
-
-      setAnthologys(_anthologys);
-      setInfo(info);
-      setRelatives(relatives);
-      setDefaultProgress(history.current!.progress);
-
-      setLoading(false); //页面内容获取成功，页面不再加载
-      setRefreshing(false);
-      setNextVideoAvailable(
-        history.current!.anthologyIndex + 1 < _anthologys.length,
-      );
-      setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
-      curSourceIndex.current = 0;
-      curSources.current = sources[history.current!.anthologyIndex].data;
-      switchVideoSrc();
-    });
+        setAnthologyIndex(history.current!.anthologyIndex); //当前播放第一集
+        curSourceIndex.current = 0;
+        curSources.current = sources[history.current!.anthologyIndex].data;
+        switchVideoSrc();
+      },
+    );
   };
 
   useEffect(init, []);
@@ -277,7 +280,7 @@ const VideoPage: React.FC<{}> = () => {
     });
   };
 
-  const {VideoStyle} = useContext(ThemeContext).theme
+  const {VideoStyle} = useContext(ThemeContext).theme;
 
   return (
     <Container>
@@ -425,7 +428,9 @@ const VideoPage: React.FC<{}> = () => {
                   <View style={styles.itemContainer}>
                     <SubTitle
                       title={info.title}
-                      style={{color: VideoStyle.textColor(index === anthologyIndex) }}
+                      style={{
+                        color: VideoStyle.textColor(index === anthologyIndex),
+                      }}
                     />
                   </View>
                 </Pressable>

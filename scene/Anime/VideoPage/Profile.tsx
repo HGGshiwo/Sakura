@@ -1,27 +1,23 @@
 import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
-import {FlatList, View, useWindowDimensions} from 'react-native';
+import {FlatList, View, useWindowDimensions, Pressable} from 'react-native';
 import {UpdateMode} from 'realm';
 import {V1RecommandInfoItem} from '../../../component/ListItem';
 import {ListTitleLine} from '../../../component/ListTitleLine';
-import {LoadingContainer} from '../../../component/Loading';
-import {RateText} from '../../../component/Text';
+import {InfoText, RateText, SubTitle} from '../../../component/Text';
 import Follow from '../../../models/Follow';
 import {InfoSub} from '../../../type/InfoSub';
 import {ListItemInfo} from '../../../type/ListItemInfo';
 import {RecommandInfo} from '../../../type/RecommandInfo';
 import {VideoPageProps} from '../../../type/route';
 import {DetailButtonLine} from './DetailButtonLine';
-import {RelaviteLine} from './RelaviteLine';
 import {TitleLine} from './TitleLine';
 const {useRealm} = Context;
 import Context from '../../../models';
 import {ReactNode, useEffect, useState} from 'react';
 import EndLine from '../../../component/EndLine';
-import Toast from 'react-native-root-toast';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCloudArrowDown, faFileDownload, faShare } from '@fortawesome/free-solid-svg-icons';
 import ToolBar from '../../../component/ToolBar';
+import alert from '../../../component/Toast';
 
 type Props = {
   url: string;
@@ -79,16 +75,7 @@ const Profile: React.FC<Props> = ({
         UpdateMode.Modified,
       );
     });
-    Toast.show(`${!followed ? '' : '取消'}追番成功`, {
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      textStyle:{fontSize: 14},
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.TOP,
-      shadow: true,
-      animation: true,
-      hideOnPress: true,
-      delay: 0,
-    });
+    alert(`${!followed ? '' : '取消'}追番成功`);
   };
 
   return (
@@ -114,7 +101,19 @@ const Profile: React.FC<Props> = ({
               onPress={() => setAnthologySheetVisible(true)}
             />
             {relatives.length == 0 ? null : (
-              <RelaviteLine relatives={relatives} />
+              <FlatList
+                horizontal={true}
+                data={relatives}
+                renderItem={({item}) => (
+                  <Pressable
+                    onPress={() =>
+                      navigation.push('Video', {url: item.data})
+                    }>
+                    <SubTitle style={{padding: 12}} title={item.title} />
+                  </Pressable>
+                )}
+                keyExtractor={item => `${item.id}`}
+              />
             )}
             {children}
           </View>

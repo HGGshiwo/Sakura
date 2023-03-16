@@ -1,3 +1,4 @@
+import { ListItemInfo } from "../../type/ListItemInfo";
 import { Source } from "../../type/Source";
 import VideoPageInfo from "../../type/VideoPageInfo";
 import { Dom, getDomFromString } from "../Dom";
@@ -5,7 +6,7 @@ import { Dom, getDomFromString } from "../Dom";
 const href = 'http://www.yinghuacd.com';
 
 
-const loadPage = (url:string, callback:(data: VideoPageInfo)=>void) => {
+const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
   const _url = href + url
   fetch(_url)
     .then(response => response.text())
@@ -40,11 +41,11 @@ const loadPage = (url:string, callback:(data: VideoPageInfo)=>void) => {
         produce: infoSubDoms![1].getElementsByTagName('a')![0].innerHTML,
       };
 
-      let infoDom = document!.getElementsByClassName('info')![0];
+      let infoDom = document.getElementsByClassName('info')![0];
 
       //播放列表
       let movurlDoms = document.getElementsByClassName('movurl');
-      let playList: Record<string, Source>={};
+      let playList: Record<string, Source> = {};
 
       movurlDoms![0]
         .getElementsByTagName('li')!
@@ -57,14 +58,21 @@ const loadPage = (url:string, callback:(data: VideoPageInfo)=>void) => {
           playList[key as keyof typeof playList].data.push(href + a.href)
         });
 
-      const _sources = Object.values(playList).sort((a:Source, b:Source) => {
+      const _sources = Object.values(playList).sort((a: Source, b: Source) => {
         return a.key > b.key ? 1 : -1
       })
 
       //相关系列
-
+      let relatives: ListItemInfo[] = []
+      let imgDoms = document.getElementsByClassName('img')!
+      if (imgDoms.length != 0) {
+        relatives = imgDoms[0].getElementsByClassName('tname')!.map((pnameDom, index) => {
+          const aDom = pnameDom.getElementsByTagName('a')![0]
+          return { title: aDom.innerHTML, id: index, data: aDom.href }
+        })
+      }
       //相关推荐
-      let recommands = document!
+      let recommands = document
         .getElementsByClassName('pics')![0]
         .getElementsByTagName('li')!
         .map((liDom, index) => {
@@ -83,16 +91,17 @@ const loadPage = (url:string, callback:(data: VideoPageInfo)=>void) => {
         infoSub,
         recommands,
         sources: _sources,
-        info: infoDom.innerHTML
+        info: infoDom.innerHTML,
+        relatives
       })
     })
 }
 
-const loadVideoSrc = (url:string, callback:(state:boolean, src?:string, type?: string )=>void) => {
+const loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void) => {
   _loadVideoSrc(url, callback, 3)
 }
 
-const _loadVideoSrc = (url:string, callback:(state:boolean, src?:string, type?: string)=>void, times:number) => {
+const _loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void, times: number) => {
   fetch(url).then(response => response.text())
     .then((responseText) => {
       if (responseText === '') {
