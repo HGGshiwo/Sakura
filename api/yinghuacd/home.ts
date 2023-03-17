@@ -1,10 +1,12 @@
 import { AnimePageInfo } from "../../type/PageInfo/AnimePageInfo";
+import { RecommandInfo } from "../../type/RecommandInfo";
+import { Section } from "../../type/Section";
 import { Dom, getDomFromString } from "../Dom";
 
 const href = 'http://www.yinghuacd.com';
 
 
-function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: string) => void) {
+function loadPage(_afterLoad: (carousels:RecommandInfo[], sections: Section[]) => void, _afterErr?: (err: string) => void) {
   const _url = href
   fetch(_url)
     .then(response => response.text())
@@ -36,7 +38,7 @@ function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: s
         .map((dtitDom, index) => {
           return {
             title: dtitDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
-            href: dtitDom.getElementsByTagName('span')![0].getElementsByTagName('a')![0].href?.substring(1),
+            href: dtitDom.getElementsByTagName('span')![0].getElementsByTagName('a')![0].href!.substring(1),
             data: imgs[index].getElementsByTagName('li')!
               .map((liDom, index) => {
                 let aDoms = liDom.getElementsByTagName('p')![1].getElementsByTagName('a')!
@@ -52,42 +54,7 @@ function loadPage(_afterLoad: (data: AnimePageInfo) => void, _afterErr?: (err: s
           }
         })
 
-      //获取每日更新列表
-      let tlistDom = document.getElementsByClassName('tlist')![0]
-      const dailys = tlistDom.getElementsByTagName('ul')!.map((ulDom) => {
-        return ulDom.getElementsByTagName('li')!.map((liDom, index) => {
-          const aDoms = liDom.getElementsByTagName('a')!
-          return {
-            id: index,
-            href1: aDoms[0].href!,
-            href2: aDoms[1].href!,
-            title: aDoms[1].innerHTML,
-            state: aDoms[0].innerHTML,
-          }
-        })
-      })
-
-      //获取动漫排行
-      let picsDom = document.getElementsByClassName('pics')![0]
-      const rankings = picsDom.getElementsByTagName('li')!.map((liDom, index) => {
-        const spanDoms = liDom.getElementsByTagName('span')!
-        return {
-          id: index,
-          img: liDom.getElementsByTagName('img')![0].src!,
-          state: spanDoms[0].getElementsByTagName('font')![0].innerHTML,
-          title: liDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
-          href: liDom.getElementsByTagName('a')![0].href!,
-          type: spanDoms[1].getElementsByTagName('a')!.map((aDom: Dom) => aDom.innerHTML),
-          info: spanDoms[1].getElementsByTagName('a')![0].innerHTML
-        }
-      })
-
-      _afterLoad({
-        carousels,
-        dailys,
-        rankings,
-        sections,
-      })
+      _afterLoad(carousels, sections)
 
     }).catch(err => {
       console.log(err)

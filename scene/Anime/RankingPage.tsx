@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
-import loadPage from '../../api/yinghuacd/home';
+import loadPage from '../../api/yinghuacd/rank';
 import Container from '../../component/Container';
 import EndLine from '../../component/EndLine';
 import HeadBar from '../../component/HeadBar';
@@ -18,7 +18,7 @@ const RankingPage: React.FC<{}> = () => {
   const navigation = useNavigation<NoParamProps['navigation']>();
 
   useEffect(() => {
-    loadPage(({rankings}) => {
+    loadPage((rankings) => {
       setRankings(rankings);
       setLoading(false);
     });

@@ -25,7 +25,7 @@ const CategoryPage: React.FC<{}> = () => {
   const {url, title} = route.params;
 
   useEffect(() => {
-    loadPage(url, ({carousels, sections}) => {
+    loadPage(url, (carousels, sections) => {
       setCarousels(carousels);
       setSections(sections);
       setLoading(false);

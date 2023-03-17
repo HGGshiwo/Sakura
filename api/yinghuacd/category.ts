@@ -1,9 +1,11 @@
 import CategoryPageInfo from "../../type/PageInfo/CategoryPageInfo";
+import { RecommandInfo } from "../../type/RecommandInfo";
+import { Section } from "../../type/Section";
 import { Dom, getDomFromString } from "../Dom";
 
 const href = 'http://www.yinghuacd.com/';
 
-function loadPage(arg: string, _afterLoad?: (data: CategoryPageInfo) => void) {
+function loadPage(arg: string, _afterLoad?: (carousels: RecommandInfo[], sections: Section[]) => void) {
   const _url = href
   if (_afterLoad) {
     fetch(`${_url}${arg}/`)
@@ -32,10 +34,7 @@ function loadPage(arg: string, _afterLoad?: (data: CategoryPageInfo) => void) {
             }
           })
         const carousels = sections[0].data.splice(0, 5)
-        _afterLoad({
-          carousels,
-          sections
-        })
+        _afterLoad(carousels, sections)
       })
       .catch(err => {
         console.log(err)

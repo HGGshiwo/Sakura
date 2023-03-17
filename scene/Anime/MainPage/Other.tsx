@@ -29,7 +29,7 @@ const Other: React.FC<Props> = ({url, title}) => {
 
   const init = () => {
     setRefreshing(true)
-    loadPage(url, ({carousels, sections}) => {
+    loadPage(url, (carousels, sections) => {
       setCarousels(carousels);
       setSections(sections);
       setLoading(false);

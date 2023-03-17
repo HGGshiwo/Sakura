@@ -45,7 +45,6 @@ function loadPage(args: string, _afterSearch: (data: RecommandInfo[]) => void) {
           _afterSearch(result) //只有一页结果
           return [];
         }
-        console.log(666)
         const aDoms: Dom[] = pages[0].getElementsByTagName('a')!
         const promises = aDoms.slice(3, -2).map(aDom => {
           return fetch(`${_url}${aDom.href}`)

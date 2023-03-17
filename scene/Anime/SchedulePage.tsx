@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useContext, useEffect, useState} from 'react';
 import {View, FlatList, useWindowDimensions, Pressable} from 'react-native';
-import loadPage from '../../api/yinghuacd/home';
+import loadPage from '../../api/yinghuacd/daily';
 import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
 import {LoadingContainer} from '../../component/Loading';
@@ -10,7 +10,6 @@ import {InfoText, SubTitleBold} from '../../component/Text';
 import {NoParamProps} from '../../type/route';
 import DailyInfo from '../../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
-import theme from '../../theme';
 import ThemeContext from '../../theme';
 
 const routes = [
@@ -60,7 +59,7 @@ const SchedulePage: React.FC<{}> = () => {
     />
   );
   useEffect(() => {
-    loadPage(({dailys}) => {
+    loadPage((dailys) => {
       setDailys(dailys);
       setLoading(false);
     });

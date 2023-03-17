@@ -17,7 +17,8 @@ import {LoadingContainer} from '../../../component/Loading';
 import Anime from '../../../models/Anime';
 import {useNavigation} from '@react-navigation/native';
 import {AnimeHomeProps} from '../../../type/route';
-import loadPage from '../../../api/yinghuacd/home';
+// import loadPage from '../../../api/yinghuacd/home';
+import loadPage from '../../../api/scyinghua/home'
 import alert from '../../../component/Toast';
 const {useRealm, useQuery} = Context;
 
@@ -55,7 +56,7 @@ const Home: React.FC<{}> = () => {
   const init = () => {
     setRefreshing(true);
     loadPage(
-      ({carousels, sections, dailys}) => {
+      (carousels, sections) => {
         setCarousels(carousels);
         setSections(sections);
         setLoading(false);
