@@ -3,8 +3,7 @@ import {ReactNode, useContext, useEffect, useState} from 'react';
 import {View, StatusBar, useColorScheme, StatusBarStyle} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ViewStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
-import ThemeContext from '../theme';
-import theme from '../theme';
+import AppContext from '../context';
 type ContainerProps = {
   children: ReactNode;
   style?: ViewStyle;
@@ -13,9 +12,9 @@ const Container = ({children, style}: ContainerProps) => {
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const {name} = route;
-  const {themeName} = useContext(ThemeContext)
+  const {themeName} = useContext(AppContext)
   const isDarkMode = useColorScheme() === 'dark';
-  const {HeaderStyle, ContainerStyle} = useContext(ThemeContext).theme;;
+  const {HeaderStyle, ContainerStyle} = useContext(AppContext).theme;;
   const [backgroundColor, setBackgroundColor] = useState('white');
   const [barStyle, setBarStyle] = useState<StatusBarStyle>(
     isDarkMode ? 'light-content' : 'dark-content',

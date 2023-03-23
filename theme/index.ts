@@ -1,6 +1,19 @@
 import { createContext } from "react";
 
-const theme = {
+type AppTheme = Record<string, { 
+  ContainerStyle: any, 
+  HeaderStyle: any, 
+  BottomStyle: any, 
+  LoadingStyle: any, 
+  NavBarStyle: any, 
+  VideoStyle: any, 
+  FollowButtonStyle: any,
+  RoundButtonStyle: any,
+  DialogStyle: any,
+  TabBarStyle: any, 
+}>;
+
+const appTheme: AppTheme = {
   red: {
     ContainerStyle: {
       backgroundColor: 'white',
@@ -13,6 +26,7 @@ const theme = {
     },
     BottomStyle: {
       textColor: (focused: boolean) => focused ? 'red' : 'lightgrey',
+      backgroundColor: 'white',
     },
     LoadingStyle: {
       color: 'red',
@@ -54,6 +68,7 @@ const theme = {
     },
     BottomStyle: {
       textColor: (focused: boolean) => focused ? 'dodgerblue' : 'lightgrey',
+      backgroundColor: 'white',
     },
     LoadingStyle: {
       color: 'dodgerblue',
@@ -87,39 +102,41 @@ const theme = {
       backgroundColor: 'white',
     },
     HeaderStyle: {
-      backgroundColor: 'red',
-      indicatorColor: 'white',
-      textColor: (focused: boolean) => focused ? 'white' : 'white',
+      backgroundColor: 'white',
+      indicatorColor: 'mediumvioletred',
+      textColor: (focused: boolean) => focused ? 'mediumvioletred' : 'grey',
       shadowColor: 'white',
     },
     BottomStyle: {
-      textColor: (focused: boolean) => focused ? 'blue' : 'lightgrey',
+      textColor: (focused: boolean) => focused ? 'black' : 'grey',
+      backgroundColor: 'white',
     },
     LoadingStyle: {
-      color: 'red',
+      color: 'mediumvioletred',
     },
     NavBarStyle: {
-      color: 'red',
+      color: 'mediumvioletred',
     },
     VideoStyle: {
-      textColor: (focused: boolean) => focused ? 'red' : 'black',
-      indicatorColor: 'red',
-      playerTextColor: (focused: boolean) => focused ? 'red' : 'white'
+      textColor: (focused: boolean) => focused ? 'mediumvioletred' : 'black',
+      indicatorColor: 'mediumvioletred',
+      playerTextColor: (focused: boolean) => focused ? 'mediumvioletred' : 'white'
     },
     FollowButtonStyle: {
-      backgroundColor: (followed: boolean) => followed ? 'lightgray' : 'red',
-      rippleColor: 'red',
+      backgroundColor: (followed: boolean) => followed ? 'lightgray' : 'mediumvioletred',
+      rippleColor: 'grey',
       textColor: (followed: boolean) => followed ? 'gray' : 'white'
     },
     RoundButtonStyle: {
-      textColor: 'red',
+      textColor: 'mediumvioletred',
+      backgroundColor: 'white',
     },
     DialogStyle: {
-      textColor: 'red'
+      textColor: 'black'
     },
     TabBarStyle: {
-      textColor: (focused: boolean) => focused ? 'red' : 'black',
-      indicatorColor: 'red',
+      textColor: (focused: boolean) => focused ? 'black' : 'grey',
+      indicatorColor: 'black',
     }
   },
   gold: {
@@ -133,13 +150,14 @@ const theme = {
       shadowColor: 'white',
     },
     BottomStyle: {
-      textColor: (focused: boolean) => focused ? 'gold' : 'lightgrey',
+      textColor: (focused: boolean) => focused ? 'black' : 'lightgrey',
+      backgroundColor: 'white',
     },
     LoadingStyle: {
       color: 'gold',
     },
     NavBarStyle: {
-      color: 'gold',
+      color: 'orange',
     },
     VideoStyle: {
       textColor: (focused: boolean) => focused ? 'gold' : 'black',
@@ -152,7 +170,8 @@ const theme = {
       textColor: (followed: boolean) => followed ? 'gray' : 'black'
     },
     RoundButtonStyle: {
-      textColor: 'gold',
+      textColor: 'black',
+      backgroundColor: 'gold',
     },
     DialogStyle: {
       textColor: 'gold'
@@ -163,6 +182,6 @@ const theme = {
     }
   }
 }
-const ThemeContext = createContext({ theme: theme.red, themeName: 'red', changeTheme: (name: keyof typeof theme) => { } });
-export default ThemeContext;
-export { theme };
+
+export default appTheme;
+export type { AppTheme }

@@ -23,7 +23,7 @@ import alert from '../../component/Toast';
 import api, {loadSearchPage} from '../../api';
 
 import {TabBar, TabView} from 'react-native-tab-view';
-import ThemeContext from '../../theme';
+import AppContext from '../../context';
 
 const {useRealm} = Context;
 
@@ -127,7 +127,7 @@ const SearchPage: React.FC<Props> = () => {
 
   const layout = useWindowDimensions();
 
-  const {TabBarStyle} = useContext(ThemeContext).theme
+  const {TabBarStyle} = useContext(AppContext).theme
   
   const handleSearch = () => {
     setHistoryVisible(false);

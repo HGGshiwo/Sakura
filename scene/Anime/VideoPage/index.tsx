@@ -26,7 +26,7 @@ import {TabBar, TabView} from 'react-native-tab-view';
 import Profile from './Profile';
 import MultiItemRow from '../../../component/MultiItemRow';
 import {LoadingContainer} from '../../../component/Loading';
-import ThemeContext from '../../../theme';
+import AppContext from '../../../context';
 const {useRealm} = Context;
 
 const emptyInfoSub = {
@@ -142,6 +142,7 @@ const VideoPage: React.FC<{}> = () => {
   
   const init = () => {
     setRefreshing(true);
+    console.log(url)
     const loadPage = url.includes('yinghuacd')
       ? api.yinghuacd.video
       : api.scyinghua.video;
@@ -287,7 +288,7 @@ const VideoPage: React.FC<{}> = () => {
     });
   };
 
-  const {VideoStyle} = useContext(ThemeContext).theme;
+  const {VideoStyle} = useContext(AppContext).theme;
 
   return (
     <Container>

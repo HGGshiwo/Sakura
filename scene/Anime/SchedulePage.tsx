@@ -10,7 +10,7 @@ import {InfoText, SubTitleBold} from '../../component/Text';
 import {NoParamProps} from '../../type/route';
 import DailyInfo from '../../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
-import ThemeContext from '../../theme';
+import AppContext from '../../context';
 
 const routes = [
   {key: '0', title: '星期一'},
@@ -65,7 +65,7 @@ const SchedulePage: React.FC<{}> = () => {
     });
   }, []);
 
-  const {TabBarStyle} = useContext(ThemeContext).theme
+  const {TabBarStyle} = useContext(AppContext).theme
 
   return (
     <Container>

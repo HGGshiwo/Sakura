@@ -5,16 +5,13 @@
  * @format
  */
 
-import React, {createContext, useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {StatusBar, useColorScheme, Text} from 'react-native';
+import {useColorScheme, Text} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootSiblingParent} from 'react-native-root-siblings';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -34,7 +31,9 @@ import {
   SchedulePage,
 } from './scene/Anime';
 import RankingPage from './scene/Anime/RankingPage';
-import ThemeContext, {theme} from './theme';
+import appTheme from './theme';
+import storage from './storage';
+import AppContext from './context';
 
 const {RealmProvider} = Context;
 
@@ -55,11 +54,15 @@ const texts = {
   Comic: '漫画',
 };
 const TabPage = () => {
-  const {BottomStyle} = useContext(ThemeContext).theme;
+  const {BottomStyle} = useContext(AppContext).theme;
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
-        tabBarStyle: {height: 50, paddingTop: 10},
+        tabBarStyle: {
+          height: 50,
+          paddingTop: 10,
+          backgroundColor: BottomStyle.backgroundColor,
+        },
         tabBarIcon: ({focused, color, size}) => {
           let icon = icons[route.name as keyof typeof icons];
           // You can return any component that you like here!
@@ -107,25 +110,62 @@ const routes = [
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  const [_theme, setTheme] = useState(theme.red);
-  const [themeName, setThemeName] = useState('red');
+  const [theme, setTheme] = useState<any>(appTheme.red);
+  const [themeName, setThemeName] = useState('');
+  const [animeSource, setAnimeSource] = useState('');
+
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   const Stack = createNativeStackNavigator();
 
+  useEffect(() => {
+    storage.load({key: 'themeName'}).then(
+      themeName => {
+        setTheme(appTheme[themeName]);
+        setThemeName(themeName);
+      },
+      () => {
+        setTheme(appTheme.red);
+        setThemeName('red');
+      },
+    );
+    storage.load({key: 'animeSource'}).then(
+      animeSource => {
+        setAnimeSource(animeSource);
+      },
+      () => {
+        setAnimeSource('scyinghua');
+      },
+    );
+  }, []);
+
+  const changeTheme = (themeName: string) => {
+    setThemeName(themeName);
+    setTheme(appTheme[themeName]);
+    //持久化保存数据
+    storage.save({
+      key: 'themeName',
+      data: themeName,
+      expires: null,
+    });
+  };
+
+  const changeAnimeSource = (source: string) => {
+    setAnimeSource(source);
+    //持久化保存数据
+    storage.save({
+      key: 'animeSource',
+      data: source,
+      expires: null,
+    });
+  };
+
   return (
     <SafeAreaProvider style={backgroundStyle}>
-      <ThemeContext.Provider
-        value={{
-          theme: _theme,
-          themeName,
-          changeTheme: (themeName: keyof typeof theme) => {
-            setThemeName(themeName);
-            setTheme(theme[themeName]);
-          },
-        }}>
+      <AppContext.Provider
+        value={{theme, themeName, changeTheme, animeSource, changeAnimeSource}}>
         <NavigationContainer>
           <GestureHandlerRootView style={{flex: 1}}>
             <RealmProvider>
@@ -135,7 +175,7 @@ function App(): JSX.Element {
                     <Stack.Screen
                       key={index}
                       name={route.name}
-                      component={route.component}
+                      component={route.component as any}
                     />
                   ))}
                 </Stack.Navigator>
@@ -143,7 +183,7 @@ function App(): JSX.Element {
             </RealmProvider>
           </GestureHandlerRootView>
         </NavigationContainer>
-      </ThemeContext.Provider>
+      </AppContext.Provider>
     </SafeAreaProvider>
   );
 }

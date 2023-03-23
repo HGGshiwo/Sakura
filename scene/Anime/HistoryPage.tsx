@@ -17,7 +17,7 @@ import Dialog from 'react-native-dialog';
 import EndLine from '../../component/EndLine';
 import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
 import alert from '../../component/Toast';
-import ThemeContext from '../../theme';
+import AppContext from '../../context';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 const {useRealm, useQuery} = Context;
@@ -29,7 +29,7 @@ const HistoryPage: React.FC<{}> = () => {
   const curItem = useRef<HistoryInfo>();
   const realm = useRealm();
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
-  const {DialogStyle} = useContext(ThemeContext).theme
+  const {DialogStyle} = useContext(AppContext).theme
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {

@@ -9,7 +9,7 @@ import {faHeart} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {ViewStyle, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useContext} from 'react';
-import ThemeContext from '../theme';
+import AppContext from '../context';
 
 interface Props {
   onPress?: (event: any) => void;
@@ -46,7 +46,7 @@ interface FollowButtonProps extends Props {
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
-  const {FollowButtonStyle} = useContext(ThemeContext).theme;
+  const {FollowButtonStyle} = useContext(AppContext).theme;
   return (
     <Pressable
       android_ripple={{
@@ -79,7 +79,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
 };
 
 const RoundButton: React.FC<Props> = ({title, style, onPress}) => {
-  const {RoundButtonStyle} = useContext(ThemeContext).theme;
+  const {RoundButtonStyle} = useContext(AppContext).theme;
   return (
     <Pressable onPress={onPress}>
       <View
@@ -109,7 +109,7 @@ const BackButton: React.FC<{
 };
 
 const NavBarButton: React.FC<Props> = ({onPress, title, icon}) => {
-  const {NavBarStyle} = useContext(ThemeContext).theme;
+  const {NavBarStyle} = useContext(AppContext).theme;
   return (
     <Pressable style={{flex: 1}} onPress={onPress}>
       <View style={styles.itemContainer}>

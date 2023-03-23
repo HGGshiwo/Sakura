@@ -37,7 +37,13 @@ const DetailSheet = ({
       </View>
       <ScrollView>
         <View style={styles.imageRow}>
-          <Image containerStyle={styles.imageContainer} source={{uri: src}} />
+          <Image
+            loadingIndicatorSource={{
+              uri: 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png',
+            }}
+            containerStyle={styles.imageContainer}
+            source={{uri: src}}
+          />
           <View style={styles.titleContainer}>
             <Title title={title} />
             <View>
@@ -65,7 +71,7 @@ const DetailSheet = ({
         </View>
         <View style={styles.produceRow}>
           <Title title="制作信息" style={styles.produceTitle} />
-          <InfoText title={infoSub.author} />
+          <InfoText numberOfLines={-1} title={infoSub.author} />
         </View>
         <View style={styles.infoRow}>
           <Title title="简介" style={styles.produceTitle} />
@@ -117,6 +123,7 @@ const styles = StyleSheet.create({
     height: 180,
     padding: 5,
     borderRadius: 10,
+    backgroundColor: 'grey',
   },
   titleContainer: {
     flex: 3,

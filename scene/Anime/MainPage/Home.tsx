@@ -1,5 +1,5 @@
 import {SectionList} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {RecommandInfo} from '../../../type/RecommandInfo';
 import {ParallaxCarousel} from '../../../component/ParallaxCarousel';
 import {NavBar} from '../../../component/NavBar';
@@ -17,9 +17,9 @@ import {LoadingContainer} from '../../../component/Loading';
 import Anime from '../../../models/Anime';
 import {useNavigation} from '@react-navigation/native';
 import {AnimeHomeProps} from '../../../type/route';
-// import loadPage from '../../../api/yinghuacd/home';
-import loadPage from '../../../api/scyinghua/home'
+import api from '../../../api';
 import alert from '../../../component/Toast';
+import AppContext from '../../../context';
 const {useRealm, useQuery} = Context;
 
 const Home: React.FC<{}> = () => {
@@ -32,6 +32,27 @@ const Home: React.FC<{}> = () => {
   const realm = useRealm();
   const navigation = useNavigation<AnimeHomeProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
+  const {animeSource} = useContext(AppContext)
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    console.log(animeSource)
+    const loadPage = api[animeSource].home
+    loadPage(
+      (carousels, sections) => {
+        setCarousels(carousels);
+        setSections(sections);
+        setLoading(false);
+        setRefreshing(false);
+        if (!loading) {
+          alert('刷新成功')
+        }
+      },
+      (err: string) => {
+        setText(err);
+      },
+    );
+  };
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)]
@@ -53,31 +74,14 @@ const Home: React.FC<{}> = () => {
     setHistorys(historys);
   }, [_historys]);
 
-  const init = () => {
-    setRefreshing(true);
-    loadPage(
-      (carousels, sections) => {
-        setCarousels(carousels);
-        setSections(sections);
-        setLoading(false);
-        setRefreshing(false);
-        if (!loading) {
-          alert('刷新成功')
-        }
-      },
-      (err: string) => {
-        setText(err);
-      },
-    );
-  };
-
-  useEffect(init, []);
+  useEffect(onRefresh, [animeSource])
+  useEffect(onRefresh, []);
 
   return (
     <LoadingContainer loading={loading} text={text} style={{paddingTop: '30%'}}>
       <SectionList
         refreshing={refreshing}
-        onRefresh={init}
+        onRefresh={onRefresh}
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
           <>

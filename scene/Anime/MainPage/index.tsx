@@ -9,7 +9,7 @@ import Container from '../../../component/Container';
 import {useNavigation} from '@react-navigation/native';
 import {AnimePageProps} from '../../../type/route';
 import {InfoText} from '../../../component/Text';
-import ThemeContext from '../../../theme';
+import AppContext from '../../../context';
 
 const url = {
   rbdm: {url: 'ribendongman/', title: '日本动漫'},
@@ -40,7 +40,7 @@ const AnimePage: React.FC<{}> = () => {
   ]);
 
   const [index, setIndex] = useState(0);
-  const {HeaderStyle} = useContext(ThemeContext).theme
+  const {HeaderStyle} = useContext(AppContext).theme
 
   return (
     <Container>

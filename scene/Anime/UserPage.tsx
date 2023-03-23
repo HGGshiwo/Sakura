@@ -15,7 +15,6 @@ import {ListTitleLine} from '../../component/ListTitleLine';
 import History from '../../models/History';
 import Context from '../../models';
 import HistoryInfo from '../../type/HistoryInfo';
-
 import Anime from '../../models/Anime';
 import {
   InfoText,
@@ -26,7 +25,6 @@ import {
 } from '../../component/Text';
 import Follow from '../../models/Follow';
 import {RecommandInfo} from '../../type/RecommandInfo';
-const {useRealm, useQuery} = Context;
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {UserPageProps} from '../../type/route';
@@ -34,7 +32,7 @@ import Container from '../../component/Container';
 import {Divider} from '@rneui/themed';
 import {StyleSheet} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import ThemeContext from '../../theme';
+import AppContext from '../../context';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
   faBusinessTime,
@@ -48,6 +46,7 @@ import MultiItemRow from '../../component/MultiItemRow';
 import {NavBarButton} from '../../component/Button';
 import alert from '../../component/Toast';
 
+const {useRealm, useQuery} = Context;
 const UserPage: React.FC<{}> = () => {
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
   const [follows, setFollows] = useState<RecommandInfo[]>([]);
@@ -55,7 +54,8 @@ const UserPage: React.FC<{}> = () => {
   const navigation = useNavigation<UserPageProps['navigation']>();
   const _historys = useQuery<History>(History);
   const _follows = useQuery<Follow>(Follow);
-  const {theme, themeName, changeTheme} = useContext(ThemeContext);
+  const {theme, themeName, changeTheme, animeSource, changeAnimeSource} =
+    useContext(AppContext);
   const realm = useRealm();
 
   const [routes] = useState([
@@ -120,11 +120,11 @@ const UserPage: React.FC<{}> = () => {
   const themes = [
     {name: 'red', color: 'red'},
     {name: 'blue', color: 'dodgerblue'},
-    {name: 'black', color: 'black'},
+    {name: 'black', color: 'white'},
     {name: 'gold', color: 'gold'},
   ];
 
-  const sources = ['yinghuadm', 'scyinghua'];
+  const sources = ['yinghuacd', 'scyinghua'];
 
   useEffect(() => {
     let follows = [..._follows]
@@ -288,7 +288,7 @@ const UserPage: React.FC<{}> = () => {
             renderItem={({item, index}) => (
               <Pressable
                 onPress={() => {
-                  changeTheme(item.name as any);
+                  changeTheme(item.name);
                   alert('切换主题成功');
                 }}
                 style={{
@@ -317,9 +317,13 @@ const UserPage: React.FC<{}> = () => {
                   padding: 10,
                 }}>
                 <CheckBox
-                  value={true}
+                  value={item === animeSource}
                   onValueChange={newValue => {
-                    alert('切换数据源成功');
+                    if (newValue) {
+                      console.log(item)
+                      changeAnimeSource(item);
+                      alert('切换数据源成功');
+                    }
                   }}
                 />
                 <InfoText title={item} />
@@ -330,6 +334,7 @@ const UserPage: React.FC<{}> = () => {
       </View>
     );
   };
+
   const renderScene = SceneMap({
     first: FirstRoute,
     second: SecondRoute,
@@ -338,7 +343,7 @@ const UserPage: React.FC<{}> = () => {
   });
 
   const layout = useWindowDimensions();
-  const {HeaderStyle} = useContext(ThemeContext).theme;
+  const {HeaderStyle} = useContext(AppContext).theme;
 
   return (
     <Container style={{backgroundColor: '#f7f8f9'}}>

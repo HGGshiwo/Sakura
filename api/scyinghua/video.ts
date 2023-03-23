@@ -30,7 +30,8 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
       };
 
       let infoDom = document!.getElementsByClassName('content-text none')![0];
-
+      const info = infoDom ? infoDom.innerHTML : ''
+      
       //播放列表
       let moduleListDoms = document.getElementsByClassName('module-list module-player-list tab-list sort-list selected')!;
       let playList: Record<string, Source> = {};
@@ -57,8 +58,9 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
         .map((col6Dom, index) => {
           let img = col6Dom!.getElementsByTagName('img')![0]!['data-src']!.replace('https', 'http')
           if (img === '/' || img.includes('None')) {
-            img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'
+            img = 'http://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'
           }
+
           return {
             id: index,
             href: href + col6Dom!.getElementsByTagName('a')![0].href!,
@@ -74,7 +76,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
         infoSub,
         recommands,
         sources: _sources,
-        info: infoDom.innerHTML,
+        info,
         relatives: []
       })
     })

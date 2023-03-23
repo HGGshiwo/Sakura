@@ -55,6 +55,7 @@ const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
         }}
         key={index}>
         <ImageBackground
+          loadingIndicatorSource={{uri: 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'}}
           style={{flex: 1, height: 80}}
           imageStyle={styles.ibImage}
           source={{uri: item.img}}>
@@ -242,6 +243,7 @@ const styles = StyleSheet.create({
   },
   ibImage: {
     borderRadius: 5,
+    backgroundColor:'grey',
   },
   ibContainer60H: {
     //height 60, horizantal

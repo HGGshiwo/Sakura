@@ -32,7 +32,7 @@ import Blank from './Blank';
 import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
-import ThemeContext from '../../../../theme';
+import AppContext from '../../../../context';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -354,7 +354,7 @@ const Player: React.FC<PlayerProps> = ({
     setVolumeMessageVisible(false);
   };
 
-  const {VideoStyle} = useContext(ThemeContext).theme;
+  const {VideoStyle} = useContext(AppContext).theme;
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (
