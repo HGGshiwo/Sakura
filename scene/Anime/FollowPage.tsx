@@ -1,9 +1,9 @@
 import {useNavigation} from '@react-navigation/native';
-import {View, Pressable} from 'react-native';
+import {View, Pressable, StyleSheet} from 'react-native';
 import {Divider} from '@rneui/themed';
 import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
-import {SubTitleBold} from '../../component/Text';
+import {SubInfoText, SubTitleBold} from '../../component/Text';
 import {HistoryPageProps} from '../../type/route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +17,7 @@ import Follow from '../../models/Follow';
 import {RecommandInfo} from '../../type/RecommandInfo';
 import {UpdateMode} from 'realm';
 import EndLine from '../../component/EndLine';
-import {RoundButton} from '../../component/Button';
+import {SwipeListView} from 'react-native-swipe-list-view';
 import alert from '../../component/Toast';
 import ThemeContext from '../../theme';
 
@@ -30,7 +30,7 @@ const FollowPage: React.FC<{}> = () => {
   const curItem = useRef<RecommandInfo>();
   const realm = useRealm();
   const [follows, setFollows] = useState<RecommandInfo[]>([]);
-  const {DialogStyle} = useContext(ThemeContext).theme
+  const {DialogStyle} = useContext(ThemeContext).theme;
   useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)
@@ -65,7 +65,7 @@ const FollowPage: React.FC<{}> = () => {
       );
     });
     setDialogVisible(false);
-    alert('取消追番成功')
+    alert('取消追番成功');
   };
 
   return (
@@ -103,23 +103,27 @@ const FollowPage: React.FC<{}> = () => {
         </View>
       </HeadBar>
       <Divider />
-      <FlatList
+      <SwipeListView
         data={follows}
+        keyExtractor={item => item.href}
         renderItem={({item, index}) => (
           <V1RecommandInfoItem
             onPress={() => navigation.navigate('Video', {url: item.href})}
             item={item}
             imgVerticle={true}
-            index={index}>
-            <RoundButton style={{marginRight: 20}} text="立即观看" />
-            <Pressable onPress={() => onDelete(item)}>
-              <RoundButton
-                style={{marginVertical: 20, marginRight: 20}}
-                text="取消追番"
-              />
-            </Pressable>
-          </V1RecommandInfoItem>
+            index={index}
+          />
         )}
+        renderHiddenItem={({item, index}, rowMap) => (
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <Pressable
+              style={styles.hiddenRow}
+              onPress={() => onDelete(item)}>
+              <SubInfoText title="取消追番" style={{color: 'white'}} />
+            </Pressable>
+          </View>
+        )}
+        rightOpenValue={-75}
         ItemSeparatorComponent={() => <Divider />}
         ListFooterComponent={
           <>
@@ -131,5 +135,18 @@ const FollowPage: React.FC<{}> = () => {
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  hiddenRow: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    top: 0,
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    padding: 10,
+    alignItems: 'center',
+  },
+});
 
 export default FollowPage;

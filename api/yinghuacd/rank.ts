@@ -19,7 +19,7 @@ function loadPage(_afterLoad: (data: RecommandInfo[]) => void, _afterErr?: (err:
           img: liDom.getElementsByTagName('img')![0].src!,
           state: spanDoms[0].getElementsByTagName('font')![0].innerHTML,
           title: liDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
-          href: liDom.getElementsByTagName('a')![0].href!,
+          href: href + liDom.getElementsByTagName('a')![0].href!,
           type: spanDoms[1].getElementsByTagName('a')!.map((aDom: Dom) => aDom.innerHTML),
           info: spanDoms[1].getElementsByTagName('a')![0].innerHTML
         }

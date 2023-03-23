@@ -3,12 +3,12 @@ import { Dom, getDomFromString } from "../Dom";
 
 const href = 'http://www.yinghuacd.com/search/';
 
-function getResult(liDoms:Dom[]) {
+function getResult(liDoms: Dom[]) {
   return liDoms.map((liDom, index) => {
-    const aDom:Dom = liDom!.getElementsByTagName('h2')![0].getElementsByTagName('a')![0]
+    const aDom: Dom = liDom!.getElementsByTagName('h2')![0].getElementsByTagName('a')![0]
     const spans = liDom.getElementsByTagName('span')
     return {
-      href: aDom.href,
+      href: 'http://www.yinghuacd.com' + aDom.href,
       img: liDom!.getElementsByTagName('img')![0].src,
       state: spans![0] ? spans![0].innerHTML : '',
       title: aDom.innerHTML,
@@ -19,7 +19,7 @@ function getResult(liDoms:Dom[]) {
   })
 }
 
-function loadPage(arg: string, _afterSearch:(result:SearchInfo[])=>void) {
+function loadPage(arg: string, _afterSearch: (result: SearchInfo[]) => void) {
   const _url = href
   if (_afterSearch) {
     if (!arg) {
@@ -49,7 +49,6 @@ function loadPage(arg: string, _afterSearch:(result:SearchInfo[])=>void) {
           return fetch(`${_url}${arg}/${aDom.href}`)
             .then(response => response.text())
             .then((responseText) => {
-              console.log(1)
               const document = getDomFromString(responseText)
               return document!.getElementsByClassName('lpic')![0].getElementsByTagName("li")
             })

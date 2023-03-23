@@ -78,20 +78,19 @@ const FollowButton: React.FC<FollowButtonProps> = ({onPress, followed}) => {
   );
 };
 
-const RoundButton: React.FC<{text: string; style?: ViewStyle}> = ({
-  text,
-  style,
-}) => {
+const RoundButton: React.FC<Props> = ({title, style, onPress}) => {
   const {RoundButtonStyle} = useContext(ThemeContext).theme;
   return (
-    <View
-      style={[
-        styles.buttonContainer,
-        {borderWidth: 1, borderColor: RoundButtonStyle.textColor},
-        style,
-      ]}>
-      <Text style={[{color: RoundButtonStyle.textColor}]}>{text}</Text>
-    </View>
+    <Pressable onPress={onPress}>
+      <View
+        style={[
+          styles.buttonContainer,
+          {width: 60, height: 35, backgroundColor: RoundButtonStyle.backgroundColor},
+          style,
+        ]}>
+        <Text style={[{color: RoundButtonStyle.textColor}]}>{title}</Text>
+      </View>
+    </Pressable>
   );
 };
 

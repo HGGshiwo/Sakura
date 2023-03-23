@@ -3,12 +3,12 @@ import { RecommandInfo } from "../../type/RecommandInfo";
 import { Section } from "../../type/Section";
 import { Dom, getDomFromString } from "../Dom";
 
-const href = 'http://www.yinghuacd.com/';
+const href = 'http://www.yinghuacd.com';
 
 function loadPage(arg: string, _afterLoad?: (carousels: RecommandInfo[], sections: Section[]) => void) {
   const _url = href
   if (_afterLoad) {
-    fetch(`${_url}${arg}/`)
+    fetch(`${_url}/${arg}/`)
       .then(response => response.text())
       .then((responseText) => {
         const document = getDomFromString(responseText);
@@ -25,7 +25,7 @@ function loadPage(arg: string, _afterLoad?: (carousels: RecommandInfo[], section
                   let state = aDoms.length === 0 ? '' : aDoms[0].innerHTML
                   return {
                     id: index,
-                    href: liDom.getElementsByTagName('a')![0].href!,
+                    href: href + liDom.getElementsByTagName('a')![0].href!,
                     img: liDom.getElementsByTagName('img')![0].src!,
                     title: liDom.getElementsByTagName('p')![0].getElementsByTagName('a')![0].innerHTML,
                     state

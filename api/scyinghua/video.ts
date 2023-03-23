@@ -6,13 +6,15 @@ const href = 'https://www.scyinghua.com';
 
 
 const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
-  const _url = href + url
-  fetch(_url)
+  fetch(url)
     .then(response => response.text())
     .then((responseText) => {
       const document = getDomFromString(responseText);
       let title = document!.getElementsByClassName('page-title')![0].innerHTML;
-      let img = document.getElementsByClassName('url_img')![0];
+      let img = document.getElementsByClassName('url_img')![0].src!.replace('https', 'http');
+      if (img === '/' || img.includes('None')) {
+        img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'
+      }
       let videoInfoDoms = document!.getElementsByClassName('video-info-items')!
       let state = videoInfoDoms[3].getElementsByClassName('video-info-item')![0].innerHTML
       let alias = document.getElementsByClassName('video-subtitle')![0].innerHTML
@@ -53,10 +55,14 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
       let recommands = document!
         .getElementsByClassName('col-6 col-sm-4 col-lg-3')!
         .map((col6Dom, index) => {
+          let img = col6Dom!.getElementsByTagName('img')![0]!['data-src']!.replace('https', 'http')
+          if (img === '/' || img.includes('None')) {
+            img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'
+          }
           return {
             id: index,
-            href: col6Dom!.getElementsByTagName('a')![0].href!,
-            img: col6Dom!.getElementsByTagName('img')![0]!['data-src']!,
+            href: href + col6Dom!.getElementsByTagName('a')![0].href!,
+            img,
             title: col6Dom!.getElementsByTagName('h6')![0].getElementsByTagName('a')![0].innerHTML,
             state: col6Dom!.getElementsByClassName('label')![0].innerHTML,
           };
@@ -64,7 +70,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
 
       callback({
         title: title,
-        img: img.src!,
+        img: img,
         infoSub,
         recommands,
         sources: _sources,
@@ -89,7 +95,6 @@ const _loadVideoSrc = (url: string, callback: (state: boolean, src?: string, typ
       let document = getDomFromString(responseText)!
       let src = document.getElementsByClassName('img-box bofang_box')![0].getElementsByTagName("script")![0]._dom.children[0].data
       let src_type = /(?<="url":").*(?=","url_next")/.exec(src)![0].replaceAll('\\', '')
-      console.log(src_type)
       const type = src_type.includes('m3u8') ? 'm3u8' : 'mp4'
       callback(true, src_type, type)
     })

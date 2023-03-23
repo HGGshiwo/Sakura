@@ -1,5 +1,9 @@
-import {useEffect, useRef, useState} from 'react';
-import {View, FlatList} from 'react-native';
+import {
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {View, FlatList, useWindowDimensions} from 'react-native';
 import {SearchBar} from '../../component/SearchBar';
 import {InfoText} from '../../component/Text';
 import {Divider} from '@rneui/themed';
@@ -10,29 +14,30 @@ import {LoadingContainer} from '../../component/Loading';
 import {useNavigation} from '@react-navigation/native';
 import {SearchPageProps} from '../../type/route';
 import Container from '../../component/Container';
-import loadPage from '../../api/yinghuacd/search';
 import {FollowButton, RoundButton} from '../../component/Button';
 import Context from '../../models';
 import Anime from '../../models/Anime';
 import {UpdateMode} from 'realm';
 import Follow from '../../models/Follow';
-import Toast from 'react-native-root-toast';
+import alert from '../../component/Toast';
+import api, {loadSearchPage} from '../../api';
+
+import {TabBar, TabView} from 'react-native-tab-view';
+import ThemeContext from '../../theme';
 
 const {useRealm} = Context;
 
-interface Props {}
+interface Props {searchValue: string, loadPage: loadSearchPage}
 
-const SearchPage: React.FC<Props> = () => {
+const ResultView:React.FC<Props> = ({searchValue, loadPage}) => {
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
-
   const navigation = useNavigation<SearchPageProps['navigation']>();
   const realm = useRealm();
-
-  const onChangeText = (text: string) => {
+  useEffect(() => {
     setLoading(true);
-    loadPage(text, _results => {
+    loadPage(searchValue, _results => {
       setResults(_results);
       const _follows = _results.map(_result => {
         const follow = realm.objectForPrimaryKey(Follow, _result.href);
@@ -41,7 +46,7 @@ const SearchPage: React.FC<Props> = () => {
       setFollows(_follows);
       setLoading(false);
     });
-  };
+  }, [searchValue]);
 
   const onPress = (item: SearchInfo, index: number) => {
     //更新番剧数据库
@@ -72,16 +77,61 @@ const SearchPage: React.FC<Props> = () => {
     _follows[index] = !_follows[index];
     setFollows([..._follows]);
 
-    Toast.show(`${!follows![index] ? '' : '取消'}追番成功`, {
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      textStyle: {fontSize: 14},
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.TOP,
-      shadow: true,
-      animation: true,
-      hideOnPress: true,
-      delay: 0,
-    });
+    alert(`${!follows![index] ? '' : '取消'}追番成功`);
+  };
+
+  return (
+    <LoadingContainer style={{paddingTop: '30%'}} loading={loading}>
+      <FlatList
+        contentContainerStyle={{paddingHorizontal: 15}}
+        ItemSeparatorComponent={() => {
+          return <Divider />;
+        }}
+        keyExtractor={item => `${item.id}`}
+        data={results}
+        renderItem={({item, index}) => {
+          return (
+            <V1SearchInfoItem
+              item={item}
+              index={index}
+              onPress={() => {
+                navigation.navigate('Video', {url: item.href});
+              }}>
+              <FollowButton
+                onPress={() => onPress(item, index)}
+                followed={follows![index]}
+              />
+            </V1SearchInfoItem>
+          );
+        }}
+        ListEmptyComponent={() => (
+          <View style={{alignItems: 'center', paddingTop: '20%'}}>
+            <InfoText title="找不到结果" />
+          </View>
+        )}
+      />
+    </LoadingContainer>
+  );
+};
+
+const SearchPage: React.FC<Props> = () => {
+  const navigation = useNavigation<SearchPageProps['navigation']>();
+  const [searchValue, setSearchValue] = useState('');
+  const [searchValue2, setSearchValue2] = useState('')
+  const [historyVisible, setHistoryVisible] = useState(true);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    {key: 'yinghuacd', title: 'yinghuacd'},
+    {key: 'scyinghua', title: 'scyinghua'},
+  ]);
+
+  const layout = useWindowDimensions();
+
+  const {TabBarStyle} = useContext(ThemeContext).theme
+  
+  const handleSearch = () => {
+    setHistoryVisible(false);
+    setSearchValue2(searchValue)
   };
 
   return (
@@ -91,44 +141,51 @@ const SearchPage: React.FC<Props> = () => {
           navigation.navigate('Anime');
         }}>
         <SearchBar
+          searchValue={searchValue}
           style={{marginLeft: 10}}
-          loading={loading}
-          onChangeText={onChangeText}
+          onChangeText={setSearchValue}
           autoFocus={true}
+          onClose={()=>{
+            setSearchValue('')
+            setHistoryVisible(true)
+          }}
         />
+        <RoundButton title="搜索" onPress={handleSearch} />
       </HeadBar>
-
-      <LoadingContainer loading={loading}>
-        <FlatList
-          contentContainerStyle={{paddingHorizontal: 15}}
-          ItemSeparatorComponent={() => {
-            return <Divider />;
-          }}
-          keyExtractor={item => `${item.id}`}
-          data={results}
-          renderItem={({item, index}) => {
-            return (
-              <V1SearchInfoItem
-                item={item}
-                index={index}
-                onPress={() => {
-                  navigation.navigate('Video', {url: item.href});
-                }}>
-                <RoundButton style={{marginVertical: 20}} text="立即观看" />
-                <FollowButton
-                  onPress={() => onPress(item, index)}
-                  followed={follows![index]}
+      {historyVisible ? (
+        <View></View>
+      ) : (
+        <TabView
+          renderTabBar={props => (
+            <TabBar
+              scrollEnabled
+              {...props}
+              indicatorStyle={{
+                backgroundColor: TabBarStyle.indicatorColor,
+                width: 0.5,
+              }}
+              renderLabel={({route, focused, color}) => (
+                <InfoText
+                  title={route.title}
+                  style={{
+                    color: TabBarStyle.textColor(focused),
+                    paddingHorizontal: 5,
+                    fontWeight: focused ? '900' : 'normal',
+                  }}
                 />
-              </V1SearchInfoItem>
-            );
-          }}
-          ListEmptyComponent={() => (
-            <View style={{width: '100%', alignItems: 'center'}}>
-              <InfoText title="找不到结果" />
-            </View>
+              )}
+              style={{
+                backgroundColor: 'white',
+              }}
+              tabStyle={{width: 'auto'}}
+            />
           )}
+          navigationState={{index, routes}}
+          renderScene={({route}) => <ResultView searchValue={searchValue2} loadPage={api[route.key as keyof typeof api].search} />}
+          onIndexChange={setIndex}
+          initialLayout={{width: layout.width}}
         />
-      </LoadingContainer>
+      )}
     </Container>
   );
 };

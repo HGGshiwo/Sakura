@@ -31,7 +31,8 @@ const theme = {
       textColor: (followed: boolean) => followed ? 'gray' : 'white'
     },
     RoundButtonStyle: {
-      textColor: 'red',
+      textColor: 'white',
+      backgroundColor: 'red',
     },
     DialogStyle: {
       textColor: 'red'

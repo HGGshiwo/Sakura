@@ -20,8 +20,7 @@ import Anime from '../../../models/Anime';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../../type/route';
 import Container from '../../../component/Container';
-// import loadPage, {loadVideoSrc} from '../../../api/yinghuacd/video';
-import loadPage, { loadVideoSrc } from '../../../api/scyinghua/video';
+import api from '../../../api';
 import {InfoText, SubTitle} from '../../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
 import Profile from './Profile';
@@ -140,12 +139,15 @@ const VideoPage: React.FC<{}> = () => {
 
   //数据相关
   const realm = useRealm();
-
+  
   const init = () => {
     setRefreshing(true);
+    const loadPage = url.includes('yinghuacd')
+      ? api.yinghuacd.video
+      : api.scyinghua.video;
+
     loadPage(
-      // url,
-      '/detail/78.html',
+      url,
       ({title, img, infoSub, recommands, sources, info, relatives}) => {
         const _anthologys = sources.map((_source, index) => {
           return {id: index, data: _source.data, title: _source.key};
@@ -252,6 +254,10 @@ const VideoPage: React.FC<{}> = () => {
 
   const switchVideoSrc = () => {
     //设置视频播放源
+    const loadVideoSrc = url.includes('yinghuacd')
+    ? api.yinghuacd.videoSrc
+    : api.scyinghua.videoSrc;
+
     if (curSourceIndex.current < curSources.current.length) {
       console.log(
         `尝试源: ${curSourceIndex.current + 1}/${curSources.current.length}`,

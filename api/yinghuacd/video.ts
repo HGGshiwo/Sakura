@@ -7,8 +7,8 @@ const href = 'http://www.yinghuacd.com';
 
 
 const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
-  const _url = href + url
-  fetch(_url)
+
+  fetch(url)
     .then(response => response.text())
     .then((responseText) => {
 
@@ -78,7 +78,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
         .map((liDom, index) => {
           return {
             id: index,
-            href: liDom!.getElementsByTagName('a')![0].href!,
+            href: href + liDom!.getElementsByTagName('a')![0].href!,
             img: liDom!.getElementsByTagName('img')![0].src!,
             title: liDom!.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
             state: liDom!.getElementsByTagName('font')![0].innerHTML,

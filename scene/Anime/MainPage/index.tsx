@@ -9,7 +9,6 @@ import Container from '../../../component/Container';
 import {useNavigation} from '@react-navigation/native';
 import {AnimePageProps} from '../../../type/route';
 import {InfoText} from '../../../component/Text';
-import theme from '../../../theme';
 import ThemeContext from '../../../theme';
 
 const url = {
@@ -51,6 +50,7 @@ const AnimePage: React.FC<{}> = () => {
           alignItems: 'center',
           paddingHorizontal: 10,
           backgroundColor: HeaderStyle.backgroundColor,
+          height: 60,
         }}>
         <SearchBar
           placeholder="查找关键词"

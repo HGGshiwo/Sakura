@@ -1,13 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
-import {View, Pressable} from 'react-native';
+import {View, Pressable, StyleSheet} from 'react-native';
 import {Divider} from '@rneui/themed';
 import Container from '../../component/Container';
 import HeadBar from '../../component/HeadBar';
-import {SubTitleBold} from '../../component/Text';
+import {SubInfoText, SubTitleBold} from '../../component/Text';
 import {HistoryPageProps} from '../../type/route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
-import {FlatList} from 'react-native-gesture-handler';
 import {V1HistoryInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import History from '../../models/History';
@@ -19,6 +18,7 @@ import EndLine from '../../component/EndLine';
 import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
 import alert from '../../component/Toast';
 import ThemeContext from '../../theme';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 const {useRealm, useQuery} = Context;
 
@@ -99,18 +99,25 @@ const HistoryPage: React.FC<{}> = () => {
         </View>
       </HeadBar>
       <Divider />
-      <FlatList
+      <SwipeListView
         data={historys}
+        keyExtractor={item => item.href}
         ItemSeparatorComponent={() => <Divider />}
         renderItem={({item, index}) => (
           <V1HistoryInfoItem
             item={item}
             index={index}
-            onPress={() => navigation.navigate('Video', {url: item.href})}>
-            <Pressable onPress={() => onDelete(item)}>
-              <FontAwesomeIcon color="grey" icon={faTrashCan} />
+            onPress={() => navigation.navigate('Video', {url: item.href})} />
+        )}
+        rightOpenValue={-75}
+        renderHiddenItem={({item, index}, rowMap) => (
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <Pressable
+              style={styles.hiddenRow}
+              onPress={() => onDelete(item)}>
+              <SubInfoText title="删除历史" style={{color: 'white'}} />
             </Pressable>
-          </V1HistoryInfoItem>
+          </View>
         )}
         ListFooterComponent={
           <>
@@ -122,5 +129,18 @@ const HistoryPage: React.FC<{}> = () => {
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  hiddenRow: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    top: 0,
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    padding: 10,
+    alignItems: 'center',
+  },
+});
 
 export default HistoryPage;

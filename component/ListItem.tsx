@@ -57,8 +57,7 @@ const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
         <ImageBackground
           style={{flex: 1, height: 80}}
           imageStyle={styles.ibImage}
-          source={{uri: item.img}}
-          resizeMode="cover">
+          source={{uri: item.img}}>
           <InfoText style={styles.ibText} title={item.state} />
         </ImageBackground>
       </Pressable>
@@ -233,6 +232,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 5,
     flexDirection: 'row',
+    backgroundColor:'white',
   },
   itemContainerV: {
     justifyContent: 'space-between',

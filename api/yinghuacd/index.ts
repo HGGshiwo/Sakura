@@ -1,14 +1,14 @@
 import { RecommandInfo } from "../../type/RecommandInfo";
 import { Dom, getDomFromString } from "../Dom";
 
-const href = 'http://www.yinghuacd.com/';
+const href = 'http://www.yinghuacd.com';
 
 function getResult(liDoms: Dom[]) {
   return liDoms.map((liDom, index) => {
     const aDom = liDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0]
     const spans = liDom.getElementsByTagName('span')!
     return {
-      href: aDom.href!,
+      href: href + aDom.href!,
       img: liDom!.getElementsByTagName('img')![0].src!,
       state: spans[0] ? spans[0].innerHTML : '',
       title: aDom.innerHTML,
@@ -31,16 +31,14 @@ function loadPage(args: string, _afterSearch: (data: RecommandInfo[]) => void) {
       _afterSearch([])
       return
     }
-    fetch(`${_url}${arg}/`)
+    fetch(`http://www.yinghuacd.com/${arg}/`)
       .then(response => response.text())
       .then((responseText) => {
         const document = getDomFromString(responseText);
-        // debugger;
         //获取页数
         const pages = document!.getElementsByClassName('pages')!
         if (pages!.length === 0) {
           const liDoms = document!.getElementsByClassName('lpic')![0].getElementsByTagName("li")!
-          console.log(777)
           const result = getResult(liDoms)
           _afterSearch(result) //只有一页结果
           return [];

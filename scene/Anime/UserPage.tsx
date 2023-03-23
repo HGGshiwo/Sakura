@@ -33,7 +33,7 @@ import {UserPageProps} from '../../type/route';
 import Container from '../../component/Container';
 import {Divider} from '@rneui/themed';
 import {StyleSheet} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import CheckBox from '@react-native-community/checkbox';
 import ThemeContext from '../../theme';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
@@ -123,6 +123,8 @@ const UserPage: React.FC<{}> = () => {
     {name: 'black', color: 'black'},
     {name: 'gold', color: 'gold'},
   ];
+
+  const sources = ['yinghuadm', 'scyinghua'];
 
   useEffect(() => {
     let follows = [..._follows]
@@ -298,6 +300,30 @@ const UserPage: React.FC<{}> = () => {
                   borderColor: item.name === themeName ? 'brown' : 'lightgrey',
                 }}
               />
+            )}
+          />
+        </View>
+        <View style={styles.cardContainer}>
+          <SubTitleBold style={{marginVertical: 10}} title="番剧数据源" />
+          <Divider />
+          <FlatList
+            horizontal
+            data={sources}
+            renderItem={({item, index}) => (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  padding: 10,
+                }}>
+                <CheckBox
+                  value={true}
+                  onValueChange={newValue => {
+                    alert('切换数据源成功');
+                  }}
+                />
+                <InfoText title={item} />
+              </View>
             )}
           />
         </View>

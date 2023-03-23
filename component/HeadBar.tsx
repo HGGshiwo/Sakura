@@ -14,7 +14,7 @@ const HeadBar: React.FC<Props> = ({onPress, children, style}) => {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 10,
-        // paddingVertical: 15,
+        height: 60,
       }, style]}>
       <BackButton color="grey" onPress={onPress} />
       {children}

@@ -22,7 +22,7 @@ function loadPage(_afterLoad: (carousels:RecommandInfo[], sections: Section[]) =
           i += 1
           return {
             id,
-            href: liDom.getElementsByTagName('a')![0].href!,
+            href: href + liDom.getElementsByTagName('a')![0].href!,
             img: liDom.getElementsByTagName('img')![0].src!,
             title: liDom.getElementsByTagName('p')![0].innerHTML,
             state: liDom.getElementsByTagName('em')![0].innerHTML,
@@ -45,7 +45,7 @@ function loadPage(_afterLoad: (carousels:RecommandInfo[], sections: Section[]) =
                 let state = aDoms.length === 0 ? '' : aDoms[0].innerHTML
                 return {
                   id: index,
-                  href: liDom.getElementsByTagName('a')![0].href!,
+                  href: href + liDom.getElementsByTagName('a')![0].href!,
                   img: liDom.getElementsByTagName('img')![0].src!,
                   title: liDom.getElementsByTagName('p')![0].getElementsByTagName('a')![0].innerHTML,
                   state
