@@ -6,10 +6,7 @@ import {NavBar} from '../../component/NavBar';
 import MultiItemRow from '../../component/MultiItemRow';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
-import {
-  H1HistoryInfoItem,
-  V2RecommandInfoItem,
-} from '../../component/ListItem';
+import {H1HistoryInfoItem, V2RecommandInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import History from '../../models/History';
 import HistoryInfo from '../../type/HistoryInfo';
@@ -22,7 +19,7 @@ import alert from '../../component/Toast';
 import AppContext from '../../context';
 const {useRealm, useQuery} = Context;
 
-const Home: React.FC<{tabName: string}> = ({tabName}) => {
+const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
@@ -32,13 +29,13 @@ const Home: React.FC<{tabName: string}> = ({tabName}) => {
   const realm = useRealm();
   const navigation = useNavigation<NoParamProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
-  const {source} = useContext(AppContext)
+  const {source} = useContext(AppContext);
 
   const onRefresh = () => {
     setRefreshing(true);
-    const curSource = source[tabName as keyof typeof source]
-    console.log(curSource)
-    const loadPage = api[tabName][curSource].home
+    const curSource = source[tabName];
+    console.log(curSource);
+    const loadPage = api[tabName][curSource].home;
     loadPage(
       (carousels, sections) => {
         setCarousels(carousels);
@@ -46,7 +43,7 @@ const Home: React.FC<{tabName: string}> = ({tabName}) => {
         setLoading(false);
         setRefreshing(false);
         if (!loading) {
-          alert('刷新成功')
+          alert('刷新成功');
         }
       },
       (err: string) => {
@@ -75,7 +72,7 @@ const Home: React.FC<{tabName: string}> = ({tabName}) => {
     setHistorys(historys);
   }, [_historys]);
 
-  useEffect(onRefresh, [source])
+  useEffect(onRefresh, [source]);
   useEffect(onRefresh, []);
 
   return (
@@ -122,7 +119,14 @@ const Home: React.FC<{tabName: string}> = ({tabName}) => {
                 item={info}
                 key={index}
                 onPress={(recent: RecommandInfo) => {
-                  navigation.push('Video', {url: recent.href});
+                  const targets = {
+                    Anime: 'Video',
+                    Comic: 'Comic',
+                    Novel: 'Comic',
+                  };
+                  navigation.push(targets[tabName] as 'Video' | 'Comic', {
+                    url: recent.href,
+                  });
                 }}
               />
             )}

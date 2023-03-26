@@ -1,5 +1,5 @@
 import { Source } from "../../type/Source";
-import VideoPageInfo from "../../type/VideoPageInfo";
+import VideoPageInfo from "../../type/PageInfo/VideoPageInfo";
 import { Dom, getDomFromString } from "../Dom";
 
 const href = 'https://www.scyinghua.com';

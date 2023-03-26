@@ -1,21 +1,23 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 type RootStackParamList = {
-    TabPage: {tabName: 'Comic'|'Novel'|'Anime'};
-    Anime: undefined;
-    Video: { url: string };
-    Search: {tabName: 'Comic'|'Novel'|'Anime'};
-    MainPage: {tabName: 'Comic'|'Novel'|'Anime'};
-    AnimeOther: undefined;
-    Category: { url: string; title: string };
-    Tab: undefined;
-    Index: { url: string, title: string };
-    User: undefined;
-    History: undefined;
-    Follow: undefined;
-    NoParam: undefined; //不会进入，只会跳出
-    Ranking: undefined;
-    Schedule: undefined;
+  TabPage: { tabName: 'Comic' | 'Novel' | 'Anime' };
+  Anime: undefined;
+  Video: { url: string };  
+  Comic: { url: srting };
+  Novel: { url: string };
+  Search: { tabName: 'Comic' | 'Novel' | 'Anime' };
+  MainPage: { tabName: 'Comic' | 'Novel' | 'Anime' };
+  AnimeOther: undefined;
+  Category: { url: string; title: string };
+  Tab: undefined;
+  Index: { url: string, title: string };
+  User: undefined;
+  History: undefined;
+  Follow: undefined;
+  NoParam: undefined; //不会进入，只会跳出
+  Ranking: undefined;
+  Schedule: undefined;
 };
 type TabPageProps = NativeStackScreenProps<RootStackParamList, 'TabPage'>;
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
@@ -29,6 +31,7 @@ type UserPageProps = NativeStackScreenProps<RootStackParamList, 'User'>;
 type FollowPageProps = NativeStackScreenProps<RootStackParamList, 'Follow'>;
 type HistoryPageProps = NativeStackScreenProps<RootStackParamList, 'History'>;
 type NoParamProps = NativeStackScreenProps<RootStackParamList, 'NoParam'>;
+type ComicPageProps = NativeStackScreenProps<RootStackParamList, 'Comic'>;
 export type {
   TabPageProps,
   VideoPageProps,
@@ -40,6 +43,7 @@ export type {
   IndexPageProps,
   UserPageProps,
   FollowPageProps,
-  NoParamProps, 
+  NoParamProps,
   HistoryPageProps,
+  ComicPageProps,
 };

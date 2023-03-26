@@ -3,12 +3,16 @@ import {FlatList} from 'react-native';
 import Container from '../../component/Container';
 import api from '../../api';
 import ResizeImage from './ResizeImage';
+import {useRoute} from '@react-navigation/native';
+import {ComicPageProps} from '../../type/route';
 
 const ComicPage: React.FC<{}> = () => {
   const [imgs, setImgs] = useState<string[]>([]);
+  const route = useRoute<ComicPageProps['route']>();
+  const {url} = route.params;
   const onRefresh = () => {
     const loadComicSrc = api.Comic.biquge.comicSrc!;
-    loadComicSrc('https://www.biqug.org/index.php/chapter/1508887', imgs => {
+    loadComicSrc(url, imgs => {
       setImgs(imgs);
     });
   };
@@ -17,11 +21,7 @@ const ComicPage: React.FC<{}> = () => {
     <Container>
       <FlatList
         data={imgs}
-        renderItem={({item}) => (
-          <ResizeImage
-            source={{uri: item}}
-          />
-        )}
+        renderItem={({item}) => <ResizeImage source={{uri: item}} />}
       />
     </Container>
   );

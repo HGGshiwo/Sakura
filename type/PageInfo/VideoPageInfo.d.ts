@@ -1,7 +1,7 @@
-import { InfoSub } from "./InfoSub";
-import { ListItemInfo } from "./ListItemInfo";
-import { RecommandInfo } from "./RecommandInfo";
-import { Source } from "./Source";
+import { InfoSub } from "../InfoSub";
+import { ListItemInfo } from "../ListItemInfo";
+import { RecommandInfo } from "../RecommandInfo";
+import { Source } from "../Source";
 
 interface VideoPageInfo {
     title: string,

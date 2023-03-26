@@ -5,10 +5,11 @@ import * as scyinghuaVideo from "./scyinghua/video";
 import * as yinghuacdVideo from "./yinghuacd/video";
 import loadScyinghuaHomePage from "./scyinghua/home";
 import loadYinghuacdHomePage from "./yinghuacd/home";
-import VideoPageInfo from "../type/VideoPageInfo";
+import VideoPageInfo from "../type/PageInfo/VideoPageInfo";
 import { Section } from "../type/Section";
 import { RecommandInfo } from "../type/RecommandInfo";
 import * as Comic from "./Comic";
+import ComicPageInfo from "../type/PageInfo/ComicPageinfo";
 
 const api: Record<string, Record<string, {
     search: loadSearchPage,
@@ -42,10 +43,13 @@ type loadVideoPage = (url: string, callback: (data: VideoPageInfo) => void) => v
 type loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void) => void;
 type loadHomePage = (_afterLoad: (carousels: RecommandInfo[], sections: Section[]) => void, _afterErr?: (err: string) => void) => void;
 type loadComicSrc = (url: string, callback: (data: string[]) => void) => void;
+type loadComicPage = (url: string, callback:(data: ComicPageInfo)=>void)=>void;
+
 export type {
     loadSearchPage,
     loadVideoPage,
     loadVideoSrc,
     loadHomePage,
     loadComicSrc,
+    loadComicPage,
 }
