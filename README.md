@@ -2,7 +2,7 @@
 
 用于看番的 app，之后也支持看漫画和小说。
 
-安装包下载地址：[https://github.com/HGGshiwo/Sakura/releases/tag/v1.0.0-alpha](https://github.com/HGGshiwo/Sakura/releases/tag/v1.0.0-alpha)
+安装包下载地址：[https://github.com/HGGshiwo/Sakura/releases](https://github.com/HGGshiwo/Sakura/releases)
 
 目前看番存在的问题:
 
@@ -18,6 +18,8 @@
 - 视频数据和搜索功能由[www.yinghuacd.com](http://www.yinghuacd.com/)提供
 - react native 实现
 - 具体的 UI 设计参考了 B 站
+- 使用多个数据源，减小数据源失效带来的问题
+- 多个用户主题可供选择
 
 ## UI 界面
 
