@@ -1,9 +1,9 @@
-import {InfoSub} from '../../type/InfoSub';
+import {InfoSub} from '../type/InfoSub';
 import {Text, Image} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
-import {InfoText, RateText, SubTitleBold, Title} from '../../component/Text';
-import {Tag} from '../../component/Tag';
-import {CloseButton} from '../../component/Button';
+import {InfoText, RateText, SubTitleBold, Title} from './Text';
+import {Tag} from './Tag';
+import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
 
 type detailSheetProps = {

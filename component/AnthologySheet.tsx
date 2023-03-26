@@ -1,8 +1,8 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
-import {SubTitleBold} from '../../component/Text';
+import {SubTitleBold} from './Text';
 import { ReactNode } from 'react';
-import { CloseButton } from '../../component/Button';
+import { CloseButton } from './Button';
 
 type anthologySheetProps = {
   height: number;

@@ -21,18 +21,19 @@ import {
 import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
-import {LoadingText} from '../../../component/Text';
+import {LoadingText} from '../../../../component/Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
-import {BackButton} from '../../../component/Button';
-import {LoadingBox} from '../../../component/Loading';
+import {BackButton} from '../../../../component/Button';
+import {LoadingBox} from '../../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
 import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
-import AppContext from '../../../context';
+import AppContext from '../../../../context';
+import React from 'react';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
@@ -93,7 +94,7 @@ const Player: React.FC<PlayerProps> = ({
   const seekingRef = useRef(false); //是否在加载
   const [fmtDuration, setFmtDuration] = useState('00:00'); //格式化后的视频位置
   const [fmtProgress, setFmtProgress] = useState('00:00'); //格式化后的视频时长
-  const controlTimer = useRef(-1); //当前的计时器
+  const controlTimer = useRef(undefined); //当前的计时器
   const [bitrateText, setBitrateText] = useState(''); //带宽
 
   //控制是否可见
@@ -209,9 +210,9 @@ const Player: React.FC<PlayerProps> = ({
 
   //等待control消失的计时器
   const waitCloseControl: Function = () => {
-    if (controlTimer.current !== -1) {
+    if (controlTimer.current !== undefined) {
       clearTimeout(controlTimer.current);
-      controlTimer.current = -1;
+      controlTimer.current = undefined;
     }
     controlTimer.current = setTimeout(() => {
       console.log(seekingRef.current);
@@ -219,7 +220,7 @@ const Player: React.FC<PlayerProps> = ({
         setControlVisible(false);
         controlVisibleRef.current = false;
       }
-    }, 3000);
+    }, 3000) as any;
   };
 
   //打开control并在一段时间之后关闭
@@ -234,9 +235,9 @@ const Player: React.FC<PlayerProps> = ({
     setRateSheetVisible(false);
     setAnthologySheetVisible(false);
     if (controlVisibleRef.current) {
-      if (controlTimer.current !== -1) {
+      if (controlTimer.current !== undefined) {
         clearTimeout(controlTimer.current);
-        controlTimer.current = -1;
+        controlTimer.current = undefined;
       }
       setControlVisible(false);
       controlVisibleRef.current = false;

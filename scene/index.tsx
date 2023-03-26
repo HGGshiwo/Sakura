@@ -8,7 +8,7 @@ import HistoryPage from './HistoryPage';
 import FollowPage from './FollowPage';
 import SchedulePage from './SchedulePage';
 import RankingPage from './RankingPage';
-import ComicPage from './ComicPage';
+import ComicPage from './comic/Player';
 
 export {
   VideoPage,

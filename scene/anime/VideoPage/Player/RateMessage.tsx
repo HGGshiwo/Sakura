@@ -1,7 +1,6 @@
-import {faForwardFast} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import React from 'react';
 import { ReactNode } from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 
 interface Props {
   show: boolean;

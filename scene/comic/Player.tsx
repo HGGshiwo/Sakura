@@ -2,11 +2,22 @@ import {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import Container from '../../component/Container';
 import api, {loadComicPage} from '../../api';
-import ResizeImage from './ResizeImage';
 import {useRoute} from '@react-navigation/native';
 import {ComicPageProps} from '../../type/route';
 import {LoadingContainer} from '../../component/Loading';
 import alert from '../../component/Toast';
+import { Image, ImageProps, useWindowDimensions } from "react-native";
+
+const ResizeImage :React.FC<ImageProps> = (props)=>{
+  const [ aspectRatio, setAspectRatio ] = useState(1)
+  const layout = useWindowDimensions()
+  useEffect(()=>{
+      Image.getSize((props.source as any).uri,(width, height)=>{
+          setAspectRatio(width/height)
+      })
+  },[])
+  return (<Image style={{resizeMode: 'contain', width: layout.width, aspectRatio}} {...props} />)
+}
 
 const ComicPage: React.FC<{}> = () => {
   const [imgs, setImgs] = useState<string[]>([]);

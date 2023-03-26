@@ -1,5 +1,6 @@
 import {faPlay, faPause} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import React from 'react';
 import {Pressable} from 'react-native';
 
 interface Props {

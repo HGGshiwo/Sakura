@@ -1,6 +1,7 @@
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {TouchableNativeFeedback} from 'react-native-gesture-handler';
 import {faForwardStep} from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
 interface Props {
   onPress: () => void;
   disabled: boolean;

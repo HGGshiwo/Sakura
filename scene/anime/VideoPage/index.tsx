@@ -6,27 +6,27 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
-import {ListItemInfo} from '../../type/ListItemInfo';
-import {Source} from '../../type/Source';
-import {InfoSub} from '../../type/InfoSub';
-import {DetailSheet} from './DetailSheet';
+import {ListItemInfo} from '../../../type/ListItemInfo';
+import {Source} from '../../../type/Source';
+import {InfoSub} from '../../../type/InfoSub';
+import {DetailSheet} from '../../../component/DetailSheet';
 import {Player} from './Player';
-import {AnthologySheet} from './AnthologySheet';
-import {RecommandInfo} from '../../type/RecommandInfo';
-import Context from '../../models';
-import History from '../../models/History';
+import {AnthologySheet} from '../../../component/AnthologySheet';
+import {RecommandInfo} from '../../../type/RecommandInfo';
+import Context from '../../../models';
+import History from '../../../models/History';
 import {UpdateMode} from 'realm';
-import Anime from '../../models/Anime';
+import Anime from '../../../models/Anime';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {VideoPageProps} from '../../type/route';
-import Container from '../../component/Container';
-import api from '../../api';
-import {InfoText, SubTitle} from '../../component/Text';
+import {VideoPageProps} from '../../../type/route';
+import Container from '../../../component/Container';
+import api from '../../../api';
+import {InfoText, SubTitle} from '../../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
-import Profile from './Profile';
-import MultiItemRow from '../../component/MultiItemRow';
-import {LoadingContainer} from '../../component/Loading';
-import AppContext from '../../context';
+import Profile from '../../../component/Profile';
+import MultiItemRow from '../../../component/MultiItemRow';
+import {LoadingContainer} from '../../../component/Loading';
+import AppContext from '../../../context';
 const {useRealm} = Context;
 
 const emptyInfoSub = {
