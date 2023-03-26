@@ -1,40 +1,40 @@
-import {
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {View, FlatList, useWindowDimensions} from 'react-native';
-import {SearchBar} from '../../component/SearchBar';
-import {InfoText} from '../../component/Text';
+import {SearchBar} from '../component/SearchBar';
+import {InfoText} from '../component/Text';
 import {Divider} from '@rneui/themed';
-import {SearchInfo} from '../../type/SearchInfo';
-import {V1SearchInfoItem} from '../../component/ListItem';
-import HeadBar from '../../component/HeadBar';
-import {LoadingContainer} from '../../component/Loading';
+import {SearchInfo} from '../type/SearchInfo';
+import {V1SearchInfoItem} from '../component/ListItem';
+import HeadBar from '../component/HeadBar';
+import {LoadingContainer} from '../component/Loading';
 import {useNavigation} from '@react-navigation/native';
-import {SearchPageProps} from '../../type/route';
-import Container from '../../component/Container';
-import {FollowButton, RoundButton} from '../../component/Button';
-import Context from '../../models';
-import Anime from '../../models/Anime';
+import {SearchPageProps, TabPageProps} from '../type/route';
+import Container from '../component/Container';
+import {FollowButton, RoundButton} from '../component/Button';
+import Context from '../models';
+import Anime from '../models/Anime';
 import {UpdateMode} from 'realm';
-import Follow from '../../models/Follow';
-import alert from '../../component/Toast';
-import api, {loadSearchPage} from '../../api';
+import Follow from '../models/Follow';
+import alert from '../component/Toast';
+import api, {loadSearchPage} from '../api';
 
 import {TabBar, TabView} from 'react-native-tab-view';
-import AppContext from '../../context';
+import AppContext from '../context';
 
 const {useRealm} = Context;
 
-interface Props {searchValue: string, loadPage: loadSearchPage}
+interface Props {
+  searchValue: string;
+  loadPage: loadSearchPage;
+}
 
-const ResultView:React.FC<Props> = ({searchValue, loadPage}) => {
+const ResultView: React.FC<Props> = ({searchValue, loadPage}) => {
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
   const navigation = useNavigation<SearchPageProps['navigation']>();
   const realm = useRealm();
+
   useEffect(() => {
     setLoading(true);
     loadPage(searchValue, _results => {
@@ -114,24 +114,33 @@ const ResultView:React.FC<Props> = ({searchValue, loadPage}) => {
   );
 };
 
-const SearchPage: React.FC<Props> = () => {
-  const navigation = useNavigation<SearchPageProps['navigation']>();
+const SearchPage: React.FC<{}> = () => {
+  const navigation = useNavigation<TabPageProps['navigation']>();
+  const route = useNavigation<TabPageProps['route']>();
+  const {tabName} = route.params;
   const [searchValue, setSearchValue] = useState('');
-  const [searchValue2, setSearchValue2] = useState('')
+  const [searchValue2, setSearchValue2] = useState('');
   const [historyVisible, setHistoryVisible] = useState(true);
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    {key: 'yinghuacd', title: 'yinghuacd'},
-    {key: 'scyinghua', title: 'scyinghua'},
-  ]);
 
+  const _routes = {
+    Comic: [
+      {key: 'biquge', title: 'biquge'}
+    ],
+    Anime: [
+      {key: 'yinghuacd', title: 'yinghuacd'},
+      {key: 'scyinghua', title: 'scyinghua'},
+    ],
+    Novel: [],
+  };
+  const [routes] = useState(_routes[tabName]);
   const layout = useWindowDimensions();
 
-  const {TabBarStyle} = useContext(AppContext).theme
-  
+  const {TabBarStyle} = useContext(AppContext).theme;
+
   const handleSearch = () => {
     setHistoryVisible(false);
-    setSearchValue2(searchValue)
+    setSearchValue2(searchValue);
   };
 
   return (
@@ -145,9 +154,9 @@ const SearchPage: React.FC<Props> = () => {
           style={{marginLeft: 10}}
           onChangeText={setSearchValue}
           autoFocus={true}
-          onClose={()=>{
-            setSearchValue('')
-            setHistoryVisible(true)
+          onClose={() => {
+            setSearchValue('');
+            setHistoryVisible(true);
           }}
         />
         <RoundButton title="搜索" onPress={handleSearch} />
@@ -181,7 +190,12 @@ const SearchPage: React.FC<Props> = () => {
             />
           )}
           navigationState={{index, routes}}
-          renderScene={({route}) => <ResultView searchValue={searchValue2} loadPage={api[route.key as keyof typeof api].search} />}
+          renderScene={({route}) => (
+            <ResultView
+              searchValue={searchValue2}
+              loadPage={api.Anime[route.key as keyof typeof api].search}
+            />
+          )}
           onIndexChange={setIndex}
           initialLayout={{width: layout.width}}
         />

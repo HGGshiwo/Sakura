@@ -1,20 +1,20 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList, View} from 'react-native';
-import loadPage from '../../api/yinghuacd/category';
-import Container from '../../component/Container';
-import EndLine from '../../component/EndLine';
-import HeadBar from '../../component/HeadBar';
-import {V3RecommandInfoItem} from '../../component/ListItem';
-import {LoadingContainer} from '../../component/Loading';
-import MultiItemRow from '../../component/MultiItemRow';
-import {NavBar} from '../../component/NavBar';
-import {ParallaxCarousel} from '../../component/ParallaxCarousel';
-import {SearchBar} from '../../component/SearchBar';
-import {SubTitleBold} from '../../component/Text';
-import {RecommandInfo} from '../../type/RecommandInfo';
-import {CategoryPageProps} from '../../type/route';
-import {Section} from '../../type/Section';
+import loadPage from '../api/yinghuacd/category';
+import Container from '../component/Container';
+import EndLine from '../component/EndLine';
+import HeadBar from '../component/HeadBar';
+import {V3RecommandInfoItem} from '../component/ListItem';
+import {LoadingContainer} from '../component/Loading';
+import MultiItemRow from '../component/MultiItemRow';
+import {NavBar} from '../component/NavBar';
+import {ParallaxCarousel} from '../component/ParallaxCarousel';
+import {SearchBar} from '../component/SearchBar';
+import {SubTitleBold} from '../component/Text';
+import {RecommandInfo} from '../type/RecommandInfo';
+import {CategoryPageProps} from '../type/route';
+import {Section} from '../type/Section';
 
 const CategoryPage: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);

@@ -10,29 +10,29 @@ import {
   EmptyH1HistoryInfoItem,
   H1HistoryInfoItem,
   H1RecommandInfoItem,
-} from '../../component/ListItem';
-import {ListTitleLine} from '../../component/ListTitleLine';
-import History from '../../models/History';
-import Context from '../../models';
-import HistoryInfo from '../../type/HistoryInfo';
-import Anime from '../../models/Anime';
+} from '../component/ListItem';
+import {ListTitleLine} from '../component/ListTitleLine';
+import History from '../models/History';
+import Context from '../models';
+import HistoryInfo from '../type/HistoryInfo';
+import Anime from '../models/Anime';
 import {
   InfoText,
   NumberText,
   SubInfoText,
   SubTitleBold,
   Title,
-} from '../../component/Text';
-import Follow from '../../models/Follow';
-import {RecommandInfo} from '../../type/RecommandInfo';
+} from '../component/Text';
+import Follow from '../models/Follow';
+import {RecommandInfo} from '../type/RecommandInfo';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
-import {UserPageProps} from '../../type/route';
-import Container from '../../component/Container';
+import {UserPageProps} from '../type/route';
+import Container from '../component/Container';
 import {Divider} from '@rneui/themed';
 import {StyleSheet} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import AppContext from '../../context';
+import AppContext from '../context';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
   faBusinessTime,
@@ -42,9 +42,9 @@ import {
   faLemon,
   faRankingStar,
 } from '@fortawesome/free-solid-svg-icons';
-import MultiItemRow from '../../component/MultiItemRow';
-import {NavBarButton} from '../../component/Button';
-import alert from '../../component/Toast';
+import MultiItemRow from '../component/MultiItemRow';
+import {NavBarButton} from '../component/Button';
+import alert from '../component/Toast';
 
 const {useRealm, useQuery} = Context;
 const UserPage: React.FC<{}> = () => {

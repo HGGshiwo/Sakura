@@ -9,6 +9,7 @@ class Dom {
     title: string | null;
     "data-vid": string|null;
     "data-src": string|null;
+    "data-original": string|null;
     innerHTML: string;
     style:string;
     

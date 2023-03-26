@@ -1,25 +1,25 @@
 import {useNavigation} from '@react-navigation/native';
 import {View, Pressable, StyleSheet} from 'react-native';
 import {Divider} from '@rneui/themed';
-import Container from '../../component/Container';
-import HeadBar from '../../component/HeadBar';
-import {SubInfoText, SubTitleBold} from '../../component/Text';
-import {HistoryPageProps} from '../../type/route';
+import Container from '../component/Container';
+import HeadBar from '../component/HeadBar';
+import {SubInfoText, SubTitleBold} from '../component/Text';
+import {HistoryPageProps} from '../type/route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {FlatList} from 'react-native-gesture-handler';
-import {V1RecommandInfoItem} from '../../component/ListItem';
-import Context from '../../models';
+import {V1RecommandInfoItem} from '../component/ListItem';
+import Context from '../models';
 import {useContext, useEffect, useRef, useState} from 'react';
-import Anime from '../../models/Anime';
+import Anime from '../models/Anime';
 import Dialog from 'react-native-dialog';
-import Follow from '../../models/Follow';
-import {RecommandInfo} from '../../type/RecommandInfo';
+import Follow from '../models/Follow';
+import {RecommandInfo} from '../type/RecommandInfo';
 import {UpdateMode} from 'realm';
-import EndLine from '../../component/EndLine';
+import EndLine from '../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import alert from '../../component/Toast';
-import AppContext from '../../context';
+import alert from '../component/Toast';
+import AppContext from '../context';
 
 const {useRealm, useQuery} = Context;
 

@@ -5,114 +5,42 @@
  * @format
  */
 
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {useColorScheme, Text} from 'react-native';
+import {useColorScheme} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootSiblingParent} from 'react-native-root-siblings';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
-import {faYoutube} from '@fortawesome/free-brands-svg-icons';
-import Context from './models';
 
-import {
-  VideoPage,
-  AnimePage,
-  CategoryPage,
-  FollowPage,
-  HistoryPage,
-  IndexPage,
-  SearchPage,
-  UserPage,
-  SchedulePage,
-} from './scene/Anime';
-import RankingPage from './scene/Anime/RankingPage';
+import Context from './models';
+import * as Anime from './scene';
+
 import appTheme from './theme';
 import storage from './storage';
 import AppContext from './context';
-
+import TabPage from './scene/TabPage';
 const {RealmProvider} = Context;
-
-const Tab = createBottomTabNavigator();
-const icons = {
-  Anime: faYoutube,
-  User: faUser,
-  Novel: faBook,
-  Comic: faPalette,
-};
-const UserStackScreen = () => {
-  return <></>;
-};
-const texts = {
-  Anime: '番剧',
-  User: '我的',
-  Novel: '小说',
-  Comic: '漫画',
-};
-const TabPage = () => {
-  const {BottomStyle} = useContext(AppContext).theme;
-  return (
-    <Tab.Navigator
-      screenOptions={({route}) => ({
-        tabBarStyle: {
-          height: 50,
-          paddingTop: 10,
-          backgroundColor: BottomStyle.backgroundColor,
-        },
-        tabBarIcon: ({focused, color, size}) => {
-          let icon = icons[route.name as keyof typeof icons];
-          // You can return any component that you like here!
-          return (
-            <FontAwesomeIcon
-              icon={icon}
-              size={18}
-              color={BottomStyle.textColor(focused)}
-            />
-          );
-        },
-        headerShown: false,
-        tabBarLabel: ({focused, color, position}) => {
-          return (
-            <Text
-              style={{
-                paddingBottom: 8,
-                fontSize: 10,
-                color: BottomStyle.textColor(focused),
-              }}>
-              {texts[route.name as keyof typeof texts]}
-            </Text>
-          );
-        },
-      })}>
-      <Tab.Screen name="Anime" component={AnimePage} />
-      <Tab.Screen name="Novel" component={UserStackScreen} />
-      <Tab.Screen name="Comic" component={UserStackScreen} />
-      <Tab.Screen name="User" component={UserPage} />
-    </Tab.Navigator>
-  );
-};
 
 const routes = [
   {name: 'Tab', component: TabPage},
-  {name: 'Video', component: VideoPage},
-  {name: 'Search', component: SearchPage},
-  {name: 'Category', component: CategoryPage},
-  {name: 'Index', component: IndexPage},
-  {name: 'History', component: HistoryPage},
-  {name: 'Follow', component: FollowPage},
-  {name: 'Ranking', component: RankingPage},
-  {name: 'Schedule', component: SchedulePage},
+  {name: 'Video', component: Anime.VideoPage},
+  {name: 'Search', component: Anime.SearchPage},
+  {name: 'Category', component: Anime.CategoryPage},
+  {name: 'Index', component: Anime.IndexPage},
+  {name: 'History', component: Anime.HistoryPage},
+  {name: 'Follow', component: Anime.FollowPage},
+  {name: 'Ranking', component: Anime.RankingPage},
+  {name: 'Schedule', component: Anime.SchedulePage},
+  // {name: 'Comic', component: Comic.ComicPage},
 ];
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const [theme, setTheme] = useState<any>(appTheme.red);
   const [themeName, setThemeName] = useState('');
-  const [animeSource, setAnimeSource] = useState('');
+  const [source, setSource] = useState({Anime: '', Novel: '', Comic: ''});
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -131,12 +59,12 @@ function App(): JSX.Element {
         setThemeName('red');
       },
     );
-    storage.load({key: 'animeSource'}).then(
-      animeSource => {
-        setAnimeSource(animeSource);
+    storage.load({key: 'source'}).then(
+      source => {
+        setSource(source);
       },
       () => {
-        setAnimeSource('scyinghua');
+        setSource({Anime: 'scyinghua', Comic: 'biquge', Novel: 'biquge'});
       },
     );
   }, []);
@@ -152,12 +80,14 @@ function App(): JSX.Element {
     });
   };
 
-  const changeAnimeSource = (source: string) => {
-    setAnimeSource(source);
+  const changeSource = (key: 'Novel' | 'Comic' | 'Anime', _source: string) => {
+    let newSource = {...source};
+    newSource[key] = _source;
+    setSource({...newSource});
     //持久化保存数据
     storage.save({
-      key: 'animeSource',
-      data: source,
+      key: 'source',
+      data: newSource,
       expires: null,
     });
   };
@@ -165,7 +95,13 @@ function App(): JSX.Element {
   return (
     <SafeAreaProvider style={backgroundStyle}>
       <AppContext.Provider
-        value={{theme, themeName, changeTheme, animeSource, changeAnimeSource}}>
+        value={{
+          theme,
+          themeName,
+          changeTheme,
+          source,
+          changeSource,
+        }}>
         <NavigationContainer>
           <GestureHandlerRootView style={{flex: 1}}>
             <RealmProvider>

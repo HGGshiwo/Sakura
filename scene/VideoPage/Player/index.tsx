@@ -21,18 +21,18 @@ import {
 import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
-import {LoadingText} from '../../../../component/Text';
+import {LoadingText} from '../../../component/Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
-import {BackButton} from '../../../../component/Button';
-import {LoadingBox} from '../../../../component/Loading';
+import {BackButton} from '../../../component/Button';
+import {LoadingBox} from '../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
 import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
-import AppContext from '../../../../context';
+import AppContext from '../../../context';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功

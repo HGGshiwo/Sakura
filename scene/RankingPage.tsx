@@ -2,15 +2,15 @@ import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
-import loadPage from '../../api/yinghuacd/rank';
-import Container from '../../component/Container';
-import EndLine from '../../component/EndLine';
-import HeadBar from '../../component/HeadBar';
-import {V1RecommandInfoItem} from '../../component/ListItem';
-import {LoadingContainer} from '../../component/Loading';
-import {RateText, SubTitleBold} from '../../component/Text';
-import {RecommandInfo} from '../../type/RecommandInfo';
-import {NoParamProps} from '../../type/route';
+import loadPage from '../api/yinghuacd/rank';
+import Container from '../component/Container';
+import EndLine from '../component/EndLine';
+import HeadBar from '../component/HeadBar';
+import {V1RecommandInfoItem} from '../component/ListItem';
+import {LoadingContainer} from '../component/Loading';
+import {RateText, SubTitleBold} from '../component/Text';
+import {RecommandInfo} from '../type/RecommandInfo';
+import {NoParamProps} from '../type/route';
 
 const RankingPage: React.FC<{}> = () => {
   const [rankings, setRankings] = useState<RecommandInfo[]>([]);

@@ -28,6 +28,8 @@ const Container = ({children, style}: ContainerProps) => {
       case 'Tab':
       case 'User':
       case 'Anime':
+      case 'Comic':
+      case 'Novel':
         setBackgroundColor(HeaderStyle.backgroundColor);
         break;
     }

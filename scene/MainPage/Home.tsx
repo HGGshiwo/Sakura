@@ -1,28 +1,28 @@
 import {SectionList} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
-import {RecommandInfo} from '../../../type/RecommandInfo';
-import {ParallaxCarousel} from '../../../component/ParallaxCarousel';
-import {NavBar} from '../../../component/NavBar';
-import MultiItemRow from '../../../component/MultiItemRow';
-import {ListTitleLine} from '../../../component/ListTitleLine';
+import {RecommandInfo} from '../../type/RecommandInfo';
+import {ParallaxCarousel} from '../../component/ParallaxCarousel';
+import {NavBar} from '../../component/NavBar';
+import MultiItemRow from '../../component/MultiItemRow';
+import {ListTitleLine} from '../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
 import {
   H1HistoryInfoItem,
   V2RecommandInfoItem,
-} from '../../../component/ListItem';
-import Context from '../../../models';
-import History from '../../../models/History';
-import HistoryInfo from '../../../type/HistoryInfo';
-import {LoadingContainer} from '../../../component/Loading';
-import Anime from '../../../models/Anime';
-import {useNavigation} from '@react-navigation/native';
-import {AnimeHomeProps} from '../../../type/route';
-import api from '../../../api';
-import alert from '../../../component/Toast';
-import AppContext from '../../../context';
+} from '../../component/ListItem';
+import Context from '../../models';
+import History from '../../models/History';
+import HistoryInfo from '../../type/HistoryInfo';
+import {LoadingContainer} from '../../component/Loading';
+import Anime from '../../models/Anime';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {NoParamProps} from '../../type/route';
+import api from '../../api';
+import alert from '../../component/Toast';
+import AppContext from '../../context';
 const {useRealm, useQuery} = Context;
 
-const Home: React.FC<{}> = () => {
+const Home: React.FC<{tabName: string}> = ({tabName}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
   const [historys, setHistorys] = useState<HistoryInfo[]>([]);
@@ -30,14 +30,15 @@ const Home: React.FC<{}> = () => {
   const [text, setText] = useState('加载中...');
   const _historys = useQuery<History>(History);
   const realm = useRealm();
-  const navigation = useNavigation<AnimeHomeProps['navigation']>();
+  const navigation = useNavigation<NoParamProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
-  const {animeSource} = useContext(AppContext)
+  const {source} = useContext(AppContext)
 
   const onRefresh = () => {
     setRefreshing(true);
-    console.log(animeSource)
-    const loadPage = api[animeSource].home
+    const curSource = source[tabName as keyof typeof source]
+    console.log(curSource)
+    const loadPage = api[tabName][curSource].home
     loadPage(
       (carousels, sections) => {
         setCarousels(carousels);
@@ -74,7 +75,7 @@ const Home: React.FC<{}> = () => {
     setHistorys(historys);
   }, [_historys]);
 
-  useEffect(onRefresh, [animeSource])
+  useEffect(onRefresh, [source])
   useEffect(onRefresh, []);
 
   return (

@@ -2,22 +2,21 @@ import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import {FlatList, View, useWindowDimensions, Pressable} from 'react-native';
 import {UpdateMode} from 'realm';
-import {V1RecommandInfoItem} from '../../../component/ListItem';
-import {ListTitleLine} from '../../../component/ListTitleLine';
-import {InfoText, RateText, SubTitle} from '../../../component/Text';
-import Follow from '../../../models/Follow';
-import {InfoSub} from '../../../type/InfoSub';
-import {ListItemInfo} from '../../../type/ListItemInfo';
-import {RecommandInfo} from '../../../type/RecommandInfo';
-import {VideoPageProps} from '../../../type/route';
-import {DetailButtonLine} from './DetailButtonLine';
-import {TitleLine} from './TitleLine';
+import {V1RecommandInfoItem} from '../../component/ListItem';
+import {ListTitleLine} from '../../component/ListTitleLine';
+import {InfoText, RateText, SubTitle, Title} from '../../component/Text';
+import Follow from '../../models/Follow';
+import {InfoSub} from '../../type/InfoSub';
+import {ListItemInfo} from '../../type/ListItemInfo';
+import {RecommandInfo} from '../../type/RecommandInfo';
+import {VideoPageProps} from '../../type/route';
 const {useRealm} = Context;
-import Context from '../../../models';
+import Context from '../../models';
 import {ReactNode, useEffect, useState} from 'react';
-import EndLine from '../../../component/EndLine';
-import ToolBar from '../../../component/ToolBar';
-import alert from '../../../component/Toast';
+import EndLine from '../../component/EndLine';
+import ToolBar from '../../component/ToolBar';
+import alert from '../../component/Toast';
+import {FollowButton, TextButton} from '../../component/Button';
 
 type Props = {
   url: string;
@@ -85,15 +84,27 @@ const Profile: React.FC<Props> = ({
       ListHeaderComponent={
         <>
           <View style={{padding: 10, width: layout.width}}>
-            <TitleLine
-              title={title}
-              onPress={handlePressFollowed}
-              followed={followed}
-            />
-            <DetailButtonLine
-              author={infoSub.author}
-              onPress={() => setDetailSheetVisible(true)}
-            />
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Title style={{width: '70%'}} title={title} />
+              <FollowButton onPress={handlePressFollowed} followed={followed} />
+            </View>
+            {/* author和详情栏 */}
+            <View
+              style={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+              }}>
+              <InfoText
+                style={{paddingTop: 2, color: 'gray', flex: 1}}
+                title={infoSub.author}
+              />
+              <TextButton
+                title={'详情'}
+                onPress={() => setDetailSheetVisible(true)}
+              />
+            </View>
             <ToolBar />
             <ListTitleLine
               title={'选集'}
@@ -106,9 +117,7 @@ const Profile: React.FC<Props> = ({
                 data={relatives}
                 renderItem={({item}) => (
                   <Pressable
-                    onPress={() =>
-                      navigation.push('Video', {url: item.data})
-                    }>
+                    onPress={() => navigation.push('Video', {url: item.data})}>
                     <SubTitle style={{padding: 12}} title={item.title} />
                   </Pressable>
                 )}
