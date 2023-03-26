@@ -1,2 +1,2 @@
-import * as biquge   from './biquege'
-export {biquge}
+import * as biquge from './biquege'
+export { biquge }

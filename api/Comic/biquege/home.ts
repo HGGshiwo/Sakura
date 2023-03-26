@@ -1,5 +1,6 @@
 import { loadHomePage } from "../..";
 import { getDomFromString } from "../../Dom";
+import { getRecommandInfoFromCover } from "./utils";
 
 const loadPage: loadHomePage = (_afterLoad,) => {
   fetch('https://www.biqug.org/')
@@ -19,16 +20,7 @@ const loadPage: loadHomePage = (_afterLoad,) => {
         return {
           title: headDom.getElementsByTagName('span')![0].innerHTML,
           href: headDom.getElementsByTagName('a')![0].href!,
-          data: sectionDom.getElementsByClassName('in-comic--type-b cs-item')!.map((inDom) => {
-            const coverDom = inDom.getElementsByClassName('cover')![0]
-            const tagDom = coverDom.getElementsByClassName('cover__tag')![0]
-            return {
-              href: coverDom.getElementsByTagName('a')![0].href!,
-              img: coverDom.getElementsByTagName('img')![0]["data-original"]!,
-              state: tagDom ? tagDom.innerHTML : '',
-              title: inDom.getElementsByClassName('comic__title')![0].getElementsByTagName('a')![0].innerHTML,
-            }
-          })
+          data: sectionDom.getElementsByClassName('in-comic--type-b cs-item')!.map(getRecommandInfoFromCover)
         }
       })
       _afterLoad(carousels, sections)

@@ -1,3 +1,8 @@
+import { InfoSub } from "../InfoSub";
+import { ListItemInfo } from "../ListItemInfo";
+import { RecommandInfo } from "../RecommandInfo";
+import { Source } from "../Source";
+
 type ComicPageInfo = {
     title: string,
     img: string,
