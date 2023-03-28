@@ -1,9 +1,9 @@
-import { RecommandInfo } from "../../type/RecommandInfo";
-import { Section } from "../../type/Section";
-import { getDomFromString } from "../Dom";
+import RecommandInfo from "../../../type/RecommandInfo";
+import { Section } from "../../../type/Section";
+import { getDomFromString } from "../../Dom";
 import {getDataFromVideoImgDoms} from './utils'
 const href = 'https://www.scyinghua.com';
-
+const apiName = 'scyinghua'
 
 function loadPage(_afterLoad: (carousels: RecommandInfo[], sections: Section[]) => void, _afterErr?: (err: string) => void) {
 
@@ -19,8 +19,9 @@ function loadPage(_afterLoad: (carousels: RecommandInfo[], sections: Section[]) 
         const moreDom = py3Dom.getElementsByClassName('more')![0] //精选是没有more的
         return {
           href: moreDom ? href + moreDom.getElementsByTagName('a')![0].href! : '',
+          apiName,
           title: py3Dom.getElementsByClassName('h3-md')![0].innerHTML,
-          data: getDataFromVideoImgDoms(href, py3Dom)
+          data: getDataFromVideoImgDoms(href, py3Dom, apiName)
         }
       })
       let carousels_data = sections.splice(0, 1)

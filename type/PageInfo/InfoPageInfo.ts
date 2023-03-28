@@ -1,9 +1,9 @@
-import { InfoSub } from "../InfoSub";
+import  InfoSub  from "../InfoSub";
 import { ListItemInfo } from "../ListItemInfo";
 import { RecommandInfo } from "../RecommandInfo";
 import { Source } from "../Source";
 
-interface VideoPageInfo {
+interface InfoPageInfo {
     title: string,
     img: string,
     infoSub: InfoSub,
@@ -13,4 +13,4 @@ interface VideoPageInfo {
     relatives: ListItemInfo[]
 }
 
-export default VideoPageInfo;
+export default InfoPageInfo;

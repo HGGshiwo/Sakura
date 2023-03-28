@@ -1,15 +1,18 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { ReactNode } from "react";
+import { PlayerProps } from "../scene/InfoPage";
 
 type RootStackParamList = {
   TabPage: { tabName: 'Comic' | 'Novel' | 'Anime' };
   Anime: undefined;
-  Video: { url: string };  
-  Comic: { url: srting };
-  Novel: { url: string };
+  Video: { url: string, apiName: string };
+  Comic: { url: srting, apiName: string };
+  Novel: { url: string, apiName: string };
   Search: { tabName: 'Comic' | 'Novel' | 'Anime' };
   MainPage: { tabName: 'Comic' | 'Novel' | 'Anime' };
   AnimeOther: undefined;
   Category: { url: string; title: string };
+  ComicPlayer: { url: srting };
   Tab: undefined;
   Index: { url: string, title: string };
   User: undefined;
@@ -32,6 +35,8 @@ type FollowPageProps = NativeStackScreenProps<RootStackParamList, 'Follow'>;
 type HistoryPageProps = NativeStackScreenProps<RootStackParamList, 'History'>;
 type NoParamProps = NativeStackScreenProps<RootStackParamList, 'NoParam'>;
 type ComicPageProps = NativeStackScreenProps<RootStackParamList, 'Comic'>;
+type ComicPlayerPageProps = NativeStackScreenProps<RootStackParamList, 'ComicPlayer'>;
+
 export type {
   TabPageProps,
   VideoPageProps,
@@ -46,4 +51,5 @@ export type {
   NoParamProps,
   HistoryPageProps,
   ComicPageProps,
+  ComicPlayerPageProps,
 };

@@ -7,4 +7,4 @@ type InfoSub = {
     produce: string
 }
 
-export {InfoSub}
+export default InfoSub;

@@ -1,5 +1,5 @@
-import { SearchInfo } from "../../type/SearchInfo";
-import { Dom, getDomFromString } from "../Dom";
+import { SearchInfo } from "../../../type/SearchInfo";
+import { Dom, getDomFromString } from "../../Dom";
 import { getDataFromVideoImgDoms } from "./utils";
 
 const href = 'https://www.scyinghua.com/search/-------------.html?wd=';

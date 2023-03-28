@@ -2,7 +2,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
-import loadPage from '../api/yinghuacd/index';
+import api, { loadAllPage } from '../api';
 import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {V3RecommandInfoItem} from '../component/ListItem';
@@ -19,7 +19,7 @@ const IndexPage: React.FC<{}> = () => {
   const navigation = useNavigation<IndexPageProps['navigation']>();
 
   const {url, title} = route.params;
-
+  const loadPage:loadAllPage = api.Comic.yinghuacd.all!
   useEffect(() => {
     loadPage(url, _results => {
       setResults(_results);

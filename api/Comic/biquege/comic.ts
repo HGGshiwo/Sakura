@@ -1,13 +1,15 @@
-import { loadComicPage } from "../.."
+import { loadComicPage, loadInfoPage, loadPlayerData } from "../.."
 import { getDomFromString } from "../../Dom"
 import { getRecommandInfoFromCover } from "./utils"
 
-const loadPage: loadComicPage = (url, callback) => {
+const loadPage: loadInfoPage = (url, callback) => {
   fetch(url).then(response => response.text())
     .then(responseText => {
+      console.log(url)
       const documnet = getDomFromString(responseText)
       const title = documnet.getElementsByClassName('comic-title j-comic-title')![0].innerHTML
-      const img = documnet.getElementsByClassName('de-info__cover')![0].getElementsByTagName('img')![0]["data-original"]!
+      
+      const img = documnet.getElementsByClassName('de-info__cover')![0].getElementsByTagName('img')![0].src!
       const infoSub = {
         author: documnet.getElementsByClassName('comic-author')![0].getElementsByClassName('name')![0].getElementsByTagName('a')![0].innerHTML,
         alias: '',
@@ -21,7 +23,7 @@ const loadPage: loadComicPage = (url, callback) => {
       const sources = documnet.getElementsByClassName('chapter__list-box clearfix')![0].getElementsByTagName('li')!.map(liDom => {
         const aDom = liDom.getElementsByTagName('a')![0]
         return {
-          key: aDom.innerHTML,
+          key: aDom.innerHTML.trim(),
           data: [aDom.href!]
         }
       })
@@ -36,12 +38,12 @@ const loadPage: loadComicPage = (url, callback) => {
       })
     })
 }
-const loadComicSrc = (url: string, callback: (data: string[]) => void) => {
+const loadComicSrc:loadPlayerData = (url, callback) => {
   fetch(url).then(response => response.text())
     .then((responseText) => {
       const documnet = getDomFromString(responseText)
       const urls = documnet.getElementsByClassName('lazyload')!.map(lazyDom => lazyDom["data-original"]!)
-      callback(urls)
+      callback(true, urls)
     })
 }
 export default loadPage;

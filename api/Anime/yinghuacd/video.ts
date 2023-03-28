@@ -1,7 +1,7 @@
-import { ListItemInfo } from "../../type/ListItemInfo";
-import { Source } from "../../type/Source";
-import VideoPageInfo from "../../type/PageInfo/VideoPageInfo";
-import { Dom, getDomFromString } from "../Dom";
+import { ListItemInfo } from "../../../type/ListItemInfo";
+import { Source } from "../../../type/Source";
+import VideoPageInfo from "../../../type/PageInfo/InfoPageInfo";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
 
@@ -79,6 +79,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
           return {
             id: index,
             href: href + liDom!.getElementsByTagName('a')![0].href!,
+            apiName: 'yinghuacd',
             img: liDom!.getElementsByTagName('img')![0].src!,
             title: liDom!.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
             state: liDom!.getElementsByTagName('font')![0].innerHTML,
@@ -97,11 +98,11 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
     })
 }
 
-const loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void) => {
+const loadVideoSrc = (url: string, callback: (state: boolean, data?: { src: string, type: string }) => void) => {
   _loadVideoSrc(url, callback, 3)
 }
 
-const _loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void, times: number) => {
+const _loadVideoSrc = (url: string, callback: (state: boolean, data?: { src: string, type: string }) => void, times: number) => {
   fetch(url).then(response => response.text())
     .then((responseText) => {
       if (responseText === '') {
@@ -111,7 +112,7 @@ const _loadVideoSrc = (url: string, callback: (state: boolean, src?: string, typ
       let document = getDomFromString(responseText)
       let src_type = document!.getElementById('playbox')!["data-vid"]!.split('$')
       const type = src_type[0].includes('m3u8') ? 'm3u8' : src_type[1]
-      callback(true, src_type[0], type)
+      callback(true, { src: src_type[0], type })
     })
     .catch(err => {
       console.log(err)

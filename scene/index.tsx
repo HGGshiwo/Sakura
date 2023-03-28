@@ -1,4 +1,5 @@
-import VideoPage from './VideoPage'; 
+import VideoPage from './anime/VideoPage'; 
+import ImagePage from './comic/ImagePage';
 import AnimePage from './MainPage';
 import SearchPage from './SearchPage';
 import CategoryPage from './CategoryPage';
@@ -8,7 +9,7 @@ import HistoryPage from './HistoryPage';
 import FollowPage from './FollowPage';
 import SchedulePage from './SchedulePage';
 import RankingPage from './RankingPage';
-import ComicPage from './comic/Player';
+
 
 export {
   VideoPage,
@@ -21,5 +22,5 @@ export {
   FollowPage,
   SchedulePage,
   RankingPage,
-  ComicPage,
+  ImagePage,
 };

@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList} from 'react-native';
-import loadPage from '../../api/yinghuacd/category';
+import loadPage from '../../api/Anime/yinghuacd/category';
 import EndLine from '../../component/EndLine';
 import {V3RecommandInfoItem} from '../../component/ListItem';
 import {LoadingContainer} from '../../component/Loading';

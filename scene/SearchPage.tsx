@@ -12,7 +12,7 @@ import {SearchPageProps, TabPageProps} from '../type/route';
 import Container from '../component/Container';
 import {FollowButton, RoundButton} from '../component/Button';
 import Context from '../models';
-import Anime from '../models/Anime';
+import RecmdInfoDb from '../models/RecmdInfoDb';
 import {UpdateMode} from 'realm';
 import Follow from '../models/Follow';
 import alert from '../component/Toast';
@@ -26,9 +26,10 @@ const {useRealm} = Context;
 interface Props {
   searchValue: string;
   loadPage: loadSearchPage;
+  apiName: string;
 }
 
-const ResultView: React.FC<Props> = ({searchValue, loadPage}) => {
+const ResultView: React.FC<Props> = ({searchValue, loadPage, apiName}) => {
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
@@ -52,9 +53,10 @@ const ResultView: React.FC<Props> = ({searchValue, loadPage}) => {
     //更新番剧数据库
     realm.write(() => {
       realm.create(
-        Anime,
+        RecmdInfoDb,
         {
           href: item.href,
+          apiName,
           img: item.img,
           state: item.state,
           title: item.title,
@@ -95,7 +97,7 @@ const ResultView: React.FC<Props> = ({searchValue, loadPage}) => {
               item={item}
               index={index}
               onPress={() => {
-                navigation.navigate('Video', {url: item.href});
+                navigation.navigate('Video', {url: item.href, apiName: item.apiName});
               }}>
               <FollowButton
                 onPress={() => onPress(item, index)}
@@ -194,6 +196,7 @@ const SearchPage: React.FC<{}> = () => {
             <ResultView
               searchValue={searchValue2}
               loadPage={api.Anime[route.key as keyof typeof api].search}
+              apiName={route.key}
             />
           )}
           onIndexChange={setIndex}

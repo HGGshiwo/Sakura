@@ -15,7 +15,7 @@ import {ListTitleLine} from '../component/ListTitleLine';
 import History from '../models/History';
 import Context from '../models';
 import HistoryInfo from '../type/HistoryInfo';
-import Anime from '../models/Anime';
+import RecmdInfoDb from '../models/RecmdInfoDb';
 import {
   InfoText,
   NumberText,
@@ -24,7 +24,7 @@ import {
   Title,
 } from '../component/Text';
 import Follow from '../models/Follow';
-import {RecommandInfo} from '../type/RecommandInfo';
+import RecommandInfo from '../type/RecommandInfo';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {UserPageProps} from '../type/route';
@@ -54,7 +54,7 @@ const UserPage: React.FC<{}> = () => {
   const navigation = useNavigation<UserPageProps['navigation']>();
   const _historys = useQuery<History>(History);
   const _follows = useQuery<Follow>(Follow);
-  const {theme, themeName, changeTheme, animeSource, changeAnimeSource} =
+  const {theme, themeName, changeTheme, source, changeSource} =
     useContext(AppContext);
   const realm = useRealm();
 
@@ -66,7 +66,7 @@ const UserPage: React.FC<{}> = () => {
   ]);
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
-      const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+      const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
       return {
         href: _history.href,
         progress: _history.progress,
@@ -77,6 +77,7 @@ const UserPage: React.FC<{}> = () => {
         img: _animes!.img,
         title: _animes!.title,
         state: _animes!.state,
+        apiName: _animes!.apiName,
       };
     });
     setHistorys(historys);
@@ -131,9 +132,10 @@ const UserPage: React.FC<{}> = () => {
       .filter(follow => follow.following)
       .reverse()
       .map(_history => {
-        const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
         return {
           href: _history.href,
+          apiName: _animes!.apiName,
           img: _animes!.img,
           title: _animes!.title,
           state: _animes!.state,
@@ -212,7 +214,7 @@ const UserPage: React.FC<{}> = () => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href});
+                    navigation.push('Video', {url: item.href, apiName: item.apiName});
                   }}
                 />
               )}
@@ -236,7 +238,7 @@ const UserPage: React.FC<{}> = () => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href});
+                    navigation.push('Video', {url: item.href, apiName: item.apiName});
                   }}
                 />
               )}
@@ -260,7 +262,7 @@ const UserPage: React.FC<{}> = () => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href});
+                    navigation.push('Video', {url: item.href, apiName: item.apiName});
                   }}
                 />
               )}
@@ -317,11 +319,10 @@ const UserPage: React.FC<{}> = () => {
                   padding: 10,
                 }}>
                 <CheckBox
-                  value={item === animeSource}
+                  value={item === source.Anime}
                   onValueChange={newValue => {
                     if (newValue) {
-                      console.log(item)
-                      changeAnimeSource(item);
+                      changeSource('Anime', item);
                       alert('切换数据源成功');
                     }
                   }}

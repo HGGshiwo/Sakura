@@ -1,4 +1,4 @@
-import {InfoSub} from '../type/InfoSub';
+import InfoSub from '../type/InfoSub';
 import {Text, Image} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {InfoText, RateText, SubTitleBold, Title} from './Text';

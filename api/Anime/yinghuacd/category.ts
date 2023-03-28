@@ -1,7 +1,7 @@
-import CategoryPageInfo from "../../type/PageInfo/CategoryPageInfo";
-import { RecommandInfo } from "../../type/RecommandInfo";
-import { Section } from "../../type/Section";
-import { Dom, getDomFromString } from "../Dom";
+import CategoryPageInfo from "../../../type/PageInfo/CategoryPageInfo";
+import { RecommandInfo } from "../../../type/RecommandInfo";
+import { Section } from "../../../type/Section";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
 

@@ -1,10 +1,11 @@
 import home from "./home";
 import comic, { loadComicSrc } from "./comic";
-const comicSrc = loadComicSrc
+const player = loadComicSrc
 const search = ()=>{}
+const info = comic
 export {
     home,
-    comic,
-    comicSrc,
-    search
+    info,
+    player,
+    search,
 }

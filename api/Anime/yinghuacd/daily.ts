@@ -1,8 +1,8 @@
-import DailyInfo from "../../type/DailyInfo";
-import { Dom, getDomFromString } from "../Dom";
+import { apiName } from ".";
+import DailyInfo from "../../../type/DailyInfo";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
-
 
 function loadPage(_afterLoad: (data: DailyInfo[][]) => void, _afterErr?: (err: string) => void) {
   const _url = href
@@ -18,6 +18,7 @@ function loadPage(_afterLoad: (data: DailyInfo[][]) => void, _afterErr?: (err: s
           const aDoms = liDom.getElementsByTagName('a')!
           return {
             id: index,
+            apiName,
             href1: href + aDoms[0].href!,
             href2: aDoms[1].href!,
             title: aDoms[1].innerHTML,

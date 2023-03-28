@@ -1,5 +1,5 @@
-import { RecommandInfo } from "../../type/RecommandInfo";
-import { Dom, getDomFromString } from "../Dom";
+import { RecommandInfo } from "../../../type/RecommandInfo";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
 

@@ -1,6 +1,7 @@
-import { Source } from "../../type/Source";
-import VideoPageInfo from "../../type/PageInfo/VideoPageInfo";
-import { Dom, getDomFromString } from "../Dom";
+import { Source } from "../../../type/Source";
+import VideoPageInfo from "../../../type/PageInfo/InfoPageInfo";
+import { Dom, getDomFromString } from "../../Dom";
+import { loadPlayerData } from "../..";
 
 const href = 'https://www.scyinghua.com';
 
@@ -9,15 +10,18 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
   fetch(url)
     .then(response => response.text())
     .then((responseText) => {
+  
       const document = getDomFromString(responseText);
       let title = document!.getElementsByClassName('page-title')![0].innerHTML;
       let img = document.getElementsByClassName('url_img')![0].src!.replace('https', 'http');
       if (img === '/' || img.includes('None')) {
         img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'
       }
+      console.log(666)
       let videoInfoDoms = document!.getElementsByClassName('video-info-items')!
       let state = videoInfoDoms[3].getElementsByClassName('video-info-item')![0].innerHTML
-      let alias = document.getElementsByClassName('video-subtitle')![0].innerHTML
+      let aliasDom = document.getElementsByClassName('video-subtitle')![0]
+      let alias = aliasDom? aliasDom.innerHTML:''
       let infoSub = {
         author: videoInfoDoms[0].getElementsByTagName('a')!.reduce((pre, cur) => pre + ' ' + cur.innerHTML, ''),
         alias,
@@ -30,6 +34,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
       };
 
       let infoDom = document!.getElementsByClassName('content-text none')![0];
+      
       const info = infoDom ? infoDom.innerHTML : ''
       
       //播放列表
@@ -65,6 +70,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
             id: index,
             href: href + col6Dom!.getElementsByTagName('a')![0].href!,
             img,
+            apiName: 'scyinghua',
             title: col6Dom!.getElementsByTagName('h6')![0].getElementsByTagName('a')![0].innerHTML,
             state: col6Dom!.getElementsByClassName('label')![0].innerHTML,
           };
@@ -83,11 +89,11 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
     .catch(err => console.log(err))
 }
 
-const loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void) => {
+const loadVideoSrc:loadPlayerData = (url, callback) => {
   _loadVideoSrc(url, callback, 3)
 }
 
-const _loadVideoSrc = (url: string, callback: (state: boolean, src?: string, type?: string) => void, times: number) => {
+const _loadVideoSrc = (url: string, callback: (state: boolean, data?:{src: string, type: string}) => void, times: number) => {
   fetch(url).then(response => response.text())
     .then((responseText) => {
       if (responseText === '') {
@@ -95,10 +101,10 @@ const _loadVideoSrc = (url: string, callback: (state: boolean, src?: string, typ
         return
       }
       let document = getDomFromString(responseText)!
-      let src = document.getElementsByClassName('img-box bofang_box')![0].getElementsByTagName("script")![0]._dom.children[0].data
-      let src_type = /(?<="url":").*(?=","url_next")/.exec(src)![0].replaceAll('\\', '')
+      let src = (document.getElementsByClassName('img-box bofang_box')![0].getElementsByTagName("script")![0]._dom.children[0] as any).data
+      let src_type = /(?<="url":").*(?=","url_next")/.exec(src)![0].split('\\').join('')//代替replaceAll
       const type = src_type.includes('m3u8') ? 'm3u8' : 'mp4'
-      callback(true, src_type, type)
+      callback(true, {src: src_type, type})
     })
     .catch(err => {
       console.log(err)

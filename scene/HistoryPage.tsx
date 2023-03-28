@@ -11,7 +11,7 @@ import {V1HistoryInfoItem} from '../component/ListItem';
 import Context from '../models';
 import History from '../models/History';
 import {useContext, useEffect, useRef, useState} from 'react';
-import Anime from '../models/Anime';
+import RecmdInfoDb from '../models/RecmdInfoDb';
 import HistoryInfo from '../type/HistoryInfo';
 import Dialog from 'react-native-dialog';
 import EndLine from '../component/EndLine';
@@ -33,9 +33,10 @@ const HistoryPage: React.FC<{}> = () => {
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)].map(_history => {
-      const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+      const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
       return {
         href: _history.href,
+        apiName: _animes!.apiName,
         progress: _history.progress,
         progressPer: _history.progressPer,
         anthologyIndex: _history.anthologyIndex,
@@ -107,7 +108,7 @@ const HistoryPage: React.FC<{}> = () => {
           <V1HistoryInfoItem
             item={item}
             index={index}
-            onPress={() => navigation.navigate('Video', {url: item.href})} />
+            onPress={() => navigation.navigate('Video', {url: item.href, apiName: item.apiName})} />
         )}
         rightOpenValue={-75}
         renderHiddenItem={({item, index}, rowMap) => (

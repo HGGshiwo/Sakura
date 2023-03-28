@@ -6,7 +6,7 @@ type AppTheme = Record<string, {
   BottomStyle: any, 
   LoadingStyle: any, 
   NavBarStyle: any, 
-  VideoStyle: any, 
+  PlayerStyle: any, 
   FollowButtonStyle: any,
   RoundButtonStyle: any,
   DialogStyle: any,
@@ -34,7 +34,7 @@ const appTheme: AppTheme = {
     NavBarStyle: {
       color: 'red',
     },
-    VideoStyle: {
+    PlayerStyle: {
       textColor: (focused: boolean) => focused ? 'red' : 'black',
       indicatorColor: 'red',
       playerTextColor: (focused: boolean) => focused ? 'red' : 'white'
@@ -76,7 +76,7 @@ const appTheme: AppTheme = {
     NavBarStyle: {
       color: 'dodgerblue',
     },
-    VideoStyle: {
+    PlayerStyle: {
       textColor: (focused: boolean) => focused ? 'dodgerblue' : 'black',
       indicatorColor: 'dodgerblue',
       playerTextColor: (focused: boolean) => focused ? 'dodgerblue' : 'white'
@@ -117,7 +117,7 @@ const appTheme: AppTheme = {
     NavBarStyle: {
       color: 'mediumvioletred',
     },
-    VideoStyle: {
+    PlayerStyle: {
       textColor: (focused: boolean) => focused ? 'mediumvioletred' : 'black',
       indicatorColor: 'mediumvioletred',
       playerTextColor: (focused: boolean) => focused ? 'mediumvioletred' : 'white'
@@ -159,7 +159,7 @@ const appTheme: AppTheme = {
     NavBarStyle: {
       color: 'orange',
     },
-    VideoStyle: {
+    PlayerStyle: {
       textColor: (focused: boolean) => focused ? 'gold' : 'black',
       indicatorColor: 'gold',
       playerTextColor: (focused: boolean) => focused ? 'gold' : 'black'

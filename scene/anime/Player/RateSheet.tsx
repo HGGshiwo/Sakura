@@ -2,8 +2,8 @@ import React from 'react';
 import {useContext, useState} from 'react';
 import {Text, View, Pressable} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {InfoText} from '../../../../component/Text';
-import AppContext from '../../../../context';
+import {InfoText} from '../../../component/Text';
+import AppContext from '../../../context';
 
 interface Props {
   show: boolean;
@@ -20,7 +20,7 @@ const RateSheet: React.FC<Props> = ({show, onPress, defaultActive}) => {
     {title: '1.5X', id: 4, data: 1.5},
     {title: '2.0X', id: 5, data: 2},
   ];
-  const {VideoStyle} = useContext(AppContext).theme
+  const {PlayerStyle} = useContext(AppContext).theme
   return (
     <View
       style={{
@@ -45,7 +45,7 @@ const RateSheet: React.FC<Props> = ({show, onPress, defaultActive}) => {
             <View style={{flex: 1, justifyContent: 'center', marginVertical: 15}}>
               <InfoText
                 title={item.title}
-                style={{color: defaultActive === index ?  VideoStyle.textColor(true):'white' }}
+                style={{color: defaultActive === index ?  PlayerStyle.textColor(true):'white' }}
               />
             </View>
           </Pressable>

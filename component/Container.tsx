@@ -16,6 +16,7 @@ const Container = ({children, style}: ContainerProps) => {
   const isDarkMode = useColorScheme() === 'dark';
   const {HeaderStyle, ContainerStyle} = useContext(AppContext).theme;;
   const [backgroundColor, setBackgroundColor] = useState('white');
+  const [translucent, setTranslucent] = useState(false)
   const [barStyle, setBarStyle] = useState<StatusBarStyle>(
     isDarkMode ? 'light-content' : 'dark-content',
   );
@@ -24,6 +25,7 @@ const Container = ({children, style}: ContainerProps) => {
       case 'Video':
         setBackgroundColor('black');
         setBarStyle('light-content');
+        setTranslucent(false)
         break;
       case 'Tab':
       case 'User':
@@ -31,6 +33,11 @@ const Container = ({children, style}: ContainerProps) => {
       case 'Comic':
       case 'Novel':
         setBackgroundColor(HeaderStyle.backgroundColor);
+        setTranslucent(false)
+        break;
+      case 'Image': 
+        setBackgroundColor('transparent');
+        setTranslucent(true)
         break;
     }
   }, [name, themeName]);
@@ -40,15 +47,11 @@ const Container = ({children, style}: ContainerProps) => {
       style={[
         {
           backgroundColor: ContainerStyle.backgroundColor,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
           flex: 1,
         },
         style,
       ]}>
-      <StatusBar barStyle={barStyle} backgroundColor={backgroundColor} />
+      <StatusBar barStyle={barStyle} translucent={translucent} backgroundColor={backgroundColor} />
       {children}
     </View>
   );

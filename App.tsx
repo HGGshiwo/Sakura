@@ -34,7 +34,7 @@ const routes = [
   {name: 'Follow', component: scene.FollowPage},
   {name: 'Ranking', component: scene.RankingPage},
   {name: 'Schedule', component: scene.SchedulePage},
-  {name: 'Comic', component: scene.ComicPage},
+  {name: 'Image', component: scene.ImagePage},
 ];
 
 function App(): JSX.Element {

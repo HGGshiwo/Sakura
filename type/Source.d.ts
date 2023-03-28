@@ -1,6 +1,6 @@
 declare type Source = {
     key: string;
-    data: string[]
+    data: any[]
 }
 
 export { Source }

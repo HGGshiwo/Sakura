@@ -1,6 +1,6 @@
 import {SectionList} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
-import {RecommandInfo} from '../../type/RecommandInfo';
+import RecommandInfo from '../../type/RecommandInfo';
 import {ParallaxCarousel} from '../../component/ParallaxCarousel';
 import {NavBar} from '../../component/NavBar';
 import MultiItemRow from '../../component/MultiItemRow';
@@ -11,14 +11,18 @@ import Context from '../../models';
 import History from '../../models/History';
 import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
-import Anime from '../../models/Anime';
+import RecmdInfoDb from '../../models/RecmdInfoDb';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NoParamProps} from '../../type/route';
 import api from '../../api';
 import alert from '../../component/Toast';
 import AppContext from '../../context';
 const {useRealm, useQuery} = Context;
-
+const targets = {
+  Anime: 'Video',
+  Comic: 'Image',
+  Novel: 'Text',
+};
 const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
@@ -33,8 +37,8 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
 
   const onRefresh = () => {
     setRefreshing(true);
+    console.log(tabName, source)
     const curSource = source[tabName];
-    console.log(curSource);
     const loadPage = api[tabName][curSource].home;
     loadPage(
       (carousels, sections) => {
@@ -56,9 +60,10 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
     let historys = [..._historys.sorted('time', true)]
       .slice(0, 10)
       .map(_history => {
-        const _animes = realm.objectForPrimaryKey(Anime, _history.href);
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
         return {
           href: _history.href,
+          apiName: _animes!.apiName,
           progress: _history.progress,
           progressPer: _history.progressPer,
           anthologyIndex: _history.anthologyIndex,
@@ -101,7 +106,10 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href});
+                    navigation.push(targets[tabName] as any, {
+                      url: item.href,
+                      apiName: item.apiName,
+                    });
                   }}
                 />
               )}
@@ -119,13 +127,9 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
                 item={info}
                 key={index}
                 onPress={(recent: RecommandInfo) => {
-                  const targets = {
-                    Anime: 'Video',
-                    Comic: 'Comic',
-                    Novel: 'Comic',
-                  };
-                  navigation.push(targets[tabName] as 'Video' | 'Comic', {
+                  navigation.push(targets[tabName] as any, {
                     url: recent.href,
+                    apiName: recent.apiName,
                   });
                 }}
               />

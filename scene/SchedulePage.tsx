@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useContext, useEffect, useState} from 'react';
 import {View, FlatList, useWindowDimensions, Pressable} from 'react-native';
-import loadPage from '../api/yinghuacd/daily';
+import loadPage from '../api/Anime/yinghuacd/daily';
 import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';

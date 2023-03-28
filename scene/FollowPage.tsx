@@ -7,14 +7,13 @@ import {SubInfoText, SubTitleBold} from '../component/Text';
 import {HistoryPageProps} from '../type/route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
-import {FlatList} from 'react-native-gesture-handler';
 import {V1RecommandInfoItem} from '../component/ListItem';
 import Context from '../models';
 import {useContext, useEffect, useRef, useState} from 'react';
-import Anime from '../models/Anime';
+import RecmdInfoDb from '../models/RecmdInfoDb';
 import Dialog from 'react-native-dialog';
 import Follow from '../models/Follow';
-import {RecommandInfo} from '../type/RecommandInfo';
+import RecommandInfo from '../type/RecommandInfo';
 import {UpdateMode} from 'realm';
 import EndLine from '../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -36,9 +35,10 @@ const FollowPage: React.FC<{}> = () => {
       .filter(follow => follow.following)
       .reverse()
       .map(_follow => {
-        const _animes = realm.objectForPrimaryKey(Anime, _follow.href);
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _follow.href);
         return {
           href: _follow.href,
+          apiName: _animes!.apiName,
           img: _animes!.img,
           title: _animes!.title,
           state: _animes!.state,
@@ -108,7 +108,7 @@ const FollowPage: React.FC<{}> = () => {
         keyExtractor={item => item.href}
         renderItem={({item, index}) => (
           <V1RecommandInfoItem
-            onPress={() => navigation.navigate('Video', {url: item.href})}
+            onPress={() => navigation.navigate('Video', {url: item.href, apiName: item.apiName})}
             item={item}
             imgVerticle={true}
             index={index}

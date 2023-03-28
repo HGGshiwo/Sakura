@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList, View} from 'react-native';
-import loadPage from '../api/yinghuacd/category';
+import loadPage from '../api/Anime/yinghuacd/category';
 import Container from '../component/Container';
 import EndLine from '../component/EndLine';
 import HeadBar from '../component/HeadBar';

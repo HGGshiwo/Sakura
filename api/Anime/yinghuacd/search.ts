@@ -1,5 +1,5 @@
-import { SearchInfo } from "../../type/SearchInfo";
-import { Dom, getDomFromString } from "../Dom";
+import { SearchInfo } from "../../../type/SearchInfo";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com/search/';
 

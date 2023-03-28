@@ -1,7 +1,8 @@
-import { AnimePageInfo } from "../../type/PageInfo/AnimePageInfo";
-import { RecommandInfo } from "../../type/RecommandInfo";
-import { Section } from "../../type/Section";
-import { Dom, getDomFromString } from "../Dom";
+import { apiName } from ".";
+import { AnimePageInfo } from "../../../type/PageInfo/AnimePageInfo";
+import RecommandInfo from "../../../type/RecommandInfo";
+import { Section } from "../../../type/Section";
+import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
 
@@ -22,6 +23,7 @@ function loadPage(_afterLoad: (carousels:RecommandInfo[], sections: Section[]) =
           i += 1
           return {
             id,
+            apiName,
             href: href + liDom.getElementsByTagName('a')![0].href!,
             img: liDom.getElementsByTagName('img')![0].src!,
             title: liDom.getElementsByTagName('p')![0].innerHTML,
@@ -39,12 +41,14 @@ function loadPage(_afterLoad: (carousels:RecommandInfo[], sections: Section[]) =
           return {
             title: dtitDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
             href: dtitDom.getElementsByTagName('span')![0].getElementsByTagName('a')![0].href!.substring(1),
+            apiName,
             data: imgs[index].getElementsByTagName('li')!
               .map((liDom, index) => {
                 let aDoms = liDom.getElementsByTagName('p')![1].getElementsByTagName('a')!
                 let state = aDoms.length === 0 ? '' : aDoms[0].innerHTML
                 return {
                   id: index,
+                  apiName,
                   href: href + liDom.getElementsByTagName('a')![0].href!,
                   img: liDom.getElementsByTagName('img')![0].src!,
                   title: liDom.getElementsByTagName('p')![0].getElementsByTagName('a')![0].innerHTML,

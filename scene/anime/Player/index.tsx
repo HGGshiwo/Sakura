@@ -21,25 +21,24 @@ import {
 import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
-import {LoadingText} from '../../../../component/Text';
+import {LoadingText} from '../../../component/Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
-import {BackButton} from '../../../../component/Button';
-import {LoadingBox} from '../../../../component/Loading';
+import {BackButton} from '../../../component/Button';
+import {LoadingBox} from '../../../component/Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
 import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
-import AppContext from '../../../../context';
+import AppContext from '../../../context';
 import React from 'react';
 
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
   nextVideoAvailable: boolean; //下一个视频是否可用
-  videoUrl: string;
-  videoType: string;
+  videoData: {src: string, type: string}
   title: string;
   onVideoErr: Function;
   onBack: () => void;
@@ -71,8 +70,7 @@ var sec_to_time = (s: number): string => {
 const Player: React.FC<PlayerProps> = ({
   videoUrlAvailable,
   nextVideoAvailable,
-  videoUrl,
-  videoType,
+  videoData,
   title,
   onVideoErr,
   onBack,
@@ -355,7 +353,7 @@ const Player: React.FC<PlayerProps> = ({
     setVolumeMessageVisible(false);
   };
 
-  const {VideoStyle} = useContext(AppContext).theme;
+  const {PlayerStyle} = useContext(AppContext).theme;
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!videoUrlAvailable ? (
@@ -365,8 +363,8 @@ const Player: React.FC<PlayerProps> = ({
           <Video
             ref={videoRef}
             source={{
-              uri: videoUrl,
-              type: videoType,
+              uri: videoData.src,
+              type: videoData.type,
             }}
             onLoad={onLoad} // Callback when remote video is buffering
             onError={videoError} // Callback when video cannot be loaded
@@ -439,8 +437,8 @@ const Player: React.FC<PlayerProps> = ({
                 onSlidingStart={onSlidingStart}
                 onSlidingComplete={onSlidingComplete}
                 totalDuration={duration}
-                trackColor={VideoStyle.textColor(true)}
-                scrubbedColor={VideoStyle.textColor(true)}
+                trackColor={PlayerStyle.textColor(true)}
+                scrubbedColor={PlayerStyle.textColor(true)}
                 displayValues={false}
               />
             </View>
@@ -471,8 +469,8 @@ const Player: React.FC<PlayerProps> = ({
                   onSlidingStart={onSlidingStart}
                   onSlidingComplete={onSlidingComplete}
                   totalDuration={duration}
-                  trackColor={VideoStyle.textColor(true)}
-                  scrubbedColor={VideoStyle.textColor(true)}
+                  trackColor={PlayerStyle.textColor(true)}
+                  scrubbedColor={PlayerStyle.textColor(true)}
                   displayValues={false}
                 />
               </View>
@@ -518,7 +516,7 @@ const Player: React.FC<PlayerProps> = ({
             <Bar
               style={{marginLeft: 10}}
               borderWidth={0}
-              color={VideoStyle.indicatorColor}
+              color={PlayerStyle.indicatorColor}
               unfilledColor="lightgrey"
               progress={bright}
               width={100}
@@ -532,7 +530,7 @@ const Player: React.FC<PlayerProps> = ({
             <Bar
               style={{marginLeft: 10}}
               borderWidth={0}
-              color={VideoStyle.indicatorColor}
+              color={PlayerStyle.indicatorColor}
               unfilledColor="lightgrey"
               progress={volume}
               width={100}
