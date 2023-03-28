@@ -2,9 +2,10 @@ import {useRoute} from '@react-navigation/native';
 import {ComicPageProps} from '../../type/route';
 import InfoPage from '../InfoPage';
 import ComicPlayer from './Player';
-import {useWindowDimensions, Image, View} from 'react-native';
+import {useWindowDimensions, Image, View, ImageBackground} from 'react-native';
 import {useEffect, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {BackButton} from '../../component/Button';
 
 const ImagePage: React.FC<{}> = () => {
   const route = useRoute<ComicPageProps['route']>();
@@ -20,16 +21,29 @@ const ImagePage: React.FC<{}> = () => {
       apiName="biquge"
       topStyle={{height, width: layout.width}}
       url={url}
-      renderTitleImg={url =>
+      renderTitleImg={(url, onBack) =>
         url === '' ? (
-          <View
-            style={{width: layout.width, height, backgroundColor: 'grey'}}
-          />
+          <View style={{width: layout.width, height, backgroundColor: 'grey'}}>
+            <BackButton
+              style={{position: 'absolute', top: 40, left: 20}}
+              color="white"
+              onPress={onBack}
+            />
+          </View>
         ) : (
-          <Image
+          <ImageBackground
             style={{width: layout.width, height, alignSelf: 'center'}}
-            source={{uri: url}}
-          />
+            source={{uri: url}}>
+            <BackButton
+              style={{
+                position: 'absolute',
+                top: 40,
+                left: 20,
+              }}
+              color="white"
+              onPress={onBack}
+            />
+          </ImageBackground>
         )
       }
       renderPlayer={({

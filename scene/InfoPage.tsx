@@ -88,7 +88,7 @@ const InfoPage: React.FC<{
   topStyle: ViewStyle;
   url: string;
   apiName: string;
-  renderTitleImg?: (url: string) => ReactNode;
+  renderTitleImg?: (url: string, onBack: () => void) => ReactNode;
   renderPlayer: (data: PlayerProps) => ReactNode;
   tabName: 'Comic' | 'Anime' | 'Novel';
   autoFullscreen?: boolean; //点击选集以后是否全屏
@@ -381,6 +381,7 @@ const InfoPage: React.FC<{
     setNextDataAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
     setDataAvailable(false);
+    if (autoFullscreen) playerRef.current!.fullScreen();
     getPlayerData(anthologys[index].data, 0);
   };
 
@@ -392,14 +393,12 @@ const InfoPage: React.FC<{
   //获取player的数据源
   const getPlayerData = (playerPageUrls: string[], curIndex: number) => {
     const loadPlayerSrc = api[tabName][apiName].player!;
-
     if (curIndex < playerPageUrls.length) {
       const vUrl = playerPageUrls[curIndex];
       loadPlayerSrc(vUrl, (state: boolean, data: any) => {
         if (state) {
           setPlayerData(data);
           setDataAvailable(true);
-          if (autoFullscreen) playerRef.current!.fullScreen();
         } else {
           getPlayerData(playerPageUrls, curIndex + 1);
         }
@@ -475,22 +474,25 @@ const InfoPage: React.FC<{
     </View>
   );
 
+  const onBack = () => {
+    navigation.goBack();
+  };
   return (
     <Container>
-      {renderTitleImg ? renderTitleImg(imgUrl) : null}
+      {renderTitleImg ? renderTitleImg(imgUrl, onBack) : null}
       {renderPlayer({
         data: playerData,
         dataAvailable,
         nextDataAvailable,
         toNextSource,
         title,
-        onErr: () => {}, //todo 
-        onBack: () => {navigation.goBack()},
+        onErr: () => {}, //todo
+        onBack,
         onProgress,
         defaultProgress,
         renderAnthologys,
         ref: playerRef,
-        defaultFullscreen: autoFullscreen,
+        defaultFullscreen: false,
       })}
       <TabView
         lazy

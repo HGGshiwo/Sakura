@@ -5,7 +5,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import Scrubber from '../Scrubber';
+import Scrubber from '../../../component/Scrubber';
 import Video, {
   OnBandwidthUpdateData,
   OnLoadData,
@@ -213,7 +213,6 @@ const Player: React.FC<PlayerProps> = ({
       controlTimer.current = undefined;
     }
     controlTimer.current = setTimeout(() => {
-      console.log(seekingRef.current);
       if (!seekingRef.current) {
         setControlVisible(false);
         controlVisibleRef.current = false;

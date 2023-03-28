@@ -1,5 +1,7 @@
-import {
+import React, {
+  createRef,
   forwardRef,
+  useContext,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -9,9 +11,14 @@ import {FlatList, Modal, View, StyleSheet, Pressable} from 'react-native';
 import {LoadingContainer} from '../../component/Loading';
 import {Image, ImageProps, useWindowDimensions} from 'react-native';
 import {PlayerProps} from '../InfoPage';
-import {BackButton} from '../../component/Button';
-import {LoadingText} from '../../component/Text';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {BackButton, TextButton} from '../../component/Button';
+import {InfoText, LoadingText} from '../../component/Text';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Scrubber from '../../component/Scrubber';
+import AppContext from '../../context';
+import {NextButton} from '../anime/Player/NextButton';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {ListItemInfo} from '../../type/ListItemInfo';
 
 const ResizeImage: React.FC<ImageProps> = props => {
   const [aspectRatio, setAspectRatio] = useState(1);
@@ -46,11 +53,16 @@ const ComicPlayer = forwardRef<{fullScreen: () => void}, PlayerProps>(
     },
     ref,
   ) => {
-    const [fullscreen, setFullscreen] = useState(defaultFullscreen);
+    const [fullscreen, setFullscreen] = useState(false);
     const [controlVisible, setControlVisible] = useState(false);
     const controlVisibleRef = useRef(false); //control是否可见
     const controlTimer = useRef(undefined); //当前的计时器
-    const insents = useSafeAreaInsets()
+    const insents = useSafeAreaInsets();
+    const {PlayerStyle} = useContext(AppContext).theme;
+    const [progress, setProgress] = useState(defaultProgress); //当前视频播放进度
+    const [duration, setDuration] = useState(0); //当前视频总时长
+    const seekingRef = useRef(false); //是否在加载
+    const listRef = createRef<FlatList<any>>();
 
     useImperativeHandle(
       ref,
@@ -59,6 +71,10 @@ const ComicPlayer = forwardRef<{fullScreen: () => void}, PlayerProps>(
       }),
       [],
     );
+
+    useEffect(() => {
+      setDuration(data ? data.length - 1 : 0);
+    }, [data]);
 
     //打开control并在一段时间之后关闭
     const openControl = () => {
@@ -74,8 +90,10 @@ const ComicPlayer = forwardRef<{fullScreen: () => void}, PlayerProps>(
         controlTimer.current = undefined;
       }
       controlTimer.current = setTimeout(() => {
-        setControlVisible(false);
-        controlVisibleRef.current = false;
+        if (!seekingRef.current) {
+          setControlVisible(false);
+          controlVisibleRef.current = false;
+        }
       }, 3000) as any;
     };
 
@@ -94,8 +112,28 @@ const ComicPlayer = forwardRef<{fullScreen: () => void}, PlayerProps>(
         openControl();
       }
     };
+    const onSlide = (data: number) => {
+      listRef.current!.scrollToIndex({
+        index: Math.round(data),
+        viewPosition: 0.5,
+      });
+    };
+    const onSlidingComplete = (data: number) => {
+      setProgress(data); //当seek时，由slide自己更新
+      seekingRef.current = false;
+      waitCloseControl();
+    };
+    const onSlidingStart = () => {
+      console.log('start');
+      seekingRef.current = true;
+    };
+
+    const onViewCallBack = React.useCallback((viewableItems: any) => {
+      const items = viewableItems.viewableItems;
+      setProgress(items[items.length - 1].index);
+    }, []);
     return (
-      <Modal style={{flex: 1}} statusBarTranslucent visible={fullscreen}>
+      <Modal animationType='fade' style={{flex: 1}} statusBarTranslucent visible={fullscreen}>
         <LoadingContainer
           loading={!dataAvailable}
           containerStyle={{
@@ -105,9 +143,12 @@ const ComicPlayer = forwardRef<{fullScreen: () => void}, PlayerProps>(
             right: 0,
             bottom: 0,
           }}
-          style={{paddingTop: '30%'}}>
+          style={{paddingTop: '50%'}}>
           <FlatList
             data={data}
+            ref={listRef}
+            onViewableItemsChanged={onViewCallBack}
+            onEndReached={nextDataAvailable ? toNextSource : null}
             renderItem={({item}) => (
               <Pressable onPress={handlePress} style={{flex: 1}}>
                 <ResizeImage source={{uri: item}} />
@@ -123,16 +164,70 @@ const ComicPlayer = forwardRef<{fullScreen: () => void}, PlayerProps>(
             {
               display: controlVisible ? 'flex' : 'none',
               height: 60 + insents.top,
-              paddingTop: insents.top
+              paddingTop: insents.top,
             },
           ]}>
           <View style={{alignItems: 'center', flexDirection: 'row'}}>
-            <BackButton onPress={onBack} />
+            <BackButton onPress={() => setFullscreen(false)} />
             <LoadingText
               title={title}
               numberOfLines={1}
               style={{paddingLeft: 10}}
             />
+          </View>
+        </View>
+
+        {/* bottom bar */}
+
+        <View
+          style={[
+            styles.bar,
+            styles.bottomBar,
+            {display: controlVisible ? 'flex' : 'none'},
+          ]}>
+          <View style={styles.bottomBarRow}>
+            <View style={{flex: 1, paddingHorizontal: 20}}>
+              <GestureHandlerRootView style={{flex: 1}}>
+                <Scrubber
+                  value={progress}
+                  onSlidingStart={onSlidingStart}
+                  onSlide={onSlide}
+                  onSlidingComplete={onSlidingComplete}
+                  trackColor={PlayerStyle.textColor(true)}
+                  scrubbedColor={PlayerStyle.textColor(true)}
+                  totalDuration={duration}
+                  displayValues={false}
+                />
+              </GestureHandlerRootView>
+            </View>
+            <NextButton onPress={toNextSource} disabled={!nextDataAvailable} />
+          </View>
+          <View
+            style={[
+              styles.bottomBarRow,
+              {paddingBottom: 20, paddingHorizontal: 20},
+            ]}>
+            <Pressable onPress={() => {}}>
+              <InfoText
+                style={{color: 'white', fontWeight: 'bold'}}
+                title="设置"
+              />
+            </Pressable>
+            <Pressable onPress={() => {}}>
+              <InfoText
+                style={{color: 'white', fontWeight: 'bold'}}
+                title="选集"
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setFullscreen(false);
+              }}>
+              <InfoText
+                style={{color: 'white', fontWeight: 'bold'}}
+                title="详情"
+              />
+            </Pressable>
           </View>
         </View>
       </Modal>
@@ -164,30 +259,20 @@ const styles = StyleSheet.create({
     left: 0,
   },
   bottomBar: {
-    bottom: 0,
-    left: 0,
-  },
-  fullscreenBottomBar: {
-    width: '100%',
-    height: 80,
-    position: 'absolute',
+    height: undefined,
+    width: undefined,
+    bottom: 20,
+    left: 20,
+    right: 20,
+    borderRadius: 10,
     flexDirection: 'column',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    justifyContent: 'space-around',
   },
   bottomBarRow: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingTop: 10,
+    padding: 10,
     justifyContent: 'space-between',
-  },
-  slider: {
-    flex: 1,
-    marginHorizontal: 15,
   },
 });
 
