@@ -2,22 +2,36 @@ import {useRoute} from '@react-navigation/native';
 import {ComicPageProps} from '../../type/route';
 import InfoPage from '../InfoPage';
 import ComicPlayer from './Player';
-import {useWindowDimensions, Image} from 'react-native';
-import { useEffect, useState } from 'react';
+import {useWindowDimensions, Image, View} from 'react-native';
+import {useEffect, useState} from 'react';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const ImagePage: React.FC<{}> = () => {
   const route = useRoute<ComicPageProps['route']>();
+  const insets = useSafeAreaInsets();
   const {url} = route.params;
   const layout = useWindowDimensions();
-  const height = layout.width*0.56
+  const height = layout.width * 0.56 + insets.top;
 
   return (
     <InfoPage
-      tabName='Comic'
-      apiName='biquge'
+      autoFullscreen
+      tabName="Comic"
+      apiName="biquge"
       topStyle={{height, width: layout.width}}
       url={url}
-      renderTitleImg={url => (<Image style={{width: layout.width, height, alignSelf:'center'}} source={{uri: url}} />)}
+      renderTitleImg={url =>
+        url === '' ? (
+          <View
+            style={{width: layout.width, height, backgroundColor: 'grey'}}
+          />
+        ) : (
+          <Image
+            style={{width: layout.width, height, alignSelf: 'center'}}
+            source={{uri: url}}
+          />
+        )
+      }
       renderPlayer={({
         dataAvailable,
         nextDataAvailable,
@@ -29,13 +43,15 @@ const ImagePage: React.FC<{}> = () => {
         onProgress,
         defaultProgress,
         renderAnthologys,
+        ref,
       }) => (
         <ComicPlayer
-          onBack = {onBack}
+          ref={ref}
+          onBack={onBack}
           toNextSource={toNextSource}
-          onProgress={onProgress} 
+          onProgress={onProgress}
           defaultProgress={defaultProgress}
-          renderAnthologys = {renderAnthologys}
+          renderAnthologys={renderAnthologys}
           dataAvailable={dataAvailable}
           nextDataAvailable={nextDataAvailable}
           title={title}

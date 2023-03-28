@@ -9,7 +9,7 @@ type ContainerProps = {
   style?: ViewStyle;
 };
 const Container = ({children, style}: ContainerProps) => {
-  const insets = useSafeAreaInsets();
+ 
   const route = useRoute();
   const {name} = route;
   const {themeName} = useContext(AppContext)
@@ -37,6 +37,7 @@ const Container = ({children, style}: ContainerProps) => {
         break;
       case 'Image': 
         setBackgroundColor('transparent');
+        setBarStyle('light-content');
         setTranslucent(true)
         break;
     }

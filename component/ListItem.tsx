@@ -2,7 +2,7 @@ import {ReactNode} from 'react';
 import {StyleSheet, View, Pressable, ImageBackground} from 'react-native';
 import {InfoText, SubInfoText, SubTitle} from '../component/Text';
 import HistoryInfo from '../type/HistoryInfo';
-import {RecommandInfo} from '../type/RecommandInfo';
+import RecommandInfo from '../type/RecommandInfo';
 import {SearchInfo} from '../type/SearchInfo';
 
 interface Props<T> {
@@ -68,7 +68,7 @@ const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
 };
 
 //主页观看历史的一项，列表方向: 横向，一列1个，包含信息：HistoryInfo
-const H1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
+const H1HistoryInfoItem: React.FC<Props<HistoryInfo & RecommandInfo>> = ({
   item,
   index,
   onPress,
@@ -90,6 +90,7 @@ const H1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
       </Pressable>
       <InfoText style={{width: 120}} title={item.title} />
       <SubInfoText
+        style={{ width: 120}}
         title={`看到${item.anthologyTitle} ${(item.progressPer * 100).toFixed(
           0,
         )}%`}
@@ -112,8 +113,8 @@ const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
   );
 };
 
-//观看历史的一项，列表方向: 纵向，一行1个，包含信息：HistoryInfo
-const V1HistoryInfoItem: React.FC<Props<HistoryInfo>> = ({
+//观看历史的一项，列表方向: 纵向，一行1个，包含信息：HistoryInfo & RecmdInfo
+const V1HistoryInfoItem: React.FC<Props<HistoryInfo & RecommandInfo>> = ({
   item,
   children,
   onPress,
@@ -273,6 +274,7 @@ const styles = StyleSheet.create({
     color: 'white',
     backgroundColor: '#rgba(0,0,0,0.5)',
     fontSize: 12,
+    maxWidth: '80%'
   },
   infoContainer: {
     justifyContent: 'space-between',

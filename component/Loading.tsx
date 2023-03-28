@@ -36,16 +36,18 @@ const LoadingBox: React.FC<Props> = ({
 interface ContainerProps extends Props {
   children: ReactNode;
   loading: boolean;
+  containerStyle?: ViewStyle;
 }
 const LoadingContainer: React.FC<ContainerProps> = ({
   text = '加载中...',
   style,
+  containerStyle,
   loading = false,
   children,
 }) => {
   const {LoadingStyle} = useContext(AppContext).theme;
   return (
-    <View style={{flex: 1}}>
+    <View style={[{flex: 1}, containerStyle]}>
       {!loading ? (
         children
       ) : (

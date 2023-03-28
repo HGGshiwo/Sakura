@@ -5,6 +5,8 @@ import {
   useEffect,
   createRef,
   useContext,
+  Ref,
+  RefObject,
 } from 'react';
 import {
   View,
@@ -40,9 +42,12 @@ import EndLine from '../component/EndLine';
 import {V1RecommandInfoItem} from '../component/ListItem';
 import {ListTitleLine} from '../component/ListTitleLine';
 import ToolBar from '../component/ToolBar';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 interface PlayerProps {
+  ref?: RefObject<any>; // 播放器的ref
   dataAvailable: boolean; //数据源是否解析成功
+  defaultFullscreen?: boolean; //是否全屏
   nextDataAvailable: boolean; //是否有下一个数据源
   data: any; //数据源，video要求指定type
   title: string; //播放器显示的标题
@@ -86,10 +91,19 @@ const InfoPage: React.FC<{
   renderTitleImg?: (url: string) => ReactNode;
   renderPlayer: (data: PlayerProps) => ReactNode;
   tabName: 'Comic' | 'Anime' | 'Novel';
-}> = ({topStyle, url, apiName, renderTitleImg, renderPlayer, tabName}) => {
+  autoFullscreen?: boolean; //点击选集以后是否全屏
+}> = ({
+  topStyle,
+  url,
+  apiName,
+  renderTitleImg,
+  renderPlayer,
+  tabName,
+  autoFullscreen,
+}) => {
   const layout = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
-
   //播放器相关，从infoPage获得player的页面，然后解析出具体的url
   const [playerData, setPlayerData] = useState<any>(); //具体的播放所需的数据, 可能是{url, type}，也可能是string[]
 
@@ -143,7 +157,7 @@ const InfoPage: React.FC<{
   };
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
   const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
-
+  const playerRef = useRef<any>(null);
   const renderScene = ({route}: any) => {
     switch (route.key) {
       case 'profile':
@@ -385,6 +399,7 @@ const InfoPage: React.FC<{
         if (state) {
           setPlayerData(data);
           setDataAvailable(true);
+          if (autoFullscreen) playerRef.current!.fullScreen();
         } else {
           getPlayerData(playerPageUrls, curIndex + 1);
         }
@@ -462,20 +477,21 @@ const InfoPage: React.FC<{
 
   return (
     <Container>
-      {renderTitleImg
-        ? renderTitleImg(imgUrl)
-        : renderPlayer({
-            data: playerData,
-            dataAvailable,
-            nextDataAvailable,
-            toNextSource,
-            title,
-            onErr: () => {},
-            onBack: () => {},
-            onProgress,
-            defaultProgress,
-            renderAnthologys,
-          })}
+      {renderTitleImg ? renderTitleImg(imgUrl) : null}
+      {renderPlayer({
+        data: playerData,
+        dataAvailable,
+        nextDataAvailable,
+        toNextSource,
+        title,
+        onErr: () => {}, //todo 
+        onBack: () => {navigation.goBack()},
+        onProgress,
+        defaultProgress,
+        renderAnthologys,
+        ref: playerRef,
+        defaultFullscreen: autoFullscreen,
+      })}
       <TabView
         lazy
         renderTabBar={(props: any) => (
@@ -508,7 +524,7 @@ const InfoPage: React.FC<{
 
       <DetailSheet
         top={topStyle.height as number}
-        height={layout.height - (topStyle.height as number)}
+        height={layout.height + insets.top - (topStyle.height as number)}
         title={title}
         src={imgUrl}
         infoSub={infoSub}
@@ -521,7 +537,7 @@ const InfoPage: React.FC<{
 
       <AnthologySheet
         top={topStyle.height as number}
-        height={layout.height - (topStyle.height as number)}
+        height={layout.height + insets.top - (topStyle.height as number)}
         state={infoSub.state}
         visible={anthologySheetVisible}
         onClose={() => {

@@ -26,7 +26,7 @@ const targets = {
 const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
-  const [historys, setHistorys] = useState<HistoryInfo[]>([]);
+  const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('加载中...');
   const _historys = useQuery<History>(History);

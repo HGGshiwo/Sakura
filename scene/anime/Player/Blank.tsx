@@ -12,14 +12,14 @@ type Props = {
   onLongPressOut?: () => void;
   onDbPress?: () => void;
   onMoveX?: (x: number) => void;
-  onMoveXStart: () => void;
-  onMoveXComplete: () => void;
-  onLeftMoveYStart: () => void;
+  onMoveXStart?: () => void;
+  onMoveXComplete?: () => void;
+  onLeftMoveYStart?: () => void;
   onLeftMoveY?: (y: number) => void;
-  onLeftMoveYComplete: () => void;
-  onRightMoveYStart: () => void;
+  onLeftMoveYComplete?: () => void;
+  onRightMoveYStart?: () => void;
   onRightMoveY?: (y: number) => void;
-  onRightMoveYComplete: () => void;
+  onRightMoveYComplete?: () => void;
 };
 
 enum State {
@@ -81,10 +81,10 @@ const Blank: React.FC<Props> = ({
             if (onMoveXStart) onMoveXStart();
           } else if (moveX < layout.width / 2) {
             state.current = State.leftMoveY;
-            if (onLeftMoveY) onLeftMoveYStart();
+            if (onLeftMoveYStart) onLeftMoveYStart();
           } else {
             state.current = State.rightMoveY;
-            if (onRightMoveY) onRightMoveYStart();
+            if (onRightMoveYStart) onRightMoveYStart();
           }
         }
         if (state.current === State.longPress && onLongPress) {
@@ -131,7 +131,7 @@ const Blank: React.FC<Props> = ({
         } else if (state.current === State.leftMoveY) {
           if (onLeftMoveYComplete) onLeftMoveYComplete(); //移动事件结束
         } else if (state.current === State.rightMoveY) {
-          if (onRightMoveY) onRightMoveYComplete(); //移动事件结束
+          if (onRightMoveYComplete) onRightMoveYComplete(); //移动事件结束
         }
       },
       onPanResponderTerminate: (evt, gestureState) => {
