@@ -19,7 +19,7 @@ import {
   faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
 import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
-import Orientation from 'react-native-orientation-locker';
+import Orientation, { LANDSCAPE, LANDSCAPE_LEFT, OrientationLocker, PORTRAIT } from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
 import {LoadingText} from '../../../component/Text';
 import {PlayButton} from './PlayButton';
@@ -34,22 +34,7 @@ import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
 import AppContext from '../../../context';
 import React from 'react';
-
-interface PlayerProps {
-  videoUrlAvailable: boolean; //video源是否解析成功
-  nextVideoAvailable: boolean; //下一个视频是否可用
-  videoData: {src: string; type: string};
-  title: string;
-  onVideoErr: Function;
-  onBack: () => void;
-  toNextVideo: () => void;
-  onProgress: (progress: number, perProgress: number) => void;
-  defaultProgress: number; //初始的进度
-  renderAnthologys: (
-    visible: boolean,
-    setVisible: (visible: boolean) => void,
-  ) => ReactNode; //选集列表
-}
+import {PlayerProps} from '../../InfoPage';
 
 //时间转化函数
 var sec_to_time = (s: number): string => {
@@ -68,16 +53,18 @@ var sec_to_time = (s: number): string => {
 };
 
 const Player: React.FC<PlayerProps> = ({
-  videoUrlAvailable,
-  nextVideoAvailable,
-  videoData,
   title,
-  onVideoErr,
   onBack,
-  toNextVideo,
+  data,
+  dataAvailable,
+  nextDataAvailable,
+  onErr,
+  toNextSource,
   onProgress,
   defaultProgress,
   renderAnthologys,
+  hidePanel,
+  showPanel,
 }) => {
   const videoRef = useRef<Video | null>(null);
 
@@ -123,15 +110,16 @@ const Player: React.FC<PlayerProps> = ({
   const [bright, setBright] = useState(0); //亮度
   const [volume, setVolume] = useState(0); //声音
 
+  const [orientation, setOrientation] = useState<any>(PORTRAIT)
   useEffect(() => {
-    if (videoUrlAvailable) {
+    if (dataAvailable) {
       setControlVisible(true);
       setErring(false);
     } else {
       setPaused(true);
       pausedRef.current = true;
     }
-  }, [videoUrlAvailable]);
+  }, [dataAvailable]);
 
   useEffect(() => {
     setFmtProgress(sec_to_time(progressRef.current));
@@ -166,7 +154,7 @@ const Player: React.FC<PlayerProps> = ({
   const videoError = (err: any) => {
     console.log(err);
     setErring(true);
-    onVideoErr();
+    onErr();
   };
 
   const onLoad = (data: OnLoadData) => {
@@ -253,16 +241,23 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   function handleOrientation(orientation: string) {
-    orientation === 'LANDSCAPE-LEFT' || orientation === 'LANDSCAPE-RIGHT'
-      ? (setFullscreen(true), StatusBar.setHidden(true))
-      : (setFullscreen(false), StatusBar.setHidden(false));
+    // orientation === 'LANDSCAPE-LEFT' || orientation === 'LANDSCAPE-RIGHT'
+    //   ? (setFullscreen(true), StatusBar.setHidden(true))
+    //   : (setFullscreen(false), StatusBar.setHidden(false));
   }
 
   //切换是否全屏
   const handleFullscreen = () => {
-    fullscreen
-      ? Orientation.lockToPortrait()
-      : Orientation.lockToLandscapeLeft();
+    if (fullscreen) {
+      StatusBar.setHidden(false);
+      videoRef.current.presentFullscreenPlayer(); //for ios
+      setOrientation(PORTRAIT)
+    } else {
+      StatusBar.setHidden(true);
+      videoRef.current.dismissFullscreenPlayer(); //for ios
+      setOrientation(LANDSCAPE_LEFT)
+    }
+    setFullscreen(!fullscreen);
   };
 
   //显示带宽
@@ -353,21 +348,23 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   const onEnd = () => {
-    nextVideoAvailable ? toNextVideo() : null;
+    console.log('end');
+    nextDataAvailable ? toNextSource() : null;
   };
-  
+
   const {PlayerStyle} = useContext(AppContext).theme;
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
-      {!videoUrlAvailable ? (
+      {!dataAvailable ? (
         <LoadingText title="解析视频地址中..." />
       ) : (
         <>
+          <OrientationLocker orientation={orientation} />
           <Video
             ref={videoRef}
             source={{
-              uri: videoData.src,
-              type: videoData.type,
+              uri: data.src,
+              type: data.type,
             }}
             onLoad={onLoad} // Callback when remote video is buffering
             onError={videoError} // Callback when video cannot be loaded
@@ -379,7 +376,7 @@ const Player: React.FC<PlayerProps> = ({
             onBandwidthUpdate={onBandwithUpdate}
             rate={playRate}
             progressUpdateInterval={1000}
-            onVideoEnd={onEnd}
+            onEnd={onEnd}
           />
 
           <Blank
@@ -484,8 +481,8 @@ const Player: React.FC<PlayerProps> = ({
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
                 <PlayButton onPress={handlePlay} paused={paused} />
                 <NextButton
-                  onPress={toNextVideo}
-                  disabled={!nextVideoAvailable}
+                  onPress={toNextSource}
+                  disabled={!nextDataAvailable}
                 />
               </View>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>

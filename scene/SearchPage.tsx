@@ -7,7 +7,7 @@ import {SearchInfo} from '../type/SearchInfo';
 import {V1SearchInfoItem} from '../component/ListItem';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {SearchPageProps, TabName, TabPageProps, targets} from '../route';
 import Container from '../component/Container';
 import {FollowButton, RoundButton} from '../component/Button';
@@ -70,6 +70,7 @@ const ResultView: React.FC<{
         {
           href: item.href,
           following: !follows[index],
+          tabName,
         },
         UpdateMode.Modified,
       );
@@ -119,8 +120,8 @@ const ResultView: React.FC<{
 };
 
 const SearchPage: React.FC<{}> = () => {
-  const navigation = useNavigation<TabPageProps['navigation']>();
-  const route = useNavigation<TabPageProps['route']>();
+  const navigation = useNavigation<SearchPageProps['navigation']>();
+  const route = useRoute<SearchPageProps['route']>();
   const {tabName} = route.params;
   const [searchValue, setSearchValue] = useState('');
   const [searchValue2, setSearchValue2] = useState('');

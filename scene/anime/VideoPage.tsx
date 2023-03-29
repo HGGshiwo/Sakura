@@ -30,18 +30,24 @@ const VideoPage: React.FC<{}> = () => {
           onProgress,
           defaultProgress,
           renderAnthologys,
+          showPanel,
+          hidePanel,
+          playerHeight
         }) => (
           <Player
-            videoUrlAvailable={dataAvailable}
-            nextVideoAvailable={nextDataAvailable}
+            dataAvailable={dataAvailable}
+            nextDataAvailable={nextDataAvailable}
             title={title}
             onBack={onBack}
-            videoData={data}
-            onVideoErr={onErr}
-            toNextVideo={toNextSource}
+            data={data}
+            onErr={onErr}
+            toNextSource={toNextSource}
             onProgress={onProgress}
             defaultProgress={defaultProgress}
             renderAnthologys={renderAnthologys}
+            showPanel={showPanel}
+            hidePanel={hidePanel}
+            playerHeight={playerHeight}
           />
         )}
       />

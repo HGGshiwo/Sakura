@@ -62,6 +62,7 @@ interface PlayerProps {
     setVisible: (visible: boolean) => void,
   ) => ReactNode; //如何渲染选集列表
   showPanel: () => void; //展示profile panel
+  hidePanel: ()=>void; 
   playerHeight: number; //player高度
 }
 
@@ -237,8 +238,8 @@ const InfoPage: React.FC<{
                     <FlatList
                       ref={ProfileAnthologyListRef}
                       getItemLayout={(item, index) => ({
-                        length: 160,
-                        offset: 160 * index,
+                        length: 150,
+                        offset: 170 * index,
                         index,
                       })}
                       style={{marginBottom: 20}}
@@ -363,6 +364,7 @@ const InfoPage: React.FC<{
     if (ProfileAnthologyListRef.current) {
       ProfileAnthologyListRef.current!.scrollToIndex({
         index: history.current!.anthologyIndex,
+        viewPosition: 0.5
       });
     }
   }, [ProfileAnthologyListRef]);
@@ -499,6 +501,9 @@ const InfoPage: React.FC<{
         defaultFullscreen: false,
         showPanel: () => {
           panelRef.current!.show();
+        },
+        hidePanel: () => {
+          panelRef.current!.hide()
         },
         playerHeight,
       })}
