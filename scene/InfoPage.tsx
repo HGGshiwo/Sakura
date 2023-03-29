@@ -7,6 +7,7 @@ import {
   useContext,
   Ref,
   RefObject,
+  ReactElement,
 } from 'react';
 import {
   View,
@@ -43,7 +44,7 @@ import {V1RecommandInfoItem} from '../component/ListItem';
 import {ListTitleLine} from '../component/ListTitleLine';
 import ToolBar from '../component/ToolBar';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import SlidingUpPanel from 'rn-sliding-up-panel';
+import SlidingUpPanel, {SlidingUpPanelProps} from 'rn-sliding-up-panel';
 
 interface PlayerProps {
   ref?: RefObject<any>; // 播放器的ref
@@ -62,7 +63,7 @@ interface PlayerProps {
     setVisible: (visible: boolean) => void,
   ) => ReactNode; //如何渲染选集列表
   showPanel: () => void; //展示profile panel
-  hidePanel: ()=>void; 
+  hidePanel: () => void;
   playerHeight: number; //player高度
 }
 
@@ -87,6 +88,33 @@ const routes = [
   {key: 'profile', title: '简介'},
   {key: 'command', title: '评论'},
 ];
+
+const OptionalWapper: React.FC<
+  {
+    children: ReactElement;
+    usePanel: boolean;
+    panelRef: any;
+  } & SlidingUpPanelProps
+> = ({
+  children,
+  usePanel, //是否使用panel
+  allowDragging,
+  panelRef,
+  draggableRange,
+}) =>
+  usePanel ? (
+    <SlidingUpPanel
+      ref={c => (panelRef.current = c)}
+      allowMomentum
+      allowDragging={allowDragging}
+      showBackdrop={false}
+      containerStyle={{backgroundColor: 'white'}}
+      draggableRange={draggableRange}>
+      {children}
+    </SlidingUpPanel>
+  ) : (
+    children
+  );
 
 const InfoPage: React.FC<{
   playerHeight: number; //上方的播放器高度
@@ -238,7 +266,7 @@ const InfoPage: React.FC<{
                     <FlatList
                       ref={ProfileAnthologyListRef}
                       getItemLayout={(item, index) => ({
-                        length: 150,
+                        length: 170,
                         offset: 170 * index,
                         index,
                       })}
@@ -363,11 +391,10 @@ const InfoPage: React.FC<{
   useEffect(() => {
     if (ProfileAnthologyListRef.current) {
       ProfileAnthologyListRef.current!.scrollToIndex({
-        index: history.current!.anthologyIndex,
-        viewPosition: 0.5
+        index: anthologyIndex,
       });
     }
-  }, [ProfileAnthologyListRef]);
+  }, [anthologyIndex]);
 
   //滚动全屏后播放器选集列表
   useEffect(() => {
@@ -376,7 +403,7 @@ const InfoPage: React.FC<{
         index: history.current!.anthologyIndex,
       });
     }
-  }, [playerAnthologyListRef]);
+  }, [playerAnthologyListRef.current]);
 
   //切换选集
   const changeAnthology = (index: number) => {
@@ -486,7 +513,6 @@ const InfoPage: React.FC<{
   };
   return (
     <Container>
-      {renderTitleImg ? renderTitleImg(imgUrl, onBack) : null}
       {renderPlayer({
         data: playerData,
         dataAvailable,
@@ -503,20 +529,17 @@ const InfoPage: React.FC<{
           panelRef.current!.show();
         },
         hidePanel: () => {
-          panelRef.current!.hide()
+          panelRef.current!.hide();
         },
         playerHeight,
       })}
-      <SlidingUpPanel
-        ref={c => (panelRef.current = c)}
-        allowMomentum
-        allowDragging={allowDragging}
-        showBackdrop={false}
-        containerStyle={{backgroundColor: 'white'}}
+      <OptionalWapper
+        panelRef={panelRef}
         draggableRange={{
           top: layout.height - playerHeight,
           bottom: allowDragging ? 0 : layout.height - playerHeight,
-        }}>
+        }}
+        usePanel={!!autoFullscreen}>
         <TabView
           lazy
           renderTabBar={(props: any) => (
@@ -546,7 +569,7 @@ const InfoPage: React.FC<{
           onIndexChange={setIndex}
           initialLayout={{width: layout.width}}
         />
-      </SlidingUpPanel>
+      </OptionalWapper>
 
       <DetailSheet
         top={playerHeight}
