@@ -34,6 +34,7 @@ const ImagePage: React.FC<{}> = () => {
         ref,
         showPanel,
         playerHeight,
+        hidePanel
       }) => (
         <ComicPlayer
           showPanel={showPanel}
@@ -49,6 +50,7 @@ const ImagePage: React.FC<{}> = () => {
           title={title}
           onErr={onErr}
           data={data}
+          hidePanel={hidePanel}
         />
       )}
     />

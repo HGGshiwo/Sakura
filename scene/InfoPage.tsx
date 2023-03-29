@@ -104,6 +104,7 @@ const OptionalWapper: React.FC<
 }) =>
   usePanel ? (
     <SlidingUpPanel
+      friction={0.5}
       ref={c => (panelRef.current = c)}
       allowMomentum
       allowDragging={allowDragging}
@@ -530,7 +531,7 @@ const InfoPage: React.FC<{
           panelRef.current!.show();
         },
         hidePanel: () => {
-          panelRef.current!.hide();
+          if (panelRef.current) panelRef.current.hide();
         },
         playerHeight,
       })}
