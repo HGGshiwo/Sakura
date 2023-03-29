@@ -3,19 +3,26 @@ import React from 'react';
 // import {Image} from '@rneui/themed';
 import {StyleProp, ViewStyle, ImageURISource, Pressable} from 'react-native';
 import {StyleSheet, View, ActivityIndicator, Text, Image} from 'react-native';
-import {RecommandInfo} from '../../type/RecommandInfo';
-import {NoParamProps} from '../../type/route';
+import RecommandInfo from '../../type/RecommandInfo';
+import {MainPageProps, TabName, targets} from '../../route';
 
 interface Props {
   style?: StyleProp<ViewStyle>;
   item: RecommandInfo;
   showIndex?: boolean;
+  onPress: (item: RecommandInfo)=>void;
 }
 
-const SBImageItem: React.FC<Props> = ({style, item, showIndex = true}) => {
-  const navigation = useNavigation<NoParamProps['navigation']>();
+const SBImageItem: React.FC<Props> = ({
+  style,
+  item,
+  onPress,
+  showIndex = true,
+}) => {
   return (
-    <Pressable style={{flex: 1}} onPress={() => navigation.navigate('Video', {url: item.href})}>
+    <Pressable
+      style={{flex: 1}}
+      onPress={()=>onPress(item)}>
       <View style={[styles.container, style]}>
         <ActivityIndicator size="small" />
         <Image key={item.href} style={styles.image} source={{uri: item.img}} />
@@ -40,8 +47,6 @@ const SBImageItem: React.FC<Props> = ({style, item, showIndex = true}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 8,
     overflow: 'hidden',
@@ -52,6 +57,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+    backgroundColor: 'grey',
   },
 });
 

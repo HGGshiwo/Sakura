@@ -1,51 +1,25 @@
 import {useRoute} from '@react-navigation/native';
-import {ComicPageProps} from '../../type/route';
 import InfoPage from '../InfoPage';
 import ComicPlayer from './Player';
-import {useWindowDimensions, Image, View, ImageBackground} from 'react-native';
-import {useEffect, useState} from 'react';
+import {useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {BackButton} from '../../component/Button';
+import { ImagePageProps } from '../../route';
 
 const ImagePage: React.FC<{}> = () => {
-  const route = useRoute<ComicPageProps['route']>();
+  const route = useRoute<ImagePageProps['route']>();
   const insets = useSafeAreaInsets();
-  const {url} = route.params;
+  const {url, apiName} = route.params;
   const layout = useWindowDimensions();
   const height = layout.width * 0.56 + insets.top;
 
   return (
     <InfoPage
       autoFullscreen
+      allowDragging
       tabName="Comic"
-      apiName="biquge"
-      topStyle={{height, width: layout.width}}
+      apiName={apiName}
+      playerHeight={height}
       url={url}
-      renderTitleImg={(url, onBack) =>
-        url === '' ? (
-          <View style={{width: layout.width, height, backgroundColor: 'grey'}}>
-            <BackButton
-              style={{position: 'absolute', top: 40, left: 20}}
-              color="white"
-              onPress={onBack}
-            />
-          </View>
-        ) : (
-          <ImageBackground
-            style={{width: layout.width, height, alignSelf: 'center'}}
-            source={{uri: url}}>
-            <BackButton
-              style={{
-                position: 'absolute',
-                top: 40,
-                left: 20,
-              }}
-              color="white"
-              onPress={onBack}
-            />
-          </ImageBackground>
-        )
-      }
       renderPlayer={({
         dataAvailable,
         nextDataAvailable,
@@ -58,8 +32,12 @@ const ImagePage: React.FC<{}> = () => {
         defaultProgress,
         renderAnthologys,
         ref,
+        showPanel,
+        playerHeight,
       }) => (
         <ComicPlayer
+          showPanel={showPanel}
+          playerHeight={playerHeight}
           ref={ref}
           onBack={onBack}
           toNextSource={toNextSource}

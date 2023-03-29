@@ -9,17 +9,24 @@ import {
   faRankingStar,
 } from '@fortawesome/free-solid-svg-icons';
 import {useNavigation} from '@react-navigation/native';
-import {NoParamProps} from '../type/route';
+import {UserPageProps} from '../route';
 import {NavBarButton} from './Button';
 
 type Data = {
   title: string;
   icon: any;
-  data: string;
+  data:
+    | 'Follow'
+    | 'History'
+    | 'Ranking'
+    | 'Schedule'
+    | 'all'
+    | 'japan'
+    | 'china';
 };
 
 const NavBar: React.FC<{}> = () => {
-  const navigation = useNavigation<NoParamProps['navigation']>();
+  const navigation = useNavigation<UserPageProps['navigation']>();
   const data: Data[] = [
     {title: '全部内容', icon: faYoutube, data: 'all'},
     {title: '时间表', icon: faBusinessTime, data: 'Schedule'},
@@ -29,22 +36,33 @@ const NavBar: React.FC<{}> = () => {
     {title: '日漫', icon: faLemon, data: 'japan'},
     {title: '我的追番', icon: faHeart, data: 'Follow'},
   ];
+  const tabName = 'Anime';
 
   const onPress = (item: Data) => {
     switch (item.data) {
       case 'all':
-        navigation.navigate('Index', {url: 'japan/', title: '全部内容'});
+        navigation.navigate('Index', {
+          url: 'japan/',
+          title: '全部内容',
+          tabName,
+        });
         break;
       case 'japan':
-        navigation.navigate('Index', {url: 'japan/', title: '日本动漫'});
+        navigation.navigate('Index', {
+          url: 'japan/',
+          title: '日本动漫',
+          tabName,
+        });
         break;
       case 'china':
-        navigation.navigate('Index', {url: 'china/', title: '国产动漫'});
+        navigation.navigate('Index', {
+          url: 'china/',
+          title: '国产动漫',
+          tabName,
+        });
         break;
       default:
-        navigation.navigate(
-          item.data as 'Follow' | 'History' | 'Ranking' | 'Schedule',
-        );
+        navigation.navigate(item.data, {tabName});
         break;
     }
   };

@@ -1,6 +1,6 @@
 import VideoPage from './anime/VideoPage'; 
 import ImagePage from './comic/ImagePage';
-import AnimePage from './MainPage';
+import MainPage from './MainPage';
 import SearchPage from './SearchPage';
 import CategoryPage from './CategoryPage';
 import IndexPage from './IndexPage';
@@ -9,11 +9,12 @@ import HistoryPage from './HistoryPage';
 import FollowPage from './FollowPage';
 import SchedulePage from './SchedulePage';
 import RankingPage from './RankingPage';
-
+import TabPage from './TabPage';
 
 export {
+  TabPage,
   VideoPage,
-  AnimePage,
+  MainPage,
   SearchPage,
   CategoryPage,
   IndexPage,

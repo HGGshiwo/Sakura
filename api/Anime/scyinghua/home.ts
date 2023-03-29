@@ -19,7 +19,6 @@ function loadPage(_afterLoad: (carousels: RecommandInfo[], sections: Section[]) 
         const moreDom = py3Dom.getElementsByClassName('more')![0] //精选是没有more的
         return {
           href: moreDom ? href + moreDom.getElementsByTagName('a')![0].href! : '',
-          apiName,
           title: py3Dom.getElementsByClassName('h3-md')![0].innerHTML,
           data: getDataFromVideoImgDoms(href, py3Dom, apiName)
         }

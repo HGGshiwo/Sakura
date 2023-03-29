@@ -8,7 +8,7 @@ import {V1SearchInfoItem} from '../component/ListItem';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
 import {useNavigation} from '@react-navigation/native';
-import {SearchPageProps, TabPageProps} from '../type/route';
+import {SearchPageProps, TabName, TabPageProps, targets} from '../route';
 import Container from '../component/Container';
 import {FollowButton, RoundButton} from '../component/Button';
 import Context from '../models';
@@ -23,13 +23,12 @@ import AppContext from '../context';
 
 const {useRealm} = Context;
 
-interface Props {
+const ResultView: React.FC<{
   searchValue: string;
   loadPage: loadSearchPage;
   apiName: string;
-}
-
-const ResultView: React.FC<Props> = ({searchValue, loadPage, apiName}) => {
+  tabName: TabName;
+}> = ({searchValue, loadPage, apiName, tabName}) => {
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
@@ -97,7 +96,10 @@ const ResultView: React.FC<Props> = ({searchValue, loadPage, apiName}) => {
               item={item}
               index={index}
               onPress={() => {
-                navigation.navigate('Video', {url: item.href, apiName: item.apiName});
+                navigation.navigate(targets[tabName], {
+                  url: item.href,
+                  apiName: item.apiName,
+                });
               }}>
               <FollowButton
                 onPress={() => onPress(item, index)}
@@ -126,9 +128,7 @@ const SearchPage: React.FC<{}> = () => {
   const [index, setIndex] = useState(0);
 
   const _routes = {
-    Comic: [
-      {key: 'biquge', title: 'biquge'}
-    ],
+    Comic: [{key: 'biquge', title: 'biquge'}],
     Anime: [
       {key: 'yinghuacd', title: 'yinghuacd'},
       {key: 'scyinghua', title: 'scyinghua'},
@@ -147,10 +147,7 @@ const SearchPage: React.FC<{}> = () => {
 
   return (
     <Container>
-      <HeadBar
-        onPress={() => {
-          navigation.navigate('Anime');
-        }}>
+      <HeadBar onPress={navigation.goBack}>
         <SearchBar
           searchValue={searchValue}
           style={{marginLeft: 10}}
@@ -197,6 +194,7 @@ const SearchPage: React.FC<{}> = () => {
               searchValue={searchValue2}
               loadPage={api.Anime[route.key as keyof typeof api].search}
               apiName={route.key}
+              tabName={tabName}
             />
           )}
           onIndexChange={setIndex}

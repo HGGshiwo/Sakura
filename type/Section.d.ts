@@ -1,8 +1,8 @@
-import { RecommandInfo } from "./RecommandInfo";
+import RecmdInfo from "./RecommandInfo";
 
+//标题+一组数据，data
 interface Section {
     title: string;
     href: string;
-    apiName: string;
-    data: RecommandInfo[];
+    data: RecmdInfo[];
 }

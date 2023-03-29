@@ -3,11 +3,10 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {InfoText} from '../component/Text';
-import UserPage from './UserPage';
 import MainPage from './MainPage';
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 import AppContext from '../context';
-import {View, Pressable, Text} from 'react-native';
+import {tabRoutes} from '../route';
 
 const Tab = createBottomTabNavigator();
 const tabs = {
@@ -53,15 +52,14 @@ const TabPage = () => {
           );
         },
       })}>
-      {['Anime', 'Novel', 'Comic'].map(name => (
+      {tabRoutes.map(({name, component, initialParams}) => (
         <Tab.Screen
           name={name}
           key={name}
-          initialParams={{tabName: name}}
-          component={MainPage as any}
+          initialParams={initialParams}
+          component={component as any}
         />
       ))}
-      <Tab.Screen name="User" component={UserPage} />
     </Tab.Navigator>
   );
 };

@@ -12,8 +12,8 @@ import {NavBar} from '../component/NavBar';
 import {ParallaxCarousel} from '../component/ParallaxCarousel';
 import {SearchBar} from '../component/SearchBar';
 import {SubTitleBold} from '../component/Text';
-import {RecommandInfo} from '../type/RecommandInfo';
-import {CategoryPageProps} from '../type/route';
+import RecommandInfo from '../type/RecommandInfo';
+import {CategoryPageProps, targets} from '../route';
 import {Section} from '../type/Section';
 
 const CategoryPage: React.FC<{}> = () => {
@@ -22,7 +22,7 @@ const CategoryPage: React.FC<{}> = () => {
   const route = useRoute<CategoryPageProps['route']>();
   const navigation = useNavigation<CategoryPageProps['navigation']>();
   const [loading, setLoading] = useState(true);
-  const {url, title} = route.params;
+  const {url, title, tabName} = route.params;
 
   useEffect(() => {
     loadPage(url, (carousels, sections) => {
@@ -34,10 +34,7 @@ const CategoryPage: React.FC<{}> = () => {
 
   return (
     <Container>
-      <HeadBar
-        onPress={() => {
-          navigation.navigate('Tab');
-        }}>
+      <HeadBar onPress={() => navigation.goBack()}>
         <View
           style={{
             flexDirection: 'row',
@@ -54,7 +51,15 @@ const CategoryPage: React.FC<{}> = () => {
           contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
           ListHeaderComponent={
             <>
-              <ParallaxCarousel carousels={carousels} />
+              <ParallaxCarousel
+                onPress={item =>
+                  navigation.navigate(targets[tabName], {
+                    url: item.href,
+                    apiName: item.apiName,
+                  })
+                }
+                carousels={carousels}
+              />
               <NavBar />
             </>
           }
@@ -69,7 +74,10 @@ const CategoryPage: React.FC<{}> = () => {
                   item={info}
                   key={index}
                   onPress={(recent: RecommandInfo) => {
-                    navigation.push('Video', {url: recent.href});
+                    navigation.push(targets[tabName] as any, {
+                      url: recent.href,
+                      apiName: recent.apiName,
+                    });
                   }}
                 />
               )}

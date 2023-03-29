@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useContext, useEffect, useState} from 'react';
 import {View, FlatList, useWindowDimensions, Pressable} from 'react-native';
@@ -7,7 +7,7 @@ import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
 import {InfoText, SubTitleBold} from '../component/Text';
-import {NoParamProps} from '../type/route';
+import {SchedulePageProps, targets} from '../route';
 import DailyInfo from '../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
 import AppContext from '../context';
@@ -23,9 +23,11 @@ const routes = [
 ];
 
 const SchedulePage: React.FC<{}> = () => {
+  const route = useRoute<SchedulePageProps['route']>();
+  const {tabName} = route.params;
   const [dailys, setDailys] = useState<DailyInfo[][]>([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<NoParamProps['navigation']>();
+  const navigation = useNavigation<SchedulePageProps['navigation']>();
   const [index, setIndex] = useState(0);
   const layout = useWindowDimensions();
 
@@ -38,7 +40,10 @@ const SchedulePage: React.FC<{}> = () => {
       renderItem={({item, index}) => (
         <Pressable
           onPress={() => {
-            navigation.navigate('Video', {url: item.href2});
+            navigation.navigate(targets[tabName], {
+              url: item.href2,
+              apiName: item.apiName,
+            });
           }}>
           <View
             style={{
@@ -59,20 +64,18 @@ const SchedulePage: React.FC<{}> = () => {
     />
   );
   useEffect(() => {
-    loadPage((dailys) => {
+    loadPage(dailys => {
       setDailys(dailys);
       setLoading(false);
     });
   }, []);
 
-  const {TabBarStyle} = useContext(AppContext).theme
+  const {TabBarStyle} = useContext(AppContext).theme;
 
   return (
     <Container>
       <HeadBar
-        onPress={() => {
-          navigation.navigate('Tab');
-        }}
+        onPress={() => navigation.goBack()}
         style={{paddingVertical: 20}}>
         <SubTitleBold style={{marginLeft: 10}} title="时间表" />
       </HeadBar>
@@ -84,7 +87,10 @@ const SchedulePage: React.FC<{}> = () => {
             <TabBar
               scrollEnabled
               {...props}
-              indicatorStyle={{backgroundColor: TabBarStyle.indicatorColor, width: 0.5}}
+              indicatorStyle={{
+                backgroundColor: TabBarStyle.indicatorColor,
+                width: 0.5,
+              }}
               renderLabel={({route, focused, color}) => (
                 <InfoText
                   title={route.title!}

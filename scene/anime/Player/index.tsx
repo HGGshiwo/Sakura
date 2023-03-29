@@ -38,7 +38,7 @@ import React from 'react';
 interface PlayerProps {
   videoUrlAvailable: boolean; //video源是否解析成功
   nextVideoAvailable: boolean; //下一个视频是否可用
-  videoData: {src: string, type: string}
+  videoData: {src: string; type: string};
   title: string;
   onVideoErr: Function;
   onBack: () => void;
@@ -343,7 +343,7 @@ const Player: React.FC<PlayerProps> = ({
   const onRightMoveY = (dy: number) => {
     const ratio = fullscreen ? layout.height : layout.width * 0.56;
     let _volume = baseVolumeRef.current - dy / ratio;
-    _volume = Math.round(Math.max(Math.min(1, _volume), 0)* 1000) / 1000;
+    _volume = Math.round(Math.max(Math.min(1, _volume), 0) * 1000) / 1000;
     setVolume(_volume);
     SystemSetting.setVolume(_volume);
   };
@@ -352,6 +352,10 @@ const Player: React.FC<PlayerProps> = ({
     setVolumeMessageVisible(false);
   };
 
+  const onEnd = () => {
+    nextVideoAvailable ? toNextVideo() : null;
+  };
+  
   const {PlayerStyle} = useContext(AppContext).theme;
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
@@ -375,6 +379,7 @@ const Player: React.FC<PlayerProps> = ({
             onBandwidthUpdate={onBandwithUpdate}
             rate={playRate}
             progressUpdateInterval={1000}
+            onVideoEnd={onEnd}
           />
 
           <Blank

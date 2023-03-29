@@ -1,7 +1,7 @@
 import React, {} from 'react';
 import {Player} from './Player';
 import {useRoute} from '@react-navigation/native';
-import {VideoPageProps} from '../../type/route';
+import {VideoPageProps} from '../../route';
 import Container from '../../component/Container';
 import InfoPage from '../InfoPage';
 import { useWindowDimensions } from 'react-native';
@@ -14,9 +14,10 @@ const VideoPage: React.FC<{}> = () => {
   return (
     <Container>
       <InfoPage
+        allowDragging={false}
         tabName='Anime'
         apiName={apiName}
-        topStyle={{width: layout.width, height: layout.width*0.56}}
+        playerHeight={layout.width*0.56}
         url={url}
         renderPlayer={({
           title,

@@ -15,27 +15,16 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootSiblingParent} from 'react-native-root-siblings';
 
 import Context from './models';
-import * as scene from './scene';
+
 
 import appTheme from './theme';
 import storage from './storage';
 import AppContext from './context';
-import TabPage from './scene/TabPage';
+import { routes } from './route';
 
 const {RealmProvider} = Context;
 
-const routes = [
-  {name: 'Tab', component: TabPage},
-  {name: 'Video', component: scene.VideoPage},
-  {name: 'Search', component: scene.SearchPage},
-  {name: 'Category', component: scene.CategoryPage},
-  {name: 'Index', component: scene.IndexPage},
-  {name: 'History', component: scene.HistoryPage},
-  {name: 'Follow', component: scene.FollowPage},
-  {name: 'Ranking', component: scene.RankingPage},
-  {name: 'Schedule', component: scene.SchedulePage},
-  {name: 'Image', component: scene.ImagePage},
-];
+
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';

@@ -13,16 +13,12 @@ import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
 import RecmdInfoDb from '../../models/RecmdInfoDb';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {NoParamProps} from '../../type/route';
+import {MainPageProps, targets} from '../../route';
 import api from '../../api';
 import alert from '../../component/Toast';
 import AppContext from '../../context';
 const {useRealm, useQuery} = Context;
-const targets = {
-  Anime: 'Video',
-  Comic: 'Image',
-  Novel: 'Text',
-};
+
 const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
   const [sections, setSections] = useState<any[]>([]);
@@ -31,13 +27,12 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
   const [text, setText] = useState('加载中...');
   const _historys = useQuery<History>(History);
   const realm = useRealm();
-  const navigation = useNavigation<NoParamProps['navigation']>();
+  const navigation = useNavigation<MainPageProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
   const {source} = useContext(AppContext);
 
   const onRefresh = () => {
     setRefreshing(true);
-    console.log(tabName, source)
     const curSource = source[tabName];
     const loadPage = api[tabName][curSource].home;
     loadPage(
@@ -58,6 +53,7 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)]
+      .filter(history => history.tabName === tabName)
       .slice(0, 10)
       .map(_history => {
         const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
@@ -88,14 +84,22 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
           <>
-            <ParallaxCarousel carousels={carousels} />
+            <ParallaxCarousel
+              onPress={item =>
+                navigation.navigate(targets[tabName], {
+                  url: item.href,
+                  apiName: item.apiName,
+                })
+              }
+              carousels={carousels}
+            />
             <NavBar />
             <ListTitleLine
               show={historys.length !== 0}
               title="最近在看"
               buttonText="更多"
               onPress={() => {
-                navigation.navigate('History');
+                navigation.navigate('History', {tabName});
               }}
             />
             <FlatList
@@ -106,7 +110,7 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push(targets[tabName] as any, {
+                    navigation.push(targets[tabName], {
                       url: item.href,
                       apiName: item.apiName,
                     });
@@ -127,7 +131,7 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
                 item={info}
                 key={index}
                 onPress={(recent: RecommandInfo) => {
-                  navigation.push(targets[tabName] as any, {
+                  navigation.push(targets[tabName], {
                     url: recent.href,
                     apiName: recent.apiName,
                   });
@@ -144,8 +148,8 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
             buttonText="更多"
             onPress={() =>
               title === '最新更新'
-                ? navigation.navigate('Schedule')
-                : navigation.navigate('Index', {url: href, title})
+                ? navigation.navigate('Schedule', {tabName})
+                : navigation.navigate('Index', {url: href, title, tabName})
             }
           />
         )}

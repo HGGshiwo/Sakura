@@ -1,10 +1,10 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {View, Pressable, StyleSheet} from 'react-native';
 import {Divider} from '@rneui/themed';
 import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {SubInfoText, SubTitleBold} from '../component/Text';
-import {HistoryPageProps} from '../type/route';
+import {HistoryPageProps} from '../route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {V1HistoryInfoItem} from '../component/ListItem';
@@ -15,38 +15,47 @@ import RecmdInfoDb from '../models/RecmdInfoDb';
 import HistoryInfo from '../type/HistoryInfo';
 import Dialog from 'react-native-dialog';
 import EndLine from '../component/EndLine';
-import {faTrashCan} from '@fortawesome/free-regular-svg-icons';
 import alert from '../component/Toast';
 import AppContext from '../context';
-import { SwipeListView } from 'react-native-swipe-list-view';
+import {SwipeListView} from 'react-native-swipe-list-view';
+import RecommandInfo from '../type/RecommandInfo';
 
 const {useRealm, useQuery} = Context;
-
+const targets = {
+  Anime: 'Video',
+  Comic: 'Image',
+  Novel: 'Text',
+};
 const HistoryPage: React.FC<{}> = () => {
+  const route = useRoute<HistoryPageProps['route']>();
+  const {tabName} = route.params;
   const navigation = useNavigation<HistoryPageProps['navigation']>();
   const _historys = useQuery<History>(History);
   const [dialogVisible, setDialogVisible] = useState(false);
   const curItem = useRef<HistoryInfo>();
   const realm = useRealm();
-  const [historys, setHistorys] = useState<HistoryInfo[]>([]);
-  const {DialogStyle} = useContext(AppContext).theme
+  const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
+  const {DialogStyle} = useContext(AppContext).theme;
 
   useEffect(() => {
-    let historys = [..._historys.sorted('time', true)].map(_history => {
-      const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
-      return {
-        href: _history.href,
-        apiName: _animes!.apiName,
-        progress: _history.progress,
-        progressPer: _history.progressPer,
-        anthologyIndex: _history.anthologyIndex,
-        anthologyTitle: _history.anthologyTitle,
-        time: _history.time,
-        img: _animes!.img,
-        title: _animes!.title,
-        state: _animes!.state,
-      };
-    });
+    let historys = [..._historys.sorted('time', true)]
+      .map(_history => {
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
+        return {
+          href: _history.href,
+          apiName: _animes!.apiName,
+          progress: _history.progress,
+          progressPer: _history.progressPer,
+          anthologyIndex: _history.anthologyIndex,
+          anthologyTitle: _history.anthologyTitle,
+          time: _history.time,
+          img: _animes!.img,
+          title: _animes!.title,
+          state: _animes!.state,
+          tabName: _history.tabName,
+        };
+      })
+      .filter(history => history.tabName === tabName);
     setHistorys(historys);
   }, [_historys]);
 
@@ -62,7 +71,7 @@ const HistoryPage: React.FC<{}> = () => {
       const history = realm.objectForPrimaryKey(History, item!.href);
       realm.delete(history);
     });
-    alert('删除成功')
+    alert('删除成功');
   };
 
   return (
@@ -81,9 +90,7 @@ const HistoryPage: React.FC<{}> = () => {
         />
       </Dialog.Container>
       <HeadBar
-        onPress={() => {
-          navigation.navigate('Tab');
-        }}
+        onPress={()=>navigation.goBack()}
         style={{paddingVertical: 20}}>
         <View
           style={{
@@ -108,14 +115,18 @@ const HistoryPage: React.FC<{}> = () => {
           <V1HistoryInfoItem
             item={item}
             index={index}
-            onPress={() => navigation.navigate('Video', {url: item.href, apiName: item.apiName})} />
+            onPress={() =>
+              navigation.navigate(targets[tabName] as any, {
+                url: item.href,
+                apiName: item.apiName,
+              })
+            }
+          />
         )}
         rightOpenValue={-75}
         renderHiddenItem={({item, index}, rowMap) => (
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <Pressable
-              style={styles.hiddenRow}
-              onPress={() => onDelete(item)}>
+            <Pressable style={styles.hiddenRow} onPress={() => onDelete(item)}>
               <SubInfoText title="删除历史" style={{color: 'white'}} />
             </Pressable>
           </View>

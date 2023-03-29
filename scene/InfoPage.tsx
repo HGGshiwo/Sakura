@@ -34,7 +34,7 @@ import {LoadingContainer} from '../component/Loading';
 import AppContext from '../context';
 import {FollowButton, TextButton} from '../component/Button';
 import {useNavigation} from '@react-navigation/native';
-import {NoParamProps} from '../type/route';
+import {VideoPageProps} from '../route';
 import Follow from '../models/Follow';
 import alert from '../component/Toast';
 import {Divider} from '@rneui/base';
@@ -43,6 +43,7 @@ import {V1RecommandInfoItem} from '../component/ListItem';
 import {ListTitleLine} from '../component/ListTitleLine';
 import ToolBar from '../component/ToolBar';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import SlidingUpPanel from 'rn-sliding-up-panel';
 
 interface PlayerProps {
   ref?: RefObject<any>; // 播放器的ref
@@ -60,6 +61,8 @@ interface PlayerProps {
     visible: boolean,
     setVisible: (visible: boolean) => void,
   ) => ReactNode; //如何渲染选集列表
+  showPanel: () => void; //展示profile panel
+  playerHeight: number; //player高度
 }
 
 const {useRealm} = Context;
@@ -85,21 +88,23 @@ const routes = [
 ];
 
 const InfoPage: React.FC<{
-  topStyle: ViewStyle;
+  playerHeight: number; //上方的播放器高度
   url: string;
   apiName: string;
   renderTitleImg?: (url: string, onBack: () => void) => ReactNode;
   renderPlayer: (data: PlayerProps) => ReactNode;
   tabName: 'Comic' | 'Anime' | 'Novel';
   autoFullscreen?: boolean; //点击选集以后是否全屏
+  allowDragging?: boolean; //是否允许拖动profile
 }> = ({
-  topStyle,
+  playerHeight,
   url,
   apiName,
   renderTitleImg,
   renderPlayer,
   tabName,
   autoFullscreen,
+  allowDragging,
 }) => {
   const layout = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -127,8 +132,9 @@ const InfoPage: React.FC<{
 
   const history = useRef<History | null>(); //历史记录查询结果
 
-  const navigation = useNavigation<NoParamProps['navigation']>();
+  const navigation = useNavigation<VideoPageProps['navigation']>();
   const [followed, setFollowed] = useState(false); //是否追番
+  const panelRef = useRef<SlidingUpPanel | null>(); // profile panel的ref
 
   useEffect(() => {
     //查看数据库看是否追番
@@ -157,7 +163,7 @@ const InfoPage: React.FC<{
   };
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
   const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
-  const playerRef = useRef<any>(null);
+
   const renderScene = ({route}: any) => {
     switch (route.key) {
       case 'profile':
@@ -315,7 +321,7 @@ const InfoPage: React.FC<{
         history.current = realm.create(
           History,
           {
-            tabName: 'Anime',
+            tabName,
             href: url,
             apiName,
             time: new Date().getTime(),
@@ -381,7 +387,6 @@ const InfoPage: React.FC<{
     setNextDataAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
     setDataAvailable(false);
-    if (autoFullscreen) playerRef.current!.fullScreen();
     getPlayerData(anthologys[index].data, 0);
   };
 
@@ -491,42 +496,56 @@ const InfoPage: React.FC<{
         onProgress,
         defaultProgress,
         renderAnthologys,
-        ref: playerRef,
         defaultFullscreen: false,
+        showPanel: () => {
+          panelRef.current!.show();
+        },
+        playerHeight,
       })}
-      <TabView
-        lazy
-        renderTabBar={(props: any) => (
-          <TabBar
-            scrollEnabled
-            {...props}
-            indicatorStyle={{
-              backgroundColor: PlayerStyle.indicatorColor,
-              width: 0.5,
-            }}
-            renderLabel={({route, focused}) => (
-              <InfoText
-                title={route.title!}
-                style={{
-                  color: PlayerStyle.textColor(focused),
-                  paddingHorizontal: 5,
-                  fontWeight: focused ? 'bold' : 'normal',
-                }}
-              />
-            )}
-            style={{backgroundColor: 'white'}}
-            tabStyle={{width: 'auto'}}
-          />
-        )}
-        navigationState={{index, routes}}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{width: layout.width}}
-      />
+      <SlidingUpPanel
+        ref={c => (panelRef.current = c)}
+        allowMomentum
+        allowDragging={allowDragging}
+        showBackdrop={false}
+        containerStyle={{backgroundColor: 'white'}}
+        draggableRange={{
+          top: layout.height - playerHeight,
+          bottom: allowDragging ? 0 : layout.height - playerHeight,
+        }}>
+        <TabView
+          lazy
+          renderTabBar={(props: any) => (
+            <TabBar
+              scrollEnabled
+              {...props}
+              indicatorStyle={{
+                backgroundColor: PlayerStyle.indicatorColor,
+                width: 0.5,
+              }}
+              renderLabel={({route, focused}) => (
+                <InfoText
+                  title={route.title!}
+                  style={{
+                    color: PlayerStyle.textColor(focused),
+                    paddingHorizontal: 5,
+                    fontWeight: focused ? 'bold' : 'normal',
+                  }}
+                />
+              )}
+              style={{backgroundColor: 'white'}}
+              tabStyle={{width: 'auto'}}
+            />
+          )}
+          navigationState={{index, routes}}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{width: layout.width}}
+        />
+      </SlidingUpPanel>
 
       <DetailSheet
-        top={topStyle.height as number}
-        height={layout.height + insets.top - (topStyle.height as number)}
+        top={playerHeight}
+        height={layout.height + insets.top - playerHeight}
         title={title}
         src={imgUrl}
         infoSub={infoSub}
@@ -538,8 +557,8 @@ const InfoPage: React.FC<{
       />
 
       <AnthologySheet
-        top={topStyle.height as number}
-        height={layout.height + insets.top - (topStyle.height as number)}
+        top={playerHeight}
+        height={layout.height + insets.top - playerHeight}
         state={infoSub.state}
         visible={anthologySheetVisible}
         onClose={() => {

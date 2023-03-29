@@ -6,7 +6,7 @@ import Home from './Home';
 import Other from './Other';
 import Container from '../../component/Container';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {MainPageProps} from '../../type/route';
+import {MainPageProps} from '../../route';
 import {InfoText} from '../../component/Text';
 import AppContext from '../../context';
 const config = {

@@ -1,4 +1,3 @@
-import {Image} from '@rneui/themed';
 import * as React from 'react';
 import {View, Dimensions, useWindowDimensions} from 'react-native';
 import Animated, {
@@ -8,7 +7,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
-import {RecommandInfo} from '../../type/RecommandInfo';
+import RecommandInfo from '../../type/RecommandInfo';
 import {SBItem} from './SBItem';
 const colors = [
   '#26292E',
@@ -21,10 +20,13 @@ const colors = [
 
 type parallaxCarouselProps = {
   carousels: RecommandInfo[];
+  onPress: (item: RecommandInfo) => void;
 };
 
-const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
-
+const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({
+  carousels,
+  onPress,
+}) => {
   const progressValue = useSharedValue<number>(0);
   const layout = useWindowDimensions();
 
@@ -39,10 +41,10 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
       }}>
       <Carousel
         vertical={false}
-        width={layout.width-20}
+        width={layout.width - 20}
         height={180}
         style={{
-          width: layout.width-20,
+          width: layout.width - 20,
         }}
         loop
         pagingEnabled={true}
@@ -59,7 +61,7 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
         }}
         data={carousels}
         renderItem={({item}: renderItemProps) => {
-          return <SBItem pretty item={item} />;
+          return <SBItem onPress={onPress} pretty item={item} />;
         }}
       />
       {!!progressValue && (
@@ -67,7 +69,7 @@ const ParallaxCarousel: React.FC<parallaxCarouselProps> = ({carousels}) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            width: 10*carousels.length,
+            width: 10 * carousels.length,
             alignSelf: 'center',
             position: 'absolute',
             bottom: 15,

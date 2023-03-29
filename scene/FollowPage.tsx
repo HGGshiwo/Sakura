@@ -1,10 +1,10 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {View, Pressable, StyleSheet} from 'react-native';
 import {Divider} from '@rneui/themed';
 import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {SubInfoText, SubTitleBold} from '../component/Text';
-import {HistoryPageProps} from '../type/route';
+import {FollowPageProps} from '../route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {V1RecommandInfoItem} from '../component/ListItem';
@@ -19,11 +19,14 @@ import EndLine from '../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import alert from '../component/Toast';
 import AppContext from '../context';
+import {targets} from '../route';
 
 const {useRealm, useQuery} = Context;
 
 const FollowPage: React.FC<{}> = () => {
-  const navigation = useNavigation<HistoryPageProps['navigation']>();
+  const route = useRoute<FollowPageProps['route']>();
+  const {tabName} = route.params;
+  const navigation = useNavigation<FollowPageProps['navigation']>();
   const _follows = useQuery<Follow>(Follow);
   const [dialogVisible, setDialogVisible] = useState(false);
   const curItem = useRef<RecommandInfo>();
@@ -42,8 +45,10 @@ const FollowPage: React.FC<{}> = () => {
           img: _animes!.img,
           title: _animes!.title,
           state: _animes!.state,
+          tabName: _follow.tabName,
         };
-      });
+      })
+      .filter(follow => follow.tabName === tabName);
     setFollows(follows);
   }, [_follows]);
 
@@ -60,6 +65,7 @@ const FollowPage: React.FC<{}> = () => {
         {
           href: item!.href,
           following: false,
+          tabName: tabName,
         },
         UpdateMode.Modified,
       );
@@ -84,9 +90,7 @@ const FollowPage: React.FC<{}> = () => {
         />
       </Dialog.Container>
       <HeadBar
-        onPress={() => {
-          navigation.navigate('Tab');
-        }}
+        onPress={() => navigation.goBack()}
         style={{paddingVertical: 20}}>
         <View
           style={{
@@ -108,7 +112,12 @@ const FollowPage: React.FC<{}> = () => {
         keyExtractor={item => item.href}
         renderItem={({item, index}) => (
           <V1RecommandInfoItem
-            onPress={() => navigation.navigate('Video', {url: item.href, apiName: item.apiName})}
+            onPress={() =>
+              navigation.navigate(targets[tabName] as any, {
+                url: item.href,
+                apiName: item.apiName,
+              })
+            }
             item={item}
             imgVerticle={true}
             index={index}
@@ -116,9 +125,7 @@ const FollowPage: React.FC<{}> = () => {
         )}
         renderHiddenItem={({item, index}, rowMap) => (
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <Pressable
-              style={styles.hiddenRow}
-              onPress={() => onDelete(item)}>
+            <Pressable style={styles.hiddenRow} onPress={() => onDelete(item)}>
               <SubInfoText title="取消追番" style={{color: 'white'}} />
             </Pressable>
           </View>

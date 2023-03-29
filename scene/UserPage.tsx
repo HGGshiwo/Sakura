@@ -27,7 +27,7 @@ import Follow from '../models/Follow';
 import RecommandInfo from '../type/RecommandInfo';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
-import {UserPageProps} from '../type/route';
+import {TabName, UserPageProps} from '../route';
 import Container from '../component/Container';
 import {Divider} from '@rneui/themed';
 import {StyleSheet} from 'react-native';
@@ -46,105 +46,112 @@ import MultiItemRow from '../component/MultiItemRow';
 import {NavBarButton} from '../component/Button';
 import alert from '../component/Toast';
 
+type Data = {
+  title: string;
+  icon: any;
+  data: string;
+};
+
+const data: Data[] = [
+  {title: '全部内容', icon: faYoutube, data: 'all'},
+  {title: '时间表', icon: faBusinessTime, data: 'Schedule'},
+  {title: '排行榜', icon: faRankingStar, data: 'Ranking'},
+  {title: '历史记录', icon: faClockRotateLeft, data: 'History'},
+  {title: '国创', icon: faCarrot, data: 'china'},
+  {title: '日漫', icon: faLemon, data: 'japan'},
+  {title: '我的追番', icon: faHeart, data: 'Follow'},
+];
+
+const themes = [
+  {name: 'red', color: 'red'},
+  {name: 'blue', color: 'dodgerblue'},
+  {name: 'black', color: 'white'},
+  {name: 'gold', color: 'gold'},
+];
+
+const sources = ['yinghuacd', 'scyinghua'];
 const {useRealm, useQuery} = Context;
-const UserPage: React.FC<{}> = () => {
-  const [historys, setHistorys] = useState<HistoryInfo[]>([]);
+
+const SubPage: React.FC<{
+  tabName: TabName;
+}> = ({tabName}) => {
+  const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
   const [follows, setFollows] = useState<RecommandInfo[]>([]);
-  const [index, setIndex] = useState(0);
   const navigation = useNavigation<UserPageProps['navigation']>();
   const _historys = useQuery<History>(History);
   const _follows = useQuery<Follow>(Follow);
-  const {theme, themeName, changeTheme, source, changeSource} =
-    useContext(AppContext);
   const realm = useRealm();
 
-  const [routes] = useState([
-    {key: 'first', title: '番剧'},
-    {key: 'second', title: '小说'},
-    {key: 'third', title: '漫画'},
-    {key: 'forth', title: '设置'},
-  ]);
   useEffect(() => {
-    let historys = [..._historys.sorted('time', true)].map(_history => {
-      const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
-      return {
-        href: _history.href,
-        progress: _history.progress,
-        progressPer: _history.progressPer,
-        anthologyIndex: _history.anthologyIndex,
-        anthologyTitle: _history.anthologyTitle,
-        time: _history.time,
-        img: _animes!.img,
-        title: _animes!.title,
-        state: _animes!.state,
-        apiName: _animes!.apiName,
-      };
-    });
+    let historys = [..._historys.sorted('time', true)]
+      .map(_history => {
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
+        return {
+          href: _history.href,
+          progress: _history.progress,
+          progressPer: _history.progressPer,
+          anthologyIndex: _history.anthologyIndex,
+          anthologyTitle: _history.anthologyTitle,
+          time: _history.time,
+          img: _animes!.img,
+          title: _animes!.title,
+          state: _animes!.state,
+          apiName: _animes!.apiName,
+          tabName: _history.tabName,
+        };
+      })
+      .filter(history => history.tabName === tabName);
     setHistorys(historys);
   }, [_historys]);
-
-  type Data = {
-    title: string;
-    icon: any;
-    data: string;
-  };
-
-  const onPress = (item: Data) => {
-    switch (item.data) {
-      case 'all':
-        navigation.navigate('Index', {url: 'japan/', title: '全部内容'});
-        break;
-      case 'japan':
-        navigation.navigate('Index', {url: 'japan/', title: '日本动漫'});
-        break;
-      case 'china':
-        navigation.navigate('Index', {url: 'china/', title: '国产动漫'});
-        break;
-      default:
-        navigation.navigate(
-          item.data as 'Follow' | 'History' | 'Ranking' | 'Schedule',
-        );
-        break;
-    }
-  };
-
-  const data: Data[] = [
-    {title: '全部内容', icon: faYoutube, data: 'all'},
-    {title: '时间表', icon: faBusinessTime, data: 'Schedule'},
-    {title: '排行榜', icon: faRankingStar, data: 'Ranking'},
-    {title: '历史记录', icon: faClockRotateLeft, data: 'History'},
-    {title: '国创', icon: faCarrot, data: 'china'},
-    {title: '日漫', icon: faLemon, data: 'japan'},
-    {title: '我的追番', icon: faHeart, data: 'Follow'},
-  ];
-
-  const themes = [
-    {name: 'red', color: 'red'},
-    {name: 'blue', color: 'dodgerblue'},
-    {name: 'black', color: 'white'},
-    {name: 'gold', color: 'gold'},
-  ];
-
-  const sources = ['yinghuacd', 'scyinghua'];
 
   useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)
       .reverse()
-      .map(_history => {
-        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
+      .map(_follow => {
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _follow.href);
         return {
-          href: _history.href,
+          href: _follow.href,
           apiName: _animes!.apiName,
           img: _animes!.img,
           title: _animes!.title,
           state: _animes!.state,
+          tabName: _follow.tabName,
         };
-      });
+      })
+      .filter(item => item.tabName === tabName);
     setFollows(follows);
   }, [_follows]);
 
-  const FirstRoute = () => (
+  const onPress = (item: Data) => {
+    switch (item.data) {
+      case 'all':
+        navigation.navigate('Index', {
+          url: 'japan/',
+          title: '全部内容',
+          tabName,
+        });
+        break;
+      case 'japan':
+        navigation.navigate('Index', {
+          url: 'japan/',
+          title: '日本动漫',
+          tabName,
+        });
+        break;
+      case 'china':
+        navigation.navigate('Index', {
+          url: 'china/',
+          title: '国产动漫',
+          tabName,
+        });
+        break;
+      default:
+        navigation.navigate(item.data as any, {tabName});
+        break;
+    }
+  };
+  return (
     <FlatList
       data={data}
       renderItem={({index, item}) => (
@@ -202,7 +209,7 @@ const UserPage: React.FC<{}> = () => {
               title="历史记录"
               buttonText="更多"
               onPress={() => {
-                navigation.navigate('History');
+                navigation.navigate('History', {tabName});
               }}
             />
             <Divider />
@@ -214,7 +221,10 @@ const UserPage: React.FC<{}> = () => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href, apiName: item.apiName});
+                    navigation.push('Video', {
+                      url: item.href,
+                      apiName: item.apiName,
+                    });
                   }}
                 />
               )}
@@ -226,7 +236,7 @@ const UserPage: React.FC<{}> = () => {
               title="追番"
               buttonText="更多"
               onPress={() => {
-                navigation.navigate('Follow');
+                navigation.navigate('Follow', {tabName});
               }}
             />
             <Divider />
@@ -238,7 +248,10 @@ const UserPage: React.FC<{}> = () => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href, apiName: item.apiName});
+                    navigation.push('Video', {
+                      url: item.href,
+                      apiName: item.apiName,
+                    });
                   }}
                 />
               )}
@@ -250,7 +263,7 @@ const UserPage: React.FC<{}> = () => {
               title="下载管理"
               buttonText="更多"
               onPress={() => {
-                navigation.navigate('Follow');
+                navigation.navigate('Follow', {tabName});
               }}
             />
             <Divider />
@@ -262,7 +275,10 @@ const UserPage: React.FC<{}> = () => {
                   item={item}
                   index={index}
                   onPress={item => {
-                    navigation.push('Video', {url: item.href, apiName: item.apiName});
+                    navigation.push('Video', {
+                      url: item.href,
+                      apiName: item.apiName,
+                    });
                   }}
                 />
               )}
@@ -273,75 +289,80 @@ const UserPage: React.FC<{}> = () => {
       }
     />
   );
+};
 
-  const SecondRoute = () => <View style={{flex: 1}} />;
-
-  const thirdRoute = () => <View style={{flex: 1}} />;
-
-  const forthRoute = () => {
-    return (
-      <View style={{padding: 10}}>
-        <View style={styles.cardContainer}>
-          <SubTitleBold style={{marginVertical: 10}} title="用户主题" />
-          <Divider />
-          <FlatList
-            horizontal
-            data={themes}
-            renderItem={({item, index}) => (
-              <Pressable
-                onPress={() => {
-                  changeTheme(item.name);
-                  alert('切换主题成功');
-                }}
-                style={{
-                  height: 40,
-                  width: 40,
-                  backgroundColor: item.color,
-                  margin: 20,
-                  borderWidth: 2,
-                  borderColor: item.name === themeName ? 'brown' : 'lightgrey',
+const SettingPage = () => {
+  const {theme, themeName, changeTheme, source, changeSource} =
+    useContext(AppContext);
+  return (
+    <View style={{padding: 10}}>
+      <View style={styles.cardContainer}>
+        <SubTitleBold style={{marginVertical: 10}} title="用户主题" />
+        <Divider />
+        <FlatList
+          horizontal
+          data={themes}
+          renderItem={({item, index}) => (
+            <Pressable
+              onPress={() => {
+                changeTheme(item.name);
+                alert('切换主题成功');
+              }}
+              style={{
+                height: 40,
+                width: 40,
+                backgroundColor: item.color,
+                margin: 20,
+                borderWidth: 2,
+                borderColor: item.name === themeName ? 'brown' : 'lightgrey',
+              }}
+            />
+          )}
+        />
+      </View>
+      <View style={styles.cardContainer}>
+        <SubTitleBold style={{marginVertical: 10}} title="番剧数据源" />
+        <Divider />
+        <FlatList
+          horizontal
+          data={sources}
+          renderItem={({item, index}) => (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 10,
+              }}>
+              <CheckBox
+                value={item === source.Anime}
+                onValueChange={newValue => {
+                  if (newValue) {
+                    changeSource('Anime', item);
+                    alert('切换数据源成功');
+                  }
                 }}
               />
-            )}
-          />
-        </View>
-        <View style={styles.cardContainer}>
-          <SubTitleBold style={{marginVertical: 10}} title="番剧数据源" />
-          <Divider />
-          <FlatList
-            horizontal
-            data={sources}
-            renderItem={({item, index}) => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  padding: 10,
-                }}>
-                <CheckBox
-                  value={item === source.Anime}
-                  onValueChange={newValue => {
-                    if (newValue) {
-                      changeSource('Anime', item);
-                      alert('切换数据源成功');
-                    }
-                  }}
-                />
-                <InfoText title={item} />
-              </View>
-            )}
-          />
-        </View>
+              <InfoText title={item} />
+            </View>
+          )}
+        />
       </View>
-    );
-  };
+    </View>
+  );
+};
 
-  const renderScene = SceneMap({
-    first: FirstRoute,
-    second: SecondRoute,
-    third: thirdRoute,
-    forth: forthRoute,
-  });
+const UserPage: React.FC<{}> = () => {
+  const [index, setIndex] = useState(0);
+
+  const [routes] = useState([
+    {key: 'first', title: '番剧'},
+    {key: 'second', title: '小说'},
+    {key: 'third', title: '漫画'},
+    {key: 'settings', title: '设置'},
+  ]);
+
+  const renderScene = ({route}: any) =>
+    route.key === 'settings' ? <SettingPage /> : <SubPage tabName={route.key} />;
 
   const layout = useWindowDimensions();
   const {HeaderStyle} = useContext(AppContext).theme;

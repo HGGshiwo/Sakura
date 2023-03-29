@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
@@ -9,16 +9,18 @@ import HeadBar from '../component/HeadBar';
 import {V1RecommandInfoItem} from '../component/ListItem';
 import {LoadingContainer} from '../component/Loading';
 import {RateText, SubTitleBold} from '../component/Text';
-import {RecommandInfo} from '../type/RecommandInfo';
-import {NoParamProps} from '../type/route';
+import RecommandInfo from '../type/RecommandInfo';
+import {RankingPageProps, targets} from '../route';
 
 const RankingPage: React.FC<{}> = () => {
+  const route = useRoute<RankingPageProps['route']>();
+  const {tabName} = route.params;
   const [rankings, setRankings] = useState<RecommandInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<NoParamProps['navigation']>();
+  const navigation = useNavigation<RankingPageProps['navigation']>();
 
   useEffect(() => {
-    loadPage((rankings) => {
+    loadPage(rankings => {
       setRankings(rankings);
       setLoading(false);
     });
@@ -27,9 +29,7 @@ const RankingPage: React.FC<{}> = () => {
   return (
     <Container>
       <HeadBar
-        onPress={() => {
-          navigation.navigate('Tab');
-        }}
+        onPress={() => navigation.goBack()}
         style={{paddingVertical: 20}}>
         <SubTitleBold style={{marginLeft: 10}} title="排行榜" />
       </HeadBar>
@@ -39,8 +39,8 @@ const RankingPage: React.FC<{}> = () => {
           contentContainerStyle={{paddingHorizontal: 15}}
           keyExtractor={item => item.href}
           data={rankings}
-          ItemSeparatorComponent={()=><Divider />}
-          ListFooterComponent={()=><EndLine />}
+          ItemSeparatorComponent={() => <Divider />}
+          ListFooterComponent={() => <EndLine />}
           renderItem={({item, index}) => (
             <V1RecommandInfoItem
               index={index}
@@ -48,9 +48,12 @@ const RankingPage: React.FC<{}> = () => {
               key={index}
               imgVerticle={true}
               onPress={() => {
-                navigation.navigate('Video', {url: item.href});
+                navigation.navigate(targets[tabName], {
+                  url: item.href,
+                  apiName: item.apiName,
+                });
               }}>
-              <RateText title='9.7'/>
+              <RateText title="9.7" />
             </V1RecommandInfoItem>
           )}
         />

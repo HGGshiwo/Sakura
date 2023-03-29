@@ -1,3 +1,4 @@
+import { apiName } from "."
 import { loadComicPage, loadInfoPage, loadPlayerData } from "../.."
 import { getDomFromString } from "../../Dom"
 import { getRecommandInfoFromCover } from "./utils"
@@ -18,7 +19,7 @@ const loadPage: loadInfoPage = (url, callback) => {
         type: documnet.getElementsByClassName('comic-status')![0].getElementsByTagName('b')![0].getElementsByTagName('a')!.map(aDom => aDom!.innerHTML),
         produce: documnet.getElementsByClassName('comic-author')![0].getElementsByClassName('name')![0].getElementsByTagName('a')![0].innerHTML,
       }
-      const recommands = documnet.getElementsByClassName('guess-item slide-item')!.map(getRecommandInfoFromCover)
+      const recommands = documnet.getElementsByClassName('guess-item slide-item')!.map(item=>getRecommandInfoFromCover(item, apiName))
       const info = documnet.getElementsByClassName('comic-intro')![0].getElementsByTagName('span')![0].innerHTML
       const sources = documnet.getElementsByClassName('chapter__list-box clearfix')![0].getElementsByTagName('li')!.map(liDom => {
         const aDom = liDom.getElementsByTagName('a')![0]
@@ -26,7 +27,7 @@ const loadPage: loadInfoPage = (url, callback) => {
           key: aDom.innerHTML.trim(),
           data: [aDom.href!]
         }
-      })
+      }).reverse()
       callback({
         title,
         img,
