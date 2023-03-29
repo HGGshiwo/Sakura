@@ -10,6 +10,7 @@ import FollowPage from './FollowPage';
 import SchedulePage from './SchedulePage';
 import RankingPage from './RankingPage';
 import TabPage from './TabPage';
+import TextPage from './novel/TextPage';
 
 export {
   TabPage,
@@ -24,4 +25,5 @@ export {
   SchedulePage,
   RankingPage,
   ImagePage,
+  TextPage,
 };

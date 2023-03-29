@@ -184,6 +184,7 @@ const InfoPage: React.FC<{
         {
           href: url,
           following: !followed,
+          tabName,
         },
         UpdateMode.Modified,
       );

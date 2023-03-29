@@ -39,6 +39,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   renderAnthologys,
   playerHeight,
   showPanel,
+  hidePanel,
 }) => {
   const [controlVisible, setControlVisible] = useState(false);
   const controlVisibleRef = useRef(false); //control是否可见
@@ -78,6 +79,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   const handlePress = () => {
     // setRateSheetVisible(false);
     // setAnthologySheetVisible(false);
+    hidePanel()
     if (controlVisibleRef.current) {
       if (controlTimer.current !== undefined) {
         clearTimeout(controlTimer.current);

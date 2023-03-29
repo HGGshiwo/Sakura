@@ -4,6 +4,8 @@ import { Section } from "../type/Section";
 import  RecommandInfo  from "../type/RecommandInfo";
 import * as Comic from "./Comic";
 import * as Anime from './Anime';
+import * as Novel from './Novel';
+
 import ComicPageInfo from "../type/PageInfo/ComicPageinfo";
 
 const api: Record<string, Record<string, {
@@ -14,7 +16,8 @@ const api: Record<string, Record<string, {
     all?: loadAllPage,
 }>> = {
     Comic,
-    Anime
+    Anime,
+    Novel,
 }
 
 export default api;
