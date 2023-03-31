@@ -1,16 +1,15 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
-import {SectionList} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
 import loadPage from '../../api/Anime/yinghuacd/category';
 import EndLine from '../../component/EndLine';
 import {V3RecommandInfoItem} from '../../component/ListItem';
 import {LoadingContainer} from '../../component/Loading';
-import MultiItemRow from '../../component/MultiItemRow';
 import {ParallaxCarousel} from '../../component/ParallaxCarousel';
 import {SubTitleBold} from '../../component/Text';
 import {MainPageProps, TabName, targets} from '../../route';
 import RecommandInfo from '../../type/RecommandInfo';
 import {Section} from '../../type/Section';
+import {SectionGrid} from '../../component/Grid';
 
 interface Props {
   url: string;
@@ -36,45 +35,35 @@ const Other: React.FC<Props> = ({url, title, tabName}) => {
     });
   };
 
+  const handlePressItem = useCallback(
+    (item: RecommandInfo) =>
+      navigation.navigate(targets[tabName], {
+        url: item.href,
+        apiName: item.apiName,
+      }),
+    [],
+  );
+
   useEffect(init, []);
 
   return (
     <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
-      <SectionList
+      <SectionGrid
+        numColumns={3}
         refreshing={refreshing}
         onRefresh={init}
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
-          <ParallaxCarousel
-            onPress={item =>
-              navigation.navigate(targets[tabName], {
-                url: item.href,
-                apiName: item.apiName,
-              })
-            }
-            carousels={carousels}
-          />
+          <ParallaxCarousel onPress={handlePressItem} carousels={carousels} />
         }
         sections={sections}
-        keyExtractor={(item, index) => item.title + index}
-        renderItem={({index, section}) => (
-          <MultiItemRow
-            numberOfItem={3}
-            children={(index, info) => (
-              <V3RecommandInfoItem
-                index={index}
-                item={info}
-                key={index}
-                onPress={(recent: RecommandInfo) => {
-                  navigation.push('Video', {
-                    url: recent.href,
-                    apiName: recent.apiName,
-                  });
-                }}
-              />
-            )}
+        keyExtractor={(item, index) => item.href}
+        renderItem={({index, item}) => (
+          <V3RecommandInfoItem
             index={index}
-            datas={section.data}
+            item={item}
+            key={index}
+            onPress={handlePressItem}
           />
         )}
         renderSectionHeader={({section: {title}}) => (

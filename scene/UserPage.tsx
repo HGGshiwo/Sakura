@@ -1,11 +1,5 @@
-import {useContext, useEffect, useState} from 'react';
-import {
-  FlatList,
-  View,
-  useWindowDimensions,
-  SectionList,
-  Pressable,
-} from 'react-native';
+import {useCallback, useContext, useEffect, useState} from 'react';
+import {FlatList, View, useWindowDimensions, Pressable} from 'react-native';
 import {
   EmptyH1HistoryInfoItem,
   H1HistoryInfoItem,
@@ -25,9 +19,9 @@ import {
 } from '../component/Text';
 import Follow from '../models/Follow';
 import RecommandInfo from '../type/RecommandInfo';
-import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import {TabView, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
-import {TabName, UserPageProps} from '../route';
+import {TabName, targets, UserPageProps} from '../route';
 import Container from '../component/Container';
 import {Divider} from '@rneui/themed';
 import {StyleSheet} from 'react-native';
@@ -42,9 +36,10 @@ import {
   faLemon,
   faRankingStar,
 } from '@fortawesome/free-solid-svg-icons';
-import MultiItemRow from '../component/MultiItemRow';
+
 import {NavBarButton} from '../component/Button';
 import alert from '../component/Toast';
+import {FlatGrid} from '../component/Grid';
 
 type Data = {
   title: string;
@@ -151,24 +146,27 @@ const SubPage: React.FC<{
         break;
     }
   };
+
+  const handlePressItem = useCallback(
+    (item: RecommandInfo) =>
+      navigation.push(targets[tabName], {
+        url: item.href,
+        apiName: item.apiName,
+      }),
+    [],
+  );
+
   return (
-    <FlatList
+    <FlatGrid
       data={data}
+      numColumns={4}
       renderItem={({index, item}) => (
-        <MultiItemRow
-          containerStyle={{backgroundColor: 'white', padding: 10}}
-          index={index}
-          numberOfItem={4}
-          datas={data}>
-          {(index, item) => (
-            <NavBarButton
-              key={index}
-              onPress={() => onPress(item)}
-              title={item.title}
-              icon={item.icon}
-            />
-          )}
-        </MultiItemRow>
+        <NavBarButton
+          key={index}
+          onPress={() => onPress(item)}
+          title={item.title}
+          icon={item.icon}
+        />
       )}
       ListHeaderComponent={
         <View
@@ -179,11 +177,11 @@ const SubPage: React.FC<{
           }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
             <View style={styles.numberContainer}>
-              <NumberText title={`${_historys.length}`} />
+              <NumberText title={`${historys.length}`} />
               <SubInfoText style={{fontSize: 12}} title="浏览" />
             </View>
             <View style={styles.numberContainer}>
-              <NumberText title={`${_follows.length}`} />
+              <NumberText title={`${follows.length}`} />
               <SubInfoText style={{fontSize: 12}} title="收藏" />
             </View>
             <View style={styles.numberContainer}>
@@ -195,11 +193,6 @@ const SubPage: React.FC<{
               <SubInfoText style={{fontSize: 12}} title="点赞" />
             </View>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-            }}></View>
         </View>
       }
       ListFooterComponent={
@@ -208,9 +201,7 @@ const SubPage: React.FC<{
             <ListTitleLine
               title="历史记录"
               buttonText="更多"
-              onPress={() => {
-                navigation.navigate('History', {tabName});
-              }}
+              onPress={() => navigation.navigate('History', {tabName})}
             />
             <Divider />
             <FlatList
@@ -220,12 +211,7 @@ const SubPage: React.FC<{
                 <H1HistoryInfoItem
                   item={item}
                   index={index}
-                  onPress={item => {
-                    navigation.push('Video', {
-                      url: item.href,
-                      apiName: item.apiName,
-                    });
-                  }}
+                  onPress={handlePressItem}
                 />
               )}
               ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
@@ -235,9 +221,7 @@ const SubPage: React.FC<{
             <ListTitleLine
               title="追番"
               buttonText="更多"
-              onPress={() => {
-                navigation.navigate('Follow', {tabName});
-              }}
+              onPress={() => navigation.navigate('Follow', {tabName})}
             />
             <Divider />
             <FlatList
@@ -247,12 +231,7 @@ const SubPage: React.FC<{
                 <H1RecommandInfoItem
                   item={item}
                   index={index}
-                  onPress={item => {
-                    navigation.push('Video', {
-                      url: item.href,
-                      apiName: item.apiName,
-                    });
-                  }}
+                  onPress={handlePressItem}
                 />
               )}
               ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
@@ -262,9 +241,7 @@ const SubPage: React.FC<{
             <ListTitleLine
               title="下载管理"
               buttonText="更多"
-              onPress={() => {
-                navigation.navigate('Follow', {tabName});
-              }}
+              onPress={() => navigation.navigate('Follow', {tabName})}
             />
             <Divider />
             <FlatList
@@ -274,12 +251,7 @@ const SubPage: React.FC<{
                 <H1RecommandInfoItem
                   item={item}
                   index={index}
-                  onPress={item => {
-                    navigation.push('Video', {
-                      url: item.href,
-                      apiName: item.apiName,
-                    });
-                  }}
+                  onPress={handlePressItem}
                 />
               )}
               ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
@@ -362,7 +334,11 @@ const UserPage: React.FC<{}> = () => {
   ]);
 
   const renderScene = ({route}: any) =>
-    route.key === 'settings' ? <SettingPage /> : <SubPage tabName={route.key} />;
+    route.key === 'settings' ? (
+      <SettingPage />
+    ) : (
+      <SubPage tabName={route.key} />
+    );
 
   const layout = useWindowDimensions();
   const {HeaderStyle} = useContext(AppContext).theme;

@@ -238,9 +238,9 @@ const styles = StyleSheet.create({
   },
   itemContainerV: {
     justifyContent: 'space-between',
-    flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 5,
+    flex: 1,
   },
   ibImage: {
     borderRadius: 5,

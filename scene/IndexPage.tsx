@@ -7,10 +7,10 @@ import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {V3RecommandInfoItem} from '../component/ListItem';
 import {LoadingContainer} from '../component/Loading';
-import MultiItemRow from '../component/MultiItemRow';
 import {SubTitleBold} from '../component/Text';
 import RecommandInfo from '../type/RecommandInfo';
 import {IndexPageProps, targets} from '../route';
+import {FlatGrid} from '../component/Grid';
 
 const IndexPage: React.FC<{}> = () => {
   const [results, setResults] = useState<RecommandInfo[]>([]);
@@ -35,28 +35,21 @@ const IndexPage: React.FC<{}> = () => {
       </HeadBar>
       <Divider />
       <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
-        <FlatList
+        <FlatGrid
           contentContainerStyle={{paddingHorizontal: 15}}
           keyExtractor={item => item.href}
           data={results}
           renderItem={({item, index}) => (
-            <MultiItemRow
-              numberOfItem={3}
+            <V3RecommandInfoItem
               index={index}
-              datas={results}
-              children={(index, info: RecommandInfo) => (
-                <V3RecommandInfoItem
-                  index={index}
-                  item={info}
-                  key={index}
-                  onPress={() => {
-                    navigation.navigate(targets[tabName], {
-                      url: info.href,
-                      apiName: info.apiName,
-                    });
-                  }}
-                />
-              )}
+              item={item}
+              key={index}
+              onPress={() => {
+                navigation.navigate(targets[tabName], {
+                  url: item.href,
+                  apiName: item.apiName,
+                });
+              }}
             />
           )}
         />

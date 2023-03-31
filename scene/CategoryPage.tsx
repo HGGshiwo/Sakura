@@ -1,13 +1,12 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
-import {SectionList, View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {View} from 'react-native';
 import loadPage from '../api/Anime/yinghuacd/category';
 import Container from '../component/Container';
 import EndLine from '../component/EndLine';
 import HeadBar from '../component/HeadBar';
 import {V3RecommandInfoItem} from '../component/ListItem';
 import {LoadingContainer} from '../component/Loading';
-import MultiItemRow from '../component/MultiItemRow';
 import {NavBar} from '../component/NavBar';
 import {ParallaxCarousel} from '../component/ParallaxCarousel';
 import {SearchBar} from '../component/SearchBar';
@@ -15,6 +14,7 @@ import {SubTitleBold} from '../component/Text';
 import RecommandInfo from '../type/RecommandInfo';
 import {CategoryPageProps, targets} from '../route';
 import {Section} from '../type/Section';
+import {SectionGrid} from '../component/Grid';
 
 const CategoryPage: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
@@ -32,6 +32,15 @@ const CategoryPage: React.FC<{}> = () => {
     });
   }, []);
 
+  const handlePressItem = useCallback(
+    (item: RecommandInfo) =>
+      navigation.navigate(targets[tabName], {
+        url: item.href,
+        apiName: item.apiName,
+      }),
+    [],
+  );
+
   return (
     <Container>
       <HeadBar onPress={() => navigation.goBack()}>
@@ -47,42 +56,26 @@ const CategoryPage: React.FC<{}> = () => {
         </View>
       </HeadBar>
       <LoadingContainer loading={loading}>
-        <SectionList
+        <SectionGrid
           contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
           ListHeaderComponent={
             <>
               <ParallaxCarousel
-                onPress={item =>
-                  navigation.navigate(targets[tabName], {
-                    url: item.href,
-                    apiName: item.apiName,
-                  })
-                }
+                onPress={handlePressItem}
                 carousels={carousels}
               />
               <NavBar />
             </>
           }
+          numColumns={3}
           sections={sections}
           keyExtractor={(item, index) => item.title + index}
-          renderItem={({index, section}) => (
-            <MultiItemRow
-              numberOfItem={3}
-              children={(index, info) => (
-                <V3RecommandInfoItem
-                  index={index}
-                  item={info}
-                  key={index}
-                  onPress={(recent: RecommandInfo) => {
-                    navigation.push(targets[tabName] as any, {
-                      url: recent.href,
-                      apiName: recent.apiName,
-                    });
-                  }}
-                />
-              )}
+          renderItem={({index, item}) => (
+            <V3RecommandInfoItem
               index={index}
-              datas={section.data}
+              item={item}
+              key={index}
+              onPress={handlePressItem}
             />
           )}
           renderSectionHeader={({section: {title}}) => (

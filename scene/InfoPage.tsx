@@ -30,7 +30,6 @@ import Container from '../component/Container';
 import api, {loadInfoPage} from '../api';
 import {InfoText, RateText, SubTitle, Title} from '../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
-import MultiItemRow from '../component/MultiItemRow';
 import {LoadingContainer} from '../component/Loading';
 import AppContext from '../context';
 import {FollowButton, TextButton} from '../component/Button';
@@ -45,6 +44,7 @@ import {ListTitleLine} from '../component/ListTitleLine';
 import ToolBar from '../component/ToolBar';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SlidingUpPanel, {SlidingUpPanelProps} from 'rn-sliding-up-panel';
+import {FlatGrid} from '../component/Grid';
 
 interface PlayerProps {
   ref?: RefObject<any>; // 播放器的ref
@@ -121,7 +121,6 @@ const InfoPage: React.FC<{
   playerHeight: number; //上方的播放器高度
   url: string;
   apiName: string;
-  renderTitleImg?: (url: string, onBack: () => void) => ReactNode;
   renderPlayer: (data: PlayerProps) => ReactNode;
   tabName: 'Comic' | 'Anime' | 'Novel';
   autoFullscreen?: boolean; //点击选集以后是否全屏
@@ -130,7 +129,6 @@ const InfoPage: React.FC<{
   playerHeight,
   url,
   apiName,
-  renderTitleImg,
   renderPlayer,
   tabName,
   autoFullscreen,
@@ -581,9 +579,7 @@ const InfoPage: React.FC<{
         infoSub={infoSub}
         info={info}
         visible={detailLineVisible}
-        onPress={() => {
-          setDetailSheetVisible(false);
-        }}
+        onPress={() => setDetailSheetVisible(false)}
       />
 
       <AnthologySheet
@@ -594,30 +590,24 @@ const InfoPage: React.FC<{
         onClose={() => {
           setAnthologySheetVisible(false);
         }}>
-        <FlatList
+        <FlatGrid
           contentContainerStyle={{paddingBottom: 50}}
+          numColumns={2}
           data={anthologys}
-          renderItem={({index}) => (
-            <MultiItemRow
-              numberOfItem={2}
-              children={(index, info) => (
-                <Pressable
-                  style={{flex: 1}}
-                  onPress={() => changeAnthology(index)}
-                  key={index}>
-                  <View style={styles.itemContainer}>
-                    <SubTitle
-                      title={info.title}
-                      style={{
-                        color: PlayerStyle.textColor(index === anthologyIndex),
-                      }}
-                    />
-                  </View>
-                </Pressable>
-              )}
-              index={index}
-              datas={anthologys}
-            />
+          renderItem={({index, item}) => (
+            <Pressable
+              style={{flex: 1}}
+              onPress={() => changeAnthology(index)}
+              key={index}>
+              <View style={styles.itemContainer}>
+                <SubTitle
+                  title={item.title}
+                  style={{
+                    color: PlayerStyle.textColor(index === anthologyIndex),
+                  }}
+                />
+              </View>
+            </Pressable>
           )}
         />
       </AnthologySheet>
