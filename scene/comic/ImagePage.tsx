@@ -3,7 +3,7 @@ import InfoPage from '../InfoPage';
 import ComicPlayer from './Player';
 import {useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import { ImagePageProps } from '../../route';
+import {ImagePageProps} from '../../route';
 
 const ImagePage: React.FC<{}> = () => {
   const route = useRoute<ImagePageProps['route']>();
@@ -34,7 +34,8 @@ const ImagePage: React.FC<{}> = () => {
         ref,
         showPanel,
         playerHeight,
-        hidePanel
+        hidePanel,
+        flashData,
       }) => (
         <ComicPlayer
           showPanel={showPanel}
@@ -51,6 +52,7 @@ const ImagePage: React.FC<{}> = () => {
           onErr={onErr}
           data={data}
           hidePanel={hidePanel}
+          flashData={flashData}
         />
       )}
     />

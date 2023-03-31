@@ -38,10 +38,8 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
       const info = infoDom ? infoDom.innerHTML : ''
       
       //播放列表
-      let moduleListDoms = document.getElementsByClassName('module-list module-player-list tab-list sort-list selected')!;
       let playList: Record<string, Source> = {};
-      moduleListDoms[0]
-        .getElementsByClassName('scroll-content')![0]
+      document.getElementsByClassName('scroll-content')![0]
         .getElementsByTagName('a')!
         .forEach((aDom, index) => {
           let key = aDom.getElementsByTagName('span')![0].innerHTML;

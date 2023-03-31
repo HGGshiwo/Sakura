@@ -193,7 +193,7 @@ const SearchPage: React.FC<{}> = () => {
           renderScene={({route}) => (
             <ResultView
               searchValue={searchValue2}
-              loadPage={api.Anime[route.key as keyof typeof api].search}
+              loadPage={api[tabName][route.key as any].search}
               apiName={route.key}
               tabName={tabName}
             />

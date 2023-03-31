@@ -65,6 +65,7 @@ interface PlayerProps {
   showPanel: () => void; //展示profile panel
   hidePanel: () => void;
   playerHeight: number; //player高度
+  flashData?: boolean; //是否需要删除之前缓存的数据
 }
 
 const {useRealm} = Context;
@@ -141,7 +142,7 @@ const InfoPage: React.FC<{
   const [playerData, setPlayerData] = useState<any>(); //具体的播放所需的数据, 可能是{url, type}，也可能是string[]
 
   const [dataAvailable, setDataAvailable] = useState(false); //playerd的数据源是否可用
-
+  const dataAvailableRef = useRef(false); //playerd的数据源是否可用
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
   const [defaultProgress, setDefaultProgress] = useState(0);
@@ -163,6 +164,7 @@ const InfoPage: React.FC<{
   const navigation = useNavigation<VideoPageProps['navigation']>();
   const [followed, setFollowed] = useState(false); //是否追番
   const panelRef = useRef<SlidingUpPanel | null>(); // profile panel的ref
+  const [flashData, setFlashData] = useState(false); //如果不是通过nextSource切换，则flash
 
   useEffect(() => {
     //查看数据库看是否追番
@@ -274,7 +276,11 @@ const InfoPage: React.FC<{
                       horizontal={true}
                       data={anthologys}
                       renderItem={({item, index}) => (
-                        <Pressable onPress={() => changeAnthology(item.id)}>
+                        <Pressable
+                          onPress={() => {
+                            setFlashData(true);
+                            changeAnthology(item.id);
+                          }}>
                           <View style={styles.itemContainer2}>
                             <SubTitle
                               title={item.title}
@@ -320,7 +326,6 @@ const InfoPage: React.FC<{
 
   const onRefresh = () => {
     setRefreshing(true);
-    console.log(tabName, apiName);
     const loadPage: loadInfoPage = api[tabName][apiName].info!;
     loadPage(url, data => {
       const {title, img, infoSub, recommands, sources, info, relatives} = data;
@@ -381,6 +386,7 @@ const InfoPage: React.FC<{
       const _anthologyIndex = history.current!.anthologyIndex;
       setNextDataAvailable(_anthologyIndex < _anthologys.length);
       setAnthologyIndex(_anthologyIndex); //当前播放第一集
+      setFlashData(true)
       getPlayerData(_anthologys[_anthologyIndex].data, 0);
     });
   };
@@ -416,11 +422,16 @@ const InfoPage: React.FC<{
     setNextDataAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
     setDataAvailable(false);
+    dataAvailableRef.current = false;
     getPlayerData(anthologys[index].data, 0);
   };
 
   //在全屏下切换下一个source
   const toNextSource = () => {
+    if (!dataAvailableRef.current) {
+      return; //不允许在加载页面的时候切换
+    }
+    setFlashData(false);
     changeAnthology(anthologyIndex + 1);
   };
 
@@ -433,6 +444,7 @@ const InfoPage: React.FC<{
         if (state) {
           setPlayerData(data);
           setDataAvailable(true);
+          dataAvailableRef.current = true;
         } else {
           getPlayerData(playerPageUrls, curIndex + 1);
         }
@@ -476,6 +488,7 @@ const InfoPage: React.FC<{
           <Pressable
             style={{flex: 1}}
             onPress={() => {
+              setFlashData(true);
               changeAnthology(index);
               setVisible(false);
             }}>
@@ -532,6 +545,7 @@ const InfoPage: React.FC<{
           if (panelRef.current) panelRef.current.hide();
         },
         playerHeight,
+        flashData,
       })}
       <OptionalWapper
         panelRef={panelRef}
@@ -597,7 +611,10 @@ const InfoPage: React.FC<{
           renderItem={({index, item}) => (
             <Pressable
               style={{flex: 1}}
-              onPress={() => changeAnthology(index)}
+              onPress={() => {
+                setFlashData(true);
+                changeAnthology(index);
+              }}
               key={index}>
               <View style={styles.itemContainer}>
                 <SubTitle

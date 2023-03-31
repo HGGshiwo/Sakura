@@ -1,7 +1,7 @@
 import home from "./home";
+import search from './search'
 import comic, { loadComicSrc } from "./comic";
 const player = loadComicSrc
-const search = ()=>{}
 const info = comic
 const apiName = 'biquge'
 export {

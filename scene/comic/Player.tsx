@@ -1,5 +1,5 @@
 import React, {createRef, useContext, useEffect, useRef, useState} from 'react';
-import {FlatList, View, StyleSheet, Pressable} from 'react-native';
+import {FlatList, View, StyleSheet, Pressable, ViewToken} from 'react-native';
 import {Image, ImageProps, useWindowDimensions} from 'react-native';
 import {PlayerProps} from '../InfoPage';
 import {BackButton} from '../../component/Button';
@@ -10,19 +10,34 @@ import AppContext from '../../context';
 import {NextButton} from '../anime/Player/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-const ResizeImage: React.FC<ImageProps> = props => {
+const ResizeImage: React.FC<{uri: string}> = props => {
   const [aspectRatio, setAspectRatio] = useState(1);
   const layout = useWindowDimensions();
+  const [dataAvailable, setDataAvailable] = useState(false);
+
   useEffect(() => {
-    Image.getSize((props.source as any).uri, (width, height) => {
+    setDataAvailable(props.uri !== '');
+    Image.getSize(props.uri, (width, height) => {
       setAspectRatio(width / height);
     });
-  }, []);
-  return (
+  }, [props.uri]);
+
+  return dataAvailable ? (
     <Image
       style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
       {...props}
+      source={{uri: props.uri}}
     />
+  ) : (
+    <View
+      style={{
+        height: 300,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <InfoText title="加载图片地址中..." />
+    </View>
   );
 };
 
@@ -40,6 +55,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   playerHeight,
   showPanel,
   hidePanel,
+  flashData,
 }) => {
   const [controlVisible, setControlVisible] = useState(false);
   const controlVisibleRef = useRef(false); //control是否可见
@@ -50,8 +66,32 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   const [duration, setDuration] = useState(0); //当前视频总时长
   const seekingRef = useRef(false); //是否在加载
   const listRef = createRef<FlatList<any>>();
+  const [totalData, setTotalData] = useState<string[]>([]); //累计的图片地址
+  const durationsRef = useRef<number[]>([]); //记录下选集的长度
+  const dataIndexRef = useRef(0); //data累计的index
+  const anthologyIndexRef = useRef(-1); //选集的index，data第一次切换+1
+  const layout = useWindowDimensions();
+  const lastOffset = useRef(0);
+  const scrollUp = useRef(true);
+
   useEffect(() => {
-    setDuration(data ? data.length - 1 : 0);
+    //切换了下一个选集，则需要更新长度，加入到累计数据，
+    if (data) {
+      setDuration(data.length - 1);
+      if (flashData) {
+        setTotalData(data);
+        durationsRef.current = [data.length - 1]; //记录下长度
+        anthologyIndexRef.current = -1;
+        dataIndexRef.current = 0;
+      } else {
+        console.log(999, data);
+        setTotalData(totalData.concat(data));
+        dataIndexRef.current =
+          dataIndexRef.current + durationsRef.current.at(-1);
+        durationsRef.current = [...durationsRef.current, data.length]; //记录下长度
+        anthologyIndexRef.current = anthologyIndexRef.current + 1;
+      }
+    }
   }, [data]);
 
   //打开control并在一段时间之后关闭
@@ -75,11 +115,11 @@ const ComicPlayer: React.FC<PlayerProps> = ({
     }, 3000) as any;
   };
 
-  //点击了视频空白区域
+  //点击了空白区域
   const handlePress = () => {
     // setRateSheetVisible(false);
     // setAnthologySheetVisible(false);
-    hidePanel()
+    hidePanel();
     if (controlVisibleRef.current) {
       if (controlTimer.current !== undefined) {
         clearTimeout(controlTimer.current);
@@ -91,54 +131,94 @@ const ComicPlayer: React.FC<PlayerProps> = ({
       openControl();
     }
   };
+
+  //使用进度条改进
   const onSlide = (data: number) => {
     listRef.current!.scrollToIndex({
-      index: Math.round(data),
+      index: dataIndexRef.current + Math.round(data),
       viewPosition: 0.5,
     });
   };
+
   const onSlidingComplete = (data: number) => {
     setProgress(data); //当seek时，由slide自己更新
     seekingRef.current = false;
     waitCloseControl();
   };
+
   const onSlidingStart = () => {
-    console.log('start');
     seekingRef.current = true;
   };
 
   const onViewCallBack = React.useCallback((viewableItems: any) => {
-    const items = viewableItems.viewableItems;
-    setProgress(items[items.length - 1].index);
+    const viewables = viewableItems.viewableItems as ViewToken[];
+
+    if (scrollUp.current && viewables[0].index! <= dataIndexRef.current) {
+      //上方图片出现，并且上一次的最后一个选集可见，选集-1
+      if (anthologyIndexRef.current != -1) {
+        setProgress(durationsRef.current[anthologyIndexRef.current]);
+        console.log(666, durationsRef.current, anthologyIndexRef.current);
+        setDuration(durationsRef.current[anthologyIndexRef.current]);
+        dataIndexRef.current -= durationsRef.current[anthologyIndexRef.current];
+        anthologyIndexRef.current -= 1; //先改再-1
+      }
+    } else if (
+      !scrollUp.current &&
+      viewables.at(-1).index! >
+        dataIndexRef.current + durationsRef.current.at(-1)
+    ) {
+      //下方图片出现，并且下一次的第一个选集可见，选集+1
+      anthologyIndexRef.current += 1; //先+1再改
+      console.log(777, durationsRef.current, anthologyIndexRef.current);
+      setProgress(0);
+      setDuration(durationsRef.current[anthologyIndexRef.current]);
+      dataIndexRef.current += durationsRef.current[anthologyIndexRef.current];
+    } else if (viewables.length !== 0) {
+      console.log(
+        888,
+        viewables[viewables.length - 1].index!,
+        dataIndexRef.current,
+        viewables.at(-1).index! - dataIndexRef.current,
+      );
+      setProgress(viewables.at(-1).index! - dataIndexRef.current);
+    }
   }, []);
 
   return (
-    <View style={{flex: 1}}>
-      {!dataAvailable ? (
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-          }}>
-          <InfoText title="加载图片地址中..." />
-        </View>
-      ) : (
-        <FlatList
-          ListEmptyComponent={
-            <InfoText style={{paddingTop: '50%'}} title="加载图片中..." />
-          }
-          data={data}
-          ref={listRef}
-          onViewableItemsChanged={onViewCallBack}
-          onEndReached={nextDataAvailable ? toNextSource : null}
-          renderItem={({item}) => (
-            <Pressable onPress={handlePress} style={{flex: 1}}>
-              <ResizeImage source={{uri: item}} />
-            </Pressable>
-          )}
-        />
-      )}
+    <View style={{flex: 1, alignItems: 'center'}}>
+      <FlatList
+        ListEmptyComponent={
+          <InfoText
+            style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
+            title="加载图片地址中..."
+          />
+        }
+        ListFooterComponent={
+          totalData.length !== 0 ? (
+            <InfoText
+              style={{alignSelf: 'center', paddingVertical: layout.height / 2}}
+              title={nextDataAvailable ? '加载图片中...' : '没有更多了...'}
+            />
+          ) : null
+        }
+        data={totalData}
+        ref={listRef}
+        viewabilityConfig={{
+          waitForInteraction: true,
+          itemVisiblePercentThreshold: 0.5,
+        }}
+        onViewableItemsChanged={onViewCallBack}
+        onEndReached={nextDataAvailable ? toNextSource : null}
+        onScroll={e => {
+          scrollUp.current = e.nativeEvent.contentOffset.y < lastOffset.current;
+          lastOffset.current = e.nativeEvent.contentOffset.y;
+        }}
+        renderItem={({item}) => (
+          <Pressable onPress={handlePress} style={{flex: 1}}>
+            <ResizeImage uri={item} />
+          </Pressable>
+        )}
+      />
 
       {/* top bar  */}
       <View
@@ -229,7 +309,7 @@ const styles = StyleSheet.create({
     height: 40,
     position: 'absolute',
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.8)',
     alignItems: 'center',
     paddingHorizontal: 10,
     justifyContent: 'space-between',
