@@ -1,5 +1,3 @@
-import * as biquge from './biquge'
+import * as qb from './qb'
 
-export {
-    biquge
-}
+export { qb }

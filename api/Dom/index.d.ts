@@ -5,6 +5,7 @@ declare function getDomFromString(str: string): Dom;
 class Dom {
     _dom: Document;
     src: string | null;
+    _src: string| null;
     href: string | null;
     title: string | null;
     "data-vid": string|null;

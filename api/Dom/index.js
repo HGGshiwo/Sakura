@@ -5,7 +5,7 @@ import {
   getElementsByTagName,
   innerText,
 } from 'domutils';
-import {parseDocument} from 'htmlparser2';
+import { parseDocument } from 'htmlparser2';
 
 const getDomFromString = str => {
   return new Dom(parseDocument(str));
@@ -13,7 +13,7 @@ const getDomFromString = str => {
 
 class Dom {
   constructor(dom) {
-    attributes = ["src", "data-vid", "href", "style", "title", "data-src", "data-original"]
+    attributes = ["_src", "src", "data-vid", "href", "style", "title", "data-src", "data-original"]
     this._dom = dom;
     attributes.forEach(attribute => {
       this[attribute] = getAttributeValue(this._dom, attribute)
@@ -22,7 +22,7 @@ class Dom {
   }
 
   getElementsByClassName(className) {
-    let results = getElements({class: className}, this._dom, true);
+    let results = getElements({ class: className }, this._dom, true);
     return results.map(result => {
       return new Dom(result);
     });
@@ -36,7 +36,8 @@ class Dom {
   }
 
   getElementById(id) {
-    let el = getElements({id}, this._dom, true);
+    // return getElementById(id, this._dom, true)
+    let el = getElements({ id: id }, this._dom, true);
     let newDom = null;
     if (el.length != 0) {
       newDom = new Dom(el[0])
@@ -45,4 +46,4 @@ class Dom {
   }
 }
 
-export {Dom, getDomFromString};
+export { Dom, getDomFromString };

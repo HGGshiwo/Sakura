@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginVertical: 10,
     justifyContent: 'flex-start',
+    backgroundColor: 'white',
   },
   itemContainer: {
     flex: 1,

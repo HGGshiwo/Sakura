@@ -54,7 +54,7 @@ function App(): JSX.Element {
         setSource(source);
       },
       () => {
-        setSource({Anime: 'scyinghua', Comic: 'biquge', Novel: 'biquge'});
+        setSource({Anime: 'scyinghua', Comic: 'biquge', Novel: 'qb'});
       },
     );
   }, []);

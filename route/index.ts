@@ -16,6 +16,7 @@ const routes = [
   { name: 'Tab', component: scene.TabPage },
   { name: 'Video', component: scene.VideoPage },
   { name: 'Image', component: scene.ImagePage },
+  { name: 'Text', component: scene.TextPage },
   { name: 'Search', component: scene.SearchPage },
   { name: 'Category', component: scene.CategoryPage },
   { name: 'Index', component: scene.IndexPage },
@@ -23,7 +24,6 @@ const routes = [
   { name: 'Follow', component: scene.FollowPage },
   { name: 'Ranking', component: scene.RankingPage },
   { name: 'Schedule', component: scene.SchedulePage },
-
 ];
 type RootStackParamList = {
   MainPage: { tabName: TabName }; //Tab的三个页面
@@ -43,6 +43,7 @@ type RootStackParamList = {
 type TabPageProps = NativeStackScreenProps<RootStackParamList, 'TabPage'>;
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
 type ImagePageProps = NativeStackScreenProps<RootStackParamList, 'Image'>
+type TextPageProps = NativeStackScreenProps<RootStackParamList, 'Text'>
 type SearchPageProps = NativeStackScreenProps<RootStackParamList, 'Search'>;
 type MainPageProps = NativeStackScreenProps<RootStackParamList, 'MainPage'>;
 type CategoryPageProps = NativeStackScreenProps<RootStackParamList, 'Category'>;
@@ -57,6 +58,7 @@ export type {
   TabPageProps,
   VideoPageProps, //信息页
   ImagePageProps,
+  TextPageProps,
   SearchPageProps,
   MainPageProps,
   CategoryPageProps,

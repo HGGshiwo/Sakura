@@ -35,7 +35,8 @@ const Container = ({children, style}: ContainerProps) => {
         setBackgroundColor(HeaderStyle.backgroundColor);
         setTranslucent(false)
         break;
-      case 'Image': 
+      case 'Image':
+      case 'Text': 
         setBackgroundColor('transparent');
         setBarStyle('light-content');
         setTranslucent(true)

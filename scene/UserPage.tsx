@@ -160,6 +160,7 @@ const SubPage: React.FC<{
     <FlatGrid
       data={data}
       numColumns={4}
+      // columnWrapperStyle={{backgroundColor: 'white'}}
       renderItem={({index, item}) => (
         <NavBarButton
           key={index}

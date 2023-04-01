@@ -18,42 +18,18 @@ import Scrubber from '../../component/Scrubber';
 import AppContext from '../../context';
 import {NextButton} from '../anime/Player/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { Text } from 'react-native';
 
-const ResizeImage = React.memo<{uri: string; onPress: () => void}>(
-  ({uri, onPress}) => {
-    const [aspectRatio, setAspectRatio] = useState(1);
-    const layout = useWindowDimensions();
-    const [dataAvailable, setDataAvailable] = useState(false);
-    useEffect(() => {
-      setDataAvailable(uri !== '');
-      Image.getSize(uri, (width, height) => {
-        setAspectRatio(width / height);
-      });
-    }, [uri]);
-
+const Paragraph = React.memo<{data: string; onPress: () => void}>(
+  ({data, onPress}) => {
     return (
-      <Pressable onPress={() => onPress()} style={{flex: 1}}>
-        {dataAvailable ? (
-          <Image
-            style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
-            source={{uri}}
-          />
-        ) : (
-          <View
-            style={{
-              height: 300,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <InfoText title="加载图片地址中..." />
-          </View>
-        )}
+      <Pressable onPress={() => onPress()} style={{flex: 1, margin: 10}}>
+        <Text style={{fontSize: 16}}>{data}</Text>
       </Pressable>
     );
   },
 );
-const ComicPlayer: React.FC<PlayerProps> = ({
+const TextPlayer: React.FC<PlayerProps> = ({
   dataAvailable,
   nextDataAvailable,
   data,
@@ -88,7 +64,6 @@ const ComicPlayer: React.FC<PlayerProps> = ({
 
   useEffect(() => {
     //切换了下一个选集，则需要更新长度，加入到累计数据，
-    console.log(flashData);
     if (data) {
       console.log(999, data);
       setDuration(data.length);
@@ -163,7 +138,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
 
   const onViewCallBack = React.useCallback((viewableItems: any) => {
     const viewables = viewableItems.viewableItems as ViewToken[];
-    if(viewables.length === 0) return
+    if (viewables.length === 0) return;
     if (scrollUp.current && viewables[0].index! <= dataIndexRef.current) {
       //上方图片出现，并且上一次的最后一个选集可见，选集-1
       if (anthologyIndexRef.current != -1) {
@@ -192,7 +167,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
       <FlatList
-        keyExtractor={item => item}
+        keyExtractor={(item, index) => `${index}`}
         ListEmptyComponent={
           <InfoText
             style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
@@ -219,9 +194,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
           scrollUp.current = e.nativeEvent.contentOffset.y < lastOffset.current;
           lastOffset.current = e.nativeEvent.contentOffset.y;
         }}
-        renderItem={({item}) => (
-          <ResizeImage uri={item} onPress={handlePress} />
-        )}
+        renderItem={({item}) => <Paragraph data={item} onPress={handlePress} />}
       />
 
       {/* top bar  */}
@@ -340,4 +313,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ComicPlayer;
+export default TextPlayer;
