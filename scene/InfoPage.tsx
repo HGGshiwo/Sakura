@@ -164,7 +164,7 @@ const InfoPage: React.FC<{
   const navigation = useNavigation<VideoPageProps['navigation']>();
   const [followed, setFollowed] = useState(false); //是否追番
   const panelRef = useRef<SlidingUpPanel | null>(); // profile panel的ref
-  const [flashData, setFlashData] = useState(false); //如果不是通过nextSource切换，则flash
+  const [flashData, setFlashData] = useState(true); //如果不是通过nextSource切换，则flash
 
   useEffect(() => {
     //查看数据库看是否追番
@@ -431,6 +431,7 @@ const InfoPage: React.FC<{
     if (!dataAvailableRef.current) {
       return; //不允许在加载页面的时候切换
     }
+    console.log('next')
     setFlashData(false);
     changeAnthology(anthologyIndex + 1);
   };

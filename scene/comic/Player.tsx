@@ -1,4 +1,13 @@
-import React, {createRef, useContext, useEffect, useRef, useState} from 'react';
+import React, {
+  ReactNode,
+  createRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {FlatList, View, StyleSheet, Pressable, ViewToken} from 'react-native';
 import {Image, ImageProps, useWindowDimensions} from 'react-native';
 import {PlayerProps} from '../InfoPage';
@@ -10,37 +19,40 @@ import AppContext from '../../context';
 import {NextButton} from '../anime/Player/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-const ResizeImage: React.FC<{uri: string}> = props => {
-  const [aspectRatio, setAspectRatio] = useState(1);
-  const layout = useWindowDimensions();
-  const [dataAvailable, setDataAvailable] = useState(false);
+const ResizeImage = React.memo<{uri: string; onPress: () => void}>(
+  ({uri, onPress}) => {
+    const [aspectRatio, setAspectRatio] = useState(1);
+    const layout = useWindowDimensions();
+    const [dataAvailable, setDataAvailable] = useState(false);
+    useEffect(() => {
+      setDataAvailable(uri !== '');
+      Image.getSize(uri, (width, height) => {
+        setAspectRatio(width / height);
+      });
+    }, [uri]);
 
-  useEffect(() => {
-    setDataAvailable(props.uri !== '');
-    Image.getSize(props.uri, (width, height) => {
-      setAspectRatio(width / height);
-    });
-  }, [props.uri]);
-
-  return dataAvailable ? (
-    <Image
-      style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
-      {...props}
-      source={{uri: props.uri}}
-    />
-  ) : (
-    <View
-      style={{
-        height: 300,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <InfoText title="加载图片地址中..." />
-    </View>
-  );
-};
-
+    return (
+      <Pressable onPress={() => onPress()} style={{flex: 1}}>
+        {dataAvailable ? (
+          <Image
+            style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
+            source={{uri}}
+          />
+        ) : (
+          <View
+            style={{
+              height: 300,
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <InfoText title="加载图片地址中..." />
+          </View>
+        )}
+      </Pressable>
+    );
+  },
+);
 const ComicPlayer: React.FC<PlayerProps> = ({
   dataAvailable,
   nextDataAvailable,
@@ -76,20 +88,19 @@ const ComicPlayer: React.FC<PlayerProps> = ({
 
   useEffect(() => {
     //切换了下一个选集，则需要更新长度，加入到累计数据，
+    console.log(flashData);
     if (data) {
-      setDuration(data.length - 1);
+      console.log(999, data);
+      setDuration(data.length);
       if (flashData) {
         setTotalData(data);
-        durationsRef.current = [data.length - 1]; //记录下长度
+        durationsRef.current = [data.length]; //记录下长度
         anthologyIndexRef.current = -1;
-        dataIndexRef.current = 0;
+        dataIndexRef.current = -1;
+        console.log(222, durationsRef.current);
       } else {
-        console.log(999, data);
         setTotalData(totalData.concat(data));
-        dataIndexRef.current =
-          dataIndexRef.current + durationsRef.current.at(-1);
-        durationsRef.current = [...durationsRef.current, data.length]; //记录下长度
-        anthologyIndexRef.current = anthologyIndexRef.current + 1;
+        durationsRef.current = [...durationsRef.current, data.length];
       }
     }
   }, [data]);
@@ -116,7 +127,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   };
 
   //点击了空白区域
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     // setRateSheetVisible(false);
     // setAnthologySheetVisible(false);
     hidePanel();
@@ -130,7 +141,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
     } else {
       openControl();
     }
-  };
+  }, []);
 
   //使用进度条改进
   const onSlide = (data: number) => {
@@ -152,7 +163,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
 
   const onViewCallBack = React.useCallback((viewableItems: any) => {
     const viewables = viewableItems.viewableItems as ViewToken[];
-
+    if(viewables.length === 0) return
     if (scrollUp.current && viewables[0].index! <= dataIndexRef.current) {
       //上方图片出现，并且上一次的最后一个选集可见，选集-1
       if (anthologyIndexRef.current != -1) {
@@ -170,23 +181,24 @@ const ComicPlayer: React.FC<PlayerProps> = ({
       //下方图片出现，并且下一次的第一个选集可见，选集+1
       anthologyIndexRef.current += 1; //先+1再改
       console.log(777, durationsRef.current, anthologyIndexRef.current);
-      setProgress(0);
+      setProgress(1);
       setDuration(durationsRef.current[anthologyIndexRef.current]);
       dataIndexRef.current += durationsRef.current[anthologyIndexRef.current];
     } else if (viewables.length !== 0) {
       console.log(
         888,
-        viewables[viewables.length - 1].index!,
+        viewables[0].index,
         dataIndexRef.current,
-        viewables.at(-1).index! - dataIndexRef.current,
+        viewables[0].index! - dataIndexRef.current,
       );
-      setProgress(viewables.at(-1).index! - dataIndexRef.current);
+      setProgress(viewables[0].index! - dataIndexRef.current);
     }
   }, []);
 
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
       <FlatList
+        keyExtractor={item => item}
         ListEmptyComponent={
           <InfoText
             style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
@@ -214,9 +226,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
           lastOffset.current = e.nativeEvent.contentOffset.y;
         }}
         renderItem={({item}) => (
-          <Pressable onPress={handlePress} style={{flex: 1}}>
-            <ResizeImage uri={item} />
-          </Pressable>
+          <ResizeImage uri={item} onPress={handlePress} />
         )}
       />
 
