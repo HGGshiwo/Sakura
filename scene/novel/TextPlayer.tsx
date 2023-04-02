@@ -161,6 +161,9 @@ const TextPlayer: React.FC<PlayerProps> = ({
             title="加载小说地址中..."
           />
         }
+        ListHeaderComponent={
+          <View style={{height: 30, width: '100%'}}/>
+        }
         ListFooterComponent={
           totalData.length !== 0 ? (
             <InfoText
