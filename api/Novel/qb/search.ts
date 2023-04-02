@@ -15,17 +15,17 @@ function loadPage(arg: string, _afterSearch: (result: SearchInfo[]) => void) {
       _afterSearch([])
       return
     }
-    fetch(`${_url}${arg}`)
-      .then(response => response.text())
-      .then((responseText) => {
-        const document = getDomFromString(responseText);
-        // const results = document!.getElementsByClassName('common-comic-item')!.map((itemDom) => getRecommandInfoFromCover(itemDom, 'biquge')).map((result, index) => ({ ...result, id: result.href, type: [], info: '' }))
-        // _afterSearch(results) //只有一页结果
+    // fetch(`${_url}${arg}`)
+    //   .then(response => response.text())
+    //   .then((responseText) => {
+    //     const document = getDomFromString(responseText);
+    //     // const results = document!.getElementsByClassName('common-comic-item')!.map((itemDom) => getRecommandInfoFromCover(itemDom, 'biquge')).map((result, index) => ({ ...result, id: result.href, type: [], info: '' }))
+    //     // _afterSearch(results) //只有一页结果
 
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //   })
   }
 }
 

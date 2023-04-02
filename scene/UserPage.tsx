@@ -1,5 +1,11 @@
 import {useCallback, useContext, useEffect, useState} from 'react';
-import {FlatList, View, useWindowDimensions, Pressable} from 'react-native';
+import {
+  FlatList,
+  View,
+  useWindowDimensions,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 import {
   EmptyH1HistoryInfoItem,
   H1HistoryInfoItem,
@@ -52,9 +58,6 @@ const data: Data[] = [
   {title: '时间表', icon: faBusinessTime, data: 'Schedule'},
   {title: '排行榜', icon: faRankingStar, data: 'Ranking'},
   {title: '历史记录', icon: faClockRotateLeft, data: 'History'},
-  {title: '国创', icon: faCarrot, data: 'china'},
-  {title: '日漫', icon: faLemon, data: 'japan'},
-  {title: '我的追番', icon: faHeart, data: 'Follow'},
 ];
 
 const themes = [
@@ -76,8 +79,14 @@ const SubPage: React.FC<{
   const _historys = useQuery<History>(History);
   const _follows = useQuery<Follow>(Follow);
   const realm = useRealm();
+  const [numberDatas, setNumberDatas] = useState([
+    {title: '浏览', number: 0, key: 'history'},
+    {title: '收藏', number: 0, key: 'follow'},
+    {title: '下载', number: 0, key: 'download'},
+    {title: '点赞', number: 0, key: 'like'},
+  ]);
 
-  useEffect(() => {
+  const onRefresh = () => {
     let historys = [..._historys.sorted('time', true)]
       .map(_history => {
         const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
@@ -97,9 +106,6 @@ const SubPage: React.FC<{
       })
       .filter(history => history.tabName === tabName);
     setHistorys(historys);
-  }, [_historys]);
-
-  useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)
       .reverse()
@@ -116,7 +122,20 @@ const SubPage: React.FC<{
       })
       .filter(item => item.tabName === tabName);
     setFollows(follows);
-  }, [_follows]);
+    const newData = numberDatas.map(data => ({
+      ...data,
+      number:
+        data.key === 'history'
+          ? historys.length
+          : data.key === 'follow'
+          ? follows.length
+          : 0,
+    }));
+    setNumberDatas(newData);
+  };
+
+  useEffect(onRefresh, [_historys, _follows]);
+  useEffect(onRefresh, []);
 
   const onPress = (item: Data) => {
     switch (item.data) {
@@ -157,110 +176,106 @@ const SubPage: React.FC<{
   );
 
   return (
-    <FlatGrid
-      data={data}
-      numColumns={4}
-      // columnWrapperStyle={{backgroundColor: 'white'}}
-      renderItem={({index, item}) => (
-        <NavBarButton
-          key={index}
-          onPress={() => onPress(item)}
-          title={item.title}
-          icon={item.icon}
+    <>
+      {/* <ScrollView style={{flex: 1}}> */}
+      <View
+        style={{
+          backgroundColor: 'white',
+          padding: 10,
+          paddingTop: 30,
+        }}>
+        <FlatList
+          data={numberDatas}
+          contentContainerStyle={{justifyContent: 'space-around', flex: 1}}
+          horizontal
+          renderItem={({item}) => (
+            <View key={item.key} style={styles.numberContainer}>
+              <NumberText title={`${item.number}`} />
+              <SubInfoText style={{fontSize: 12}} title={item.title} />
+            </View>
+          )}
         />
-      )}
-      ListHeaderComponent={
-        <View
-          style={{
-            backgroundColor: 'white',
-            padding: 10,
-            paddingTop: 30,
-          }}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-            <View style={styles.numberContainer}>
-              <NumberText title={`${historys.length}`} />
-              <SubInfoText style={{fontSize: 12}} title="浏览" />
-            </View>
-            <View style={styles.numberContainer}>
-              <NumberText title={`${follows.length}`} />
-              <SubInfoText style={{fontSize: 12}} title="收藏" />
-            </View>
-            <View style={styles.numberContainer}>
-              <NumberText title={`${0}`} />
-              <SubInfoText style={{fontSize: 12}} title="下载" />
-            </View>
-            <View style={styles.numberContainer}>
-              <NumberText title={`${0}`} />
-              <SubInfoText style={{fontSize: 12}} title="点赞" />
-            </View>
-          </View>
-        </View>
-      }
-      ListFooterComponent={
-        <>
-          <View style={styles.cardContainer}>
-            <ListTitleLine
-              title="历史记录"
-              buttonText="更多"
-              onPress={() => navigation.navigate('History', {tabName})}
+        <FlatList
+          data={data}
+          contentContainerStyle={{
+            marginVertical: 10,
+            justifyContent: 'space-around',
+            width: '100%',
+          }}
+          horizontal
+          renderItem={({item}) => (
+            <NavBarButton
+              key={item.title}
+              onPress={() => onPress(item)}
+              title={item.title}
+              icon={item.icon}
             />
-            <Divider />
-            <FlatList
-              horizontal
-              data={historys}
-              renderItem={({item, index}) => (
-                <H1HistoryInfoItem
-                  item={item}
-                  index={index}
-                  onPress={handlePressItem}
-                />
-              )}
-              ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+          )}
+        />
+      </View>
+
+      <View style={styles.cardContainer}>
+        <ListTitleLine
+          title="历史记录"
+          buttonText="更多"
+          onPress={() => navigation.navigate('History', {tabName})}
+        />
+        <Divider />
+        <FlatList
+          horizontal
+          data={historys}
+          renderItem={({item, index}) => (
+            <H1HistoryInfoItem
+              item={item}
+              index={index}
+              onPress={handlePressItem}
             />
-          </View>
-          <View style={styles.cardContainer}>
-            <ListTitleLine
-              title="追番"
-              buttonText="更多"
-              onPress={() => navigation.navigate('Follow', {tabName})}
+          )}
+          ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+        />
+      </View>
+      <View style={styles.cardContainer}>
+        <ListTitleLine
+          title="追番"
+          buttonText="更多"
+          onPress={() => navigation.navigate('Follow', {tabName})}
+        />
+        <Divider />
+        <FlatList
+          horizontal
+          data={follows}
+          renderItem={({item, index}) => (
+            <H1RecommandInfoItem
+              item={item}
+              index={index}
+              onPress={handlePressItem}
             />
-            <Divider />
-            <FlatList
-              horizontal
-              data={follows}
-              renderItem={({item, index}) => (
-                <H1RecommandInfoItem
-                  item={item}
-                  index={index}
-                  onPress={handlePressItem}
-                />
-              )}
-              ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+          )}
+          ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+        />
+      </View>
+      <View style={styles.cardContainer}>
+        <ListTitleLine
+          title="下载管理"
+          buttonText="更多"
+          onPress={() => navigation.navigate('Follow', {tabName})}
+        />
+        <Divider />
+        <FlatList
+          horizontal
+          data={[]}
+          renderItem={({item, index}) => (
+            <H1RecommandInfoItem
+              item={item}
+              index={index}
+              onPress={handlePressItem}
             />
-          </View>
-          <View style={styles.cardContainer}>
-            <ListTitleLine
-              title="下载管理"
-              buttonText="更多"
-              onPress={() => navigation.navigate('Follow', {tabName})}
-            />
-            <Divider />
-            <FlatList
-              horizontal
-              data={[]}
-              renderItem={({item, index}) => (
-                <H1RecommandInfoItem
-                  item={item}
-                  index={index}
-                  onPress={handlePressItem}
-                />
-              )}
-              ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
-            />
-          </View>
-        </>
-      }
-    />
+          )}
+          ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
+        />
+      </View>
+    </>
+    // </ScrollView>
   );
 };
 
@@ -328,9 +343,9 @@ const UserPage: React.FC<{}> = () => {
   const [index, setIndex] = useState(0);
 
   const [routes] = useState([
-    {key: 'first', title: '番剧'},
-    {key: 'second', title: '小说'},
-    {key: 'third', title: '漫画'},
+    {key: 'Anime', title: '番剧'},
+    {key: 'Novel', title: '小说'},
+    {key: 'Comic', title: '漫画'},
     {key: 'settings', title: '设置'},
   ]);
 

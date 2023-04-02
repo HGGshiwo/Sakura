@@ -108,11 +108,11 @@ const BackButton: React.FC<{
   );
 };
 
-const NavBarButton: React.FC<Props> = ({onPress, title, icon}) => {
+const NavBarButton: React.FC<Props> = ({onPress, title, icon, style}) => {
   const {NavBarStyle} = useContext(AppContext).theme;
   return (
-    <Pressable style={{flex: 1}} onPress={onPress}>
-      <View style={styles.itemContainer}>
+    <Pressable onPress={onPress}>
+      <View style={[styles.itemContainer, style]}>
         <FontAwesomeIcon color={NavBarStyle.color} size={25} icon={icon!} />
         <Text style={{fontSize: 12, paddingTop: 5}}>{`${title}`}</Text>
       </View>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   itemContainer: {
-    flex: 1,
+    width: 60,
     alignItems: 'center',
     justifyContent: 'space-between',
   },

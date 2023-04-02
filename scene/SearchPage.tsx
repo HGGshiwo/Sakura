@@ -134,7 +134,7 @@ const SearchPage: React.FC<{}> = () => {
       {key: 'yinghuacd', title: 'yinghuacd'},
       {key: 'scyinghua', title: 'scyinghua'},
     ],
-    Novel: [],
+    Novel: [{key: 'fz', title: '风筝小说'}],
   };
   const [routes] = useState(_routes[tabName]);
   const layout = useWindowDimensions();

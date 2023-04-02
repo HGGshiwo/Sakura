@@ -72,7 +72,7 @@ const NavBar: React.FC<{}> = () => {
       horizontal
       contentContainerStyle={styles.container}
       data={data}
-      ItemSeparatorComponent={() => <View style={{width: 30}} />}
+      ItemSeparatorComponent={() => <View style={{width: 10}} />}
       renderItem={({item}) => {
         return (
           <NavBarButton
