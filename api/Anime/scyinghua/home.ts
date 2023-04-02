@@ -20,7 +20,7 @@ function loadPage(_afterLoad: (carousels: RecommandInfo[], sections: Section[]) 
         return {
           href: moreDom ? href + moreDom.getElementsByTagName('a')![0].href! : '',
           title: py3Dom.getElementsByClassName('h3-md')![0].innerHTML,
-          data: getDataFromVideoImgDoms(href, py3Dom, apiName)
+          data: getDataFromVideoImgDoms(href, py3Dom)
         }
       })
       let carousels_data = sections.splice(0, 1)

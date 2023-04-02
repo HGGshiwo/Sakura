@@ -327,6 +327,7 @@ const InfoPage: React.FC<{
 
   const onRefresh = () => {
     setRefreshing(true);
+    console.log(tabName, apiName, url)
     const loadPage: loadInfoPage = api[tabName][apiName].info!;
     loadPage(url, data => {
       const {title, img, infoSub, recommands, sources, info, relatives} = data;

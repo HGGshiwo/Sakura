@@ -177,6 +177,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
       <SectionList
+      
         renderSectionHeader={({section}) => (
           <Text style={{fontSize: 16, margin: 10, fontWeight: 'bold'}}>
             {section.title}
@@ -188,6 +189,9 @@ const ComicPlayer: React.FC<PlayerProps> = ({
             style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
             title="加载图片地址中..."
           />
+        }
+        ListHeaderComponent={
+          <View style={{height: 30, width: '100%'}}/>
         }
         ListFooterComponent={
           totalData.length !== 0 ? (

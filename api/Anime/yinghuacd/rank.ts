@@ -1,4 +1,5 @@
-import { RecommandInfo } from "../../../type/RecommandInfo";
+import { apiName } from ".";
+import RecommandInfo from "../../../type/RecommandInfo";
 import { Dom, getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
@@ -21,7 +22,8 @@ function loadPage(_afterLoad: (data: RecommandInfo[]) => void, _afterErr?: (err:
           title: liDom.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
           href: href + liDom.getElementsByTagName('a')![0].href!,
           type: spanDoms[1].getElementsByTagName('a')!.map((aDom: Dom) => aDom.innerHTML),
-          info: spanDoms[1].getElementsByTagName('a')![0].innerHTML
+          info: spanDoms[1].getElementsByTagName('a')![0].innerHTML,
+          apiName,
         }
       })
 

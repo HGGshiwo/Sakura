@@ -20,7 +20,7 @@ function loadPage(_afterLoad: (data: DailyInfo[][]) => void, _afterErr?: (err: s
             id: index,
             apiName,
             href1: href + aDoms[0].href!,
-            href2: aDoms[1].href!,
+            href2: href + aDoms[1].href!,
             title: aDoms[1].innerHTML,
             state: aDoms[0].innerHTML,
           }

@@ -2,6 +2,7 @@ import { ListItemInfo } from "../../../type/ListItemInfo";
 import { Source } from "../../../type/Source";
 import VideoPageInfo from "../../../type/PageInfo/InfoPageInfo";
 import { Dom, getDomFromString } from "../../Dom";
+import { apiName } from ".";
 
 const href = 'http://www.yinghuacd.com';
 
@@ -79,7 +80,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
           return {
             id: index,
             href: href + liDom!.getElementsByTagName('a')![0].href!,
-            apiName: 'yinghuacd',
+            apiName,
             img: liDom!.getElementsByTagName('img')![0].src!,
             title: liDom!.getElementsByTagName('h2')![0].getElementsByTagName('a')![0].innerHTML,
             state: liDom!.getElementsByTagName('font')![0].innerHTML,

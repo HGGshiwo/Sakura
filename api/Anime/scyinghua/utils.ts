@@ -1,6 +1,7 @@
+import { apiName } from "."
 import { Dom } from "../../Dom"
 
-const getDataFromVideoImgDoms = (href: string, father: Dom, apiName: string) => {
+const getDataFromVideoImgDoms = (href: string, father: Dom) => {
     return father.getElementsByClassName('video-img-box mb-e-20')!.map((videoImgDom, index) => {
         let img = videoImgDom.getElementsByTagName('img')![0]["data-src"]!.replace('https','http')
         if(img==='/' || img.includes('None')) {

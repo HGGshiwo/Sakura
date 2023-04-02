@@ -1,7 +1,7 @@
-import CategoryPageInfo from "../../../type/PageInfo/CategoryPageInfo";
-import { RecommandInfo } from "../../../type/RecommandInfo";
+import { apiName } from ".";
+import RecommandInfo  from "../../../type/RecommandInfo";
 import { Section } from "../../../type/Section";
-import { Dom, getDomFromString } from "../../Dom";
+import { getDomFromString } from "../../Dom";
 
 const href = 'http://www.yinghuacd.com';
 
@@ -28,7 +28,8 @@ function loadPage(arg: string, _afterLoad?: (carousels: RecommandInfo[], section
                     href: href + liDom.getElementsByTagName('a')![0].href!,
                     img: liDom.getElementsByTagName('img')![0].src!,
                     title: liDom.getElementsByTagName('p')![0].getElementsByTagName('a')![0].innerHTML,
-                    state
+                    state,
+                    apiName,
                   }
                 })
             }

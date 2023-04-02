@@ -2,6 +2,7 @@ import { Source } from "../../../type/Source";
 import VideoPageInfo from "../../../type/PageInfo/InfoPageInfo";
 import { Dom, getDomFromString } from "../../Dom";
 import { loadPlayerData } from "../..";
+import { apiName } from ".";
 
 const href = 'https://www.scyinghua.com';
 
@@ -17,7 +18,6 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
       if (img === '/' || img.includes('None')) {
         img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'
       }
-      console.log(666)
       let videoInfoDoms = document!.getElementsByClassName('video-info-items')!
       let state = videoInfoDoms[3].getElementsByClassName('video-info-item')![0].innerHTML
       let aliasDom = document.getElementsByClassName('video-subtitle')![0]
@@ -68,7 +68,7 @@ const loadPage = (url: string, callback: (data: VideoPageInfo) => void) => {
             id: index,
             href: href + col6Dom!.getElementsByTagName('a')![0].href!,
             img,
-            apiName: 'scyinghua',
+            apiName,
             title: col6Dom!.getElementsByTagName('h6')![0].getElementsByTagName('a')![0].innerHTML,
             state: col6Dom!.getElementsByClassName('label')![0].innerHTML,
           };

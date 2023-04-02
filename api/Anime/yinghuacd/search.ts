@@ -1,23 +1,8 @@
 import { SearchInfo } from "../../../type/SearchInfo";
 import { Dom, getDomFromString } from "../../Dom";
+import { getResult } from "./utils";
 
 const href = 'http://www.yinghuacd.com/search/';
-
-function getResult(liDoms: Dom[]) {
-  return liDoms.map((liDom, index) => {
-    const aDom: Dom = liDom!.getElementsByTagName('h2')![0].getElementsByTagName('a')![0]
-    const spans = liDom.getElementsByTagName('span')
-    return {
-      href: 'http://www.yinghuacd.com' + aDom.href,
-      img: liDom!.getElementsByTagName('img')![0].src,
-      state: spans![0] ? spans![0].innerHTML : '',
-      title: aDom.innerHTML,
-      id: `${index}`,
-      type: spans![1].getElementsByClassName('a')!.map((aDom) => { return aDom.innerHTML }),
-      info: liDom!.getElementsByTagName('p')![0].innerHTML
-    }
-  })
-}
 
 function loadPage(arg: string, _afterSearch: (result: SearchInfo[]) => void) {
   const _url = href
