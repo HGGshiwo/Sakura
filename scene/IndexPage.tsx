@@ -22,6 +22,7 @@ const IndexPage: React.FC<{}> = () => {
   useEffect(() => {
     loadPage(url, _results => {
       setResults(_results);
+      console.log(_results)
       setLoading(false);
     });
   }, []);
@@ -39,6 +40,7 @@ const IndexPage: React.FC<{}> = () => {
           contentContainerStyle={{paddingHorizontal: 15}}
           keyExtractor={item => item.href}
           data={results}
+          numColumns={3}
           renderItem={({item, index}) => (
             <V3RecommandInfoItem
               index={index}

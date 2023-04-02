@@ -8,7 +8,15 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {FlatList, View, StyleSheet, Pressable, ViewToken} from 'react-native';
+import {
+  FlatList,
+  View,
+  StyleSheet,
+  Pressable,
+  ViewToken,
+  SectionList,
+  SectionListData,
+} from 'react-native';
 import {Image, ImageProps, useWindowDimensions} from 'react-native';
 import {PlayerProps} from '../InfoPage';
 import {BackButton} from '../../component/Button';
@@ -18,7 +26,7 @@ import Scrubber from '../../component/Scrubber';
 import AppContext from '../../context';
 import {NextButton} from '../anime/Player/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import { Text } from 'react-native';
+import {Text} from 'react-native';
 
 const Paragraph = React.memo<{data: string; onPress: () => void}>(
   ({data, onPress}) => {
@@ -51,31 +59,23 @@ const TextPlayer: React.FC<PlayerProps> = ({
   const insents = useSafeAreaInsets();
   const {PlayerStyle} = useContext(AppContext).theme;
   const [progress, setProgress] = useState(defaultProgress); //当前视频播放进度
-  const [duration, setDuration] = useState(0); //当前视频总时长
+  const [sectionIndex, setSectionIndex] = useState(0); //当前的section的位置
   const seekingRef = useRef(false); //是否在加载
-  const listRef = createRef<FlatList<any>>();
-  const [totalData, setTotalData] = useState<string[]>([]); //累计的图片地址
-  const durationsRef = useRef<number[]>([]); //记录下选集的长度
-  const dataIndexRef = useRef(0); //data累计的index
-  const anthologyIndexRef = useRef(-1); //选集的index，data第一次切换+1
+  const listRef = createRef<SectionList<any>>();
+  const [totalData, setTotalData] = useState<SectionListData<string>[]>([]); //累计的图片地址
   const layout = useWindowDimensions();
-  const lastOffset = useRef(0);
-  const scrollUp = useRef(true);
 
   useEffect(() => {
     //切换了下一个选集，则需要更新长度，加入到累计数据，
     if (data) {
-      console.log(999, data);
-      setDuration(data.length);
       if (flashData) {
-        setTotalData(data);
-        durationsRef.current = [data.length]; //记录下长度
-        anthologyIndexRef.current = -1;
-        dataIndexRef.current = -1;
-        console.log(222, durationsRef.current);
+        setTotalData([{title, data, index: 0}]);
+        setSectionIndex(0);
+        setProgress(0);
       } else {
-        setTotalData(totalData.concat(data));
-        durationsRef.current = [...durationsRef.current, data.length];
+        setTotalData(
+          totalData.concat([{title, data, index: totalData.length}]),
+        );
       }
     }
   }, [data]);
@@ -120,8 +120,9 @@ const TextPlayer: React.FC<PlayerProps> = ({
 
   //使用进度条改进
   const onSlide = (data: number) => {
-    listRef.current!.scrollToIndex({
-      index: dataIndexRef.current + Math.round(data),
+    listRef.current!.scrollToLocation({
+      sectionIndex,
+      itemIndex: Math.round(data),
       viewPosition: 0.5,
     });
   };
@@ -139,50 +140,36 @@ const TextPlayer: React.FC<PlayerProps> = ({
   const onViewCallBack = React.useCallback((viewableItems: any) => {
     const viewables = viewableItems.viewableItems as ViewToken[];
     if (viewables.length === 0) return;
-    if (scrollUp.current && viewables[0].index! <= dataIndexRef.current) {
-      //上方图片出现，并且上一次的最后一个选集可见，选集-1
-      if (anthologyIndexRef.current != -1) {
-        setProgress(durationsRef.current[anthologyIndexRef.current]);
-        console.log(666, durationsRef.current, anthologyIndexRef.current);
-        setDuration(durationsRef.current[anthologyIndexRef.current]);
-        dataIndexRef.current -= durationsRef.current[anthologyIndexRef.current];
-        anthologyIndexRef.current -= 1; //先改再-1
-      }
-    } else if (
-      !scrollUp.current &&
-      viewables.at(-1).index! >
-        dataIndexRef.current + durationsRef.current.at(-1)
-    ) {
-      //下方图片出现，并且下一次的第一个选集可见，选集+1
-      anthologyIndexRef.current += 1; //先+1再改
-      console.log(777, durationsRef.current, anthologyIndexRef.current);
-      setProgress(1);
-      setDuration(durationsRef.current[anthologyIndexRef.current]);
-      dataIndexRef.current += durationsRef.current[anthologyIndexRef.current];
-    } else if (viewables.length !== 0) {
-      setProgress(viewables[0].index! - dataIndexRef.current);
+    if (viewables[0].section.index !== sectionIndex) {
+      //切换了section
+      setSectionIndex(viewables[0].section.index);
+      setProgress(viewables[0].index!);
+    } else {
+      setProgress(viewables[0].index!);
     }
   }, []);
 
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
-      <FlatList
-        keyExtractor={(item, index) => `${index}`}
+      <SectionList
+        renderSectionHeader={({section}) => (
+          <Text style={{fontSize: 16, margin: 10, fontWeight: 'bold'}}>{section.title}</Text>
+        )}
         ListEmptyComponent={
           <InfoText
             style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
-            title="加载图片地址中..."
+            title="加载小说地址中..."
           />
         }
         ListFooterComponent={
           totalData.length !== 0 ? (
             <InfoText
               style={{alignSelf: 'center', paddingVertical: layout.height / 2}}
-              title={nextDataAvailable ? '加载图片中...' : '没有更多了...'}
+              title={nextDataAvailable ? '加载小说中...' : '没有更多了...'}
             />
           ) : null
         }
-        data={totalData}
+        sections={totalData}
         ref={listRef}
         viewabilityConfig={{
           waitForInteraction: true,
@@ -190,10 +177,7 @@ const TextPlayer: React.FC<PlayerProps> = ({
         }}
         onViewableItemsChanged={onViewCallBack}
         onEndReached={nextDataAvailable ? toNextSource : null}
-        onScroll={e => {
-          scrollUp.current = e.nativeEvent.contentOffset.y < lastOffset.current;
-          lastOffset.current = e.nativeEvent.contentOffset.y;
-        }}
+        onEndReachedThreshold={0.8}
         renderItem={({item}) => <Paragraph data={item} onPress={handlePress} />}
       />
 
@@ -236,7 +220,11 @@ const TextPlayer: React.FC<PlayerProps> = ({
                 onSlidingComplete={onSlidingComplete}
                 trackColor={PlayerStyle.textColor(true)}
                 scrubbedColor={PlayerStyle.textColor(true)}
-                totalDuration={duration}
+                totalDuration={
+                  totalData[sectionIndex]
+                    ? totalData[sectionIndex].data.length
+                    : 0
+                }
                 displayValues={false}
               />
             </GestureHandlerRootView>

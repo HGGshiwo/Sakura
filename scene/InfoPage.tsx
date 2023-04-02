@@ -165,6 +165,7 @@ const InfoPage: React.FC<{
   const [followed, setFollowed] = useState(false); //是否追番
   const panelRef = useRef<SlidingUpPanel | null>(); // profile panel的ref
   const [flashData, setFlashData] = useState(true); //如果不是通过nextSource切换，则flash
+  const [anthologyTitle, setAnthologyTitle] = useState(' ') //选集的名字
 
   useEffect(() => {
     //查看数据库看是否追番
@@ -364,7 +365,7 @@ const InfoPage: React.FC<{
             progressPer: _history ? _history.progressPer : 0,
             anthologyTitle: _history
               ? _history.anthologyTitle
-              : _anthologys[0].title,
+              : `${title}  ${_anthologys[0].title}`,
           },
           UpdateMode.Modified,
         );
@@ -386,6 +387,7 @@ const InfoPage: React.FC<{
       const _anthologyIndex = history.current!.anthologyIndex;
       setNextDataAvailable(_anthologyIndex < _anthologys.length);
       setAnthologyIndex(_anthologyIndex); //当前播放第一集
+      setAnthologyTitle(history.current!.anthologyTitle)
       setFlashData(true)
       getPlayerData(_anthologys[_anthologyIndex].data, 0);
     });
@@ -414,13 +416,15 @@ const InfoPage: React.FC<{
   //切换选集
   const changeAnthology = (index: number) => {
     //更新数据库, 记录下当前的位置
+    const _anthologyTitle = `${title} ${anthologys[index].title}`
     realm.write(() => {
       history.current!.anthologyIndex = index;
-      history.current!.anthologyTitle = anthologys[index].title;
+      history.current!.anthologyTitle = _anthologyTitle;
     });
     setDefaultProgress(0);
     setNextDataAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
+    setAnthologyTitle(_anthologyTitle)
     setDataAvailable(false);
     dataAvailableRef.current = false;
     getPlayerData(anthologys[index].data, 0);
@@ -532,7 +536,7 @@ const InfoPage: React.FC<{
         dataAvailable,
         nextDataAvailable,
         toNextSource,
-        title,
+        title: anthologyTitle,
         onErr: () => {}, //todo
         onBack,
         onProgress,

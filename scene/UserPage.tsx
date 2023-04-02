@@ -176,8 +176,7 @@ const SubPage: React.FC<{
   );
 
   return (
-    <>
-      {/* <ScrollView style={{flex: 1}}> */}
+    <ScrollView style={{flex: 1}}>
       <View
         style={{
           backgroundColor: 'white',
@@ -274,8 +273,7 @@ const SubPage: React.FC<{
           ListEmptyComponent={() => <EmptyH1HistoryInfoItem />}
         />
       </View>
-    </>
-    // </ScrollView>
+    </ScrollView>
   );
 };
 

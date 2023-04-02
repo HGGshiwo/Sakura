@@ -42,21 +42,21 @@ const NavBar: React.FC<{}> = () => {
     switch (item.data) {
       case 'all':
         navigation.navigate('Index', {
-          url: 'japan/',
+          url: 'japan',
           title: '全部内容',
           tabName,
         });
         break;
       case 'japan':
         navigation.navigate('Index', {
-          url: 'japan/',
+          url: 'japan',
           title: '日本动漫',
           tabName,
         });
         break;
       case 'china':
         navigation.navigate('Index', {
-          url: 'china/',
+          url: 'china',
           title: '国产动漫',
           tabName,
         });

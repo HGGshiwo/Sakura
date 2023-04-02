@@ -52,8 +52,7 @@ const loadPage: loadInfoPage = (url, callback) => {
 const loadTextSrc: loadPlayerData = (url, callback) => {
   fetch(url).then(response => response.text()).then(responseText => {
     const document = getDomFromString(responseText)
-    const datas = document.getElementById('content')!.innerHTML.split('\n')
-    console.log(datas)
+    const datas = document.getElementById('content')!.innerHTML.trim().split('\n').slice(0, -1)
     callback(true, datas)
   })
 }
