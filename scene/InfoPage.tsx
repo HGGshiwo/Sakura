@@ -141,7 +141,7 @@ const InfoPage: React.FC<{
   const [index, setIndex] = useState(0);
   //播放器相关，从infoPage获得player的页面，然后解析出具体的url
   const [playerData, setPlayerData] = useState<any>(); //具体的播放所需的数据, 可能是{url, type}，也可能是string[]
-
+  const width = useRef(layout.width) //不希望profile宽度被修改
   const [dataAvailable, setDataAvailable] = useState(false); //playerd的数据源是否可用
   const dataAvailableRef = useRef(false); //playerd的数据源是否可用
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
@@ -212,7 +212,7 @@ const InfoPage: React.FC<{
               onRefresh={onRefresh}
               ListHeaderComponent={
                 <>
-                  <View style={{padding: 10, width: layout.width}}>
+                  <View style={{padding: 10, width:'100%'}}>
                     <View
                       style={{
                         flexDirection: 'row',
@@ -562,6 +562,7 @@ const InfoPage: React.FC<{
         usePanel={!!autoFullscreen}>
         <TabView
           lazy
+          sceneContainerStyle={{width: width.current}}
           renderTabBar={(props: any) => (
             <TabBar
               scrollEnabled
