@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
 import {
-  TouchableWithoutFeedback,
   View,
   PanResponder,
   useWindowDimensions,
@@ -45,7 +44,6 @@ const Blank: React.FC<Props> = ({
   onLeftMoveY,
   onLeftMoveYComplete,
 }) => {
-  const [longPressOut, setLongPressOut] = useState(false); //是否是longpress out
   const timer = useRef(-1);
   const delay = 200;
   const granted = useRef(true); //是否已经开始相应
@@ -70,8 +68,7 @@ const Blank: React.FC<Props> = ({
       onPanResponderMove: (evt, gestureState) => {
         // 最近一次的移动距离为gestureState.move{X,Y}
         // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
-
-        const {moveX, moveY, x0, y0} = gestureState;
+        const {moveX, moveY, x0, y0} = gestureState; //x0是初始位置, moveX是当前位置
         //按动时间过长，改变状态
         if (state.current === State.press) {
           if (Math.abs(moveX - x0) < 0.1 && Math.abs(moveY - y0) < 0.1) {

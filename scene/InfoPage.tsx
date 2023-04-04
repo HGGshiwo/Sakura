@@ -8,6 +8,7 @@ import {
   Ref,
   RefObject,
   ReactElement,
+  useCallback,
 } from 'react';
 import {
   View,
@@ -165,7 +166,7 @@ const InfoPage: React.FC<{
   const [followed, setFollowed] = useState(false); //是否追番
   const panelRef = useRef<SlidingUpPanel | null>(); // profile panel的ref
   const [flashData, setFlashData] = useState(true); //如果不是通过nextSource切换，则flash
-  const [anthologyTitle, setAnthologyTitle] = useState(' ') //选集的名字，在player中显示
+  const [anthologyTitle, setAnthologyTitle] = useState(' '); //选集的名字，在player中显示
 
   useEffect(() => {
     //查看数据库看是否追番
@@ -178,7 +179,7 @@ const InfoPage: React.FC<{
   };
 
   //点击追番按钮的回调函数
-  const handlePressFollowed = () => {
+  const handlePressFollowed = useCallback(() => {
     setFollowed(!followed);
     realm.write(() => {
       realm.create(
@@ -192,7 +193,7 @@ const InfoPage: React.FC<{
       );
     });
     alert(`${!followed ? '' : '取消'}追番成功`);
-  };
+  }, []);
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
   const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
 
@@ -327,7 +328,7 @@ const InfoPage: React.FC<{
 
   const onRefresh = () => {
     setRefreshing(true);
-    console.log(tabName, apiName, url)
+    console.log(tabName, apiName, url);
     const loadPage: loadInfoPage = api[tabName][apiName].info!;
     loadPage(url, data => {
       const {title, img, infoSub, recommands, sources, info, relatives} = data;
@@ -388,8 +389,8 @@ const InfoPage: React.FC<{
       const _anthologyIndex = history.current!.anthologyIndex;
       setNextDataAvailable(_anthologyIndex < _anthologys.length);
       setAnthologyIndex(_anthologyIndex); //当前播放第一集
-      setAnthologyTitle(`${title} ${history.current!.anthologyTitle}`)
-      setFlashData(true)
+      setAnthologyTitle(`${title} ${history.current!.anthologyTitle}`);
+      setFlashData(true);
       getPlayerData(_anthologys[_anthologyIndex].data, 0);
     });
   };
@@ -424,7 +425,7 @@ const InfoPage: React.FC<{
     setDefaultProgress(0);
     setNextDataAvailable(index + 1 < anthologys.length);
     setAnthologyIndex(index);
-    setAnthologyTitle(`${title} ${anthologys[index].title}`)
+    setAnthologyTitle(`${title} ${anthologys[index].title}`);
     setDataAvailable(false);
     dataAvailableRef.current = false;
     getPlayerData(anthologys[index].data, 0);
@@ -435,7 +436,7 @@ const InfoPage: React.FC<{
     if (!dataAvailableRef.current) {
       return; //不允许在加载页面的时候切换
     }
-    console.log('next')
+    console.log('next');
     setFlashData(false);
     changeAnthology(anthologyIndex + 1);
   };

@@ -19,7 +19,12 @@ import {
   faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
 import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
-import Orientation, { LANDSCAPE, LANDSCAPE_LEFT, OrientationLocker, PORTRAIT } from 'react-native-orientation-locker';
+import Orientation, {
+  LANDSCAPE,
+  LANDSCAPE_LEFT,
+  OrientationLocker,
+  PORTRAIT,
+} from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
 import {LoadingText} from '../../../component/Text';
 import {PlayButton} from './PlayButton';
@@ -35,6 +40,8 @@ import {Bar} from 'react-native-progress';
 import AppContext from '../../../context';
 import React from 'react';
 import {PlayerProps} from '../../InfoPage';
+import LinearGradient from 'react-native-linear-gradient';
+import ControlBar, {ControlBarRow} from '../../../component/ControlBar';
 
 //时间转化函数
 var sec_to_time = (s: number): string => {
@@ -110,7 +117,7 @@ const Player: React.FC<PlayerProps> = ({
   const [bright, setBright] = useState(0); //亮度
   const [volume, setVolume] = useState(0); //声音
 
-  const [orientation, setOrientation] = useState<any>(PORTRAIT)
+  const [orientation, setOrientation] = useState<any>(PORTRAIT);
   useEffect(() => {
     if (dataAvailable) {
       setControlVisible(true);
@@ -241,23 +248,24 @@ const Player: React.FC<PlayerProps> = ({
   };
 
   function handleOrientation(orientation: string) {
-    // orientation === 'LANDSCAPE-LEFT' || orientation === 'LANDSCAPE-RIGHT'
-    //   ? (setFullscreen(true), StatusBar.setHidden(true))
-    //   : (setFullscreen(false), StatusBar.setHidden(false));
+    console.log(orientation);
+    if (orientation === 'LANDSCAPE-LEFT' || orientation === 'LANDSCAPE-RIGHT') {
+      setFullscreen(true);
+      StatusBar.setHidden(true);
+    } else {
+      setFullscreen(false);
+      StatusBar.setHidden(false);
+    }
+    // setOrientation(orientation);
   }
 
   //切换是否全屏
   const handleFullscreen = () => {
     if (fullscreen) {
-      StatusBar.setHidden(false);
-      videoRef.current.presentFullscreenPlayer(); //for ios
-      setOrientation(PORTRAIT)
+      Orientation.lockToPortrait();
     } else {
-      StatusBar.setHidden(true);
-      videoRef.current.dismissFullscreenPlayer(); //for ios
-      setOrientation(LANDSCAPE_LEFT)
+      Orientation.lockToLandscapeLeft();
     }
-    setFullscreen(!fullscreen);
   };
 
   //显示带宽
@@ -316,7 +324,7 @@ const Player: React.FC<PlayerProps> = ({
 
   const onLeftMoveY = (dy: number) => {
     const ratio = fullscreen ? layout.height : layout.width * 0.56;
-    let _bright = baseBrightRef.current - dy / ratio;
+    let _bright = baseBrightRef.current - (dy - 10) / ratio; //增加一个偏移可以优化用户体验
     _bright = Math.round(Math.max(Math.min(1, _bright), 0) * 1000) / 1000;
     setBright(_bright);
     SystemSetting.setAppBrightness(_bright);
@@ -337,7 +345,7 @@ const Player: React.FC<PlayerProps> = ({
 
   const onRightMoveY = (dy: number) => {
     const ratio = fullscreen ? layout.height : layout.width * 0.56;
-    let _volume = baseVolumeRef.current - dy / ratio;
+    let _volume = baseVolumeRef.current - (dy - 10) / ratio;
     _volume = Math.round(Math.max(Math.min(1, _volume), 0) * 1000) / 1000;
     setVolume(_volume);
     SystemSetting.setVolume(_volume);
@@ -359,7 +367,7 @@ const Player: React.FC<PlayerProps> = ({
         <LoadingText title="解析视频地址中..." />
       ) : (
         <>
-          <OrientationLocker orientation={orientation} />
+          {/* <OrientationLocker orientation={orientation} /> */}
           <Video
             ref={videoRef}
             source={{
@@ -400,15 +408,7 @@ const Player: React.FC<PlayerProps> = ({
           <LoadingBox show={!erring && loading} text={bitrateText} />
 
           {/* top bar  */}
-          <View
-            style={[
-              styles.topBar,
-              styles.bar,
-              {
-                display: controlVisible ? 'flex' : 'none',
-                height: fullscreen ? 60 : 40,
-              },
-            ]}>
+          <ControlBar top show={controlVisible} fullscreen={fullscreen}>
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
               <BackButton
                 onPress={() => {
@@ -421,15 +421,13 @@ const Player: React.FC<PlayerProps> = ({
                 style={{paddingLeft: 10}}
               />
             </View>
-          </View>
+          </ControlBar>
 
           {/* bottom bar */}
-          <View
-            style={[
-              styles.bottomBar,
-              styles.bar,
-              {display: controlVisible && !fullscreen ? 'flex' : 'none'},
-            ]}>
+          <ControlBar
+            top={false}
+            show={controlVisible && !fullscreen}
+            fullscreen={fullscreen}>
             <PlayButton onPress={handlePlay} paused={paused} />
             <View style={styles.slider}>
               <Scrubber
@@ -450,18 +448,12 @@ const Player: React.FC<PlayerProps> = ({
             <Pressable onPress={handleFullscreen}>
               <FontAwesomeIcon color="white" size={24} icon={faExpand} />
             </Pressable>
-          </View>
-
-          {/* bottom bar fullscreen*/}
-          <View
-            style={[
-              styles.bottomBar,
-              styles.fullscreenBottomBar,
-              {
-                display: controlVisible && fullscreen ? 'flex' : 'none',
-              },
-            ]}>
-            <View style={styles.bottomBarRow}>
+          </ControlBar>
+          <ControlBar
+            top={false}
+            show={controlVisible && fullscreen}
+            fullscreen={fullscreen}>
+            <ControlBarRow>
               <LoadingText title={fmtProgress} />
               <View style={styles.slider}>
                 <Scrubber
@@ -476,8 +468,8 @@ const Player: React.FC<PlayerProps> = ({
                 />
               </View>
               <LoadingText title={fmtDuration} />
-            </View>
-            <View style={styles.bottomBarRow}>
+            </ControlBarRow>
+            <ControlBarRow>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
                 <PlayButton onPress={handlePlay} paused={paused} />
                 <NextButton
@@ -493,9 +485,8 @@ const Player: React.FC<PlayerProps> = ({
                   <LoadingText style={{marginLeft: 20}} title="选集" />
                 </Pressable>
               </View>
-            </View>
-          </View>
-
+            </ControlBarRow>
+          </ControlBar>
           {/* 倍速播放信息 */}
           <RateMessage show={rateMessageVisible}>
             <FontAwesomeIcon color="white" icon={faForwardFast} />
@@ -511,7 +502,6 @@ const Player: React.FC<PlayerProps> = ({
           </RateMessage>
 
           {/* 亮度 */}
-
           <RateMessage show={brightMessageVisible}>
             <FontAwesomeIcon color="white" icon={faSun} />
             <Bar
@@ -521,7 +511,7 @@ const Player: React.FC<PlayerProps> = ({
               unfilledColor="lightgrey"
               progress={bright}
               width={100}
-              height={5}
+              height={2}
             />
           </RateMessage>
 
@@ -535,7 +525,7 @@ const Player: React.FC<PlayerProps> = ({
               unfilledColor="lightgrey"
               progress={volume}
               width={100}
-              height={5}
+              height={2}
             />
           </RateMessage>
 
@@ -586,7 +576,6 @@ const styles = StyleSheet.create({
     height: 40,
     position: 'absolute',
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center',
     paddingHorizontal: 10,
     justifyContent: 'space-between',
