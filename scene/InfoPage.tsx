@@ -5,10 +5,8 @@ import {
   useEffect,
   createRef,
   useContext,
-  Ref,
   RefObject,
   ReactElement,
-  useCallback,
 } from 'react';
 import {
   View,
@@ -16,7 +14,6 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
-  ViewStyle,
 } from 'react-native';
 import {ListItemInfo} from '../type/ListItemInfo';
 import InfoSub from '../type/InfoSub';
@@ -29,23 +26,15 @@ import {UpdateMode} from 'realm';
 import RecmdInfoDb from '../models/RecmdInfoDb';
 import Container from '../component/Container';
 import api, {loadInfoPage} from '../api';
-import {InfoText, RateText, SubTitle, Title} from '../component/Text';
+import {InfoText, SubTitle} from '../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
-import {LoadingContainer} from '../component/Loading';
 import AppContext from '../context';
-import {FollowButton, TextButton} from '../component/Button';
 import {useNavigation} from '@react-navigation/native';
 import {VideoPageProps} from '../route';
-import Follow from '../models/Follow';
-import alert from '../component/Toast';
-import {Divider} from '@rneui/base';
-import EndLine from '../component/EndLine';
-import {V1RecommandInfoItem} from '../component/ListItem';
-import {ListTitleLine} from '../component/ListTitleLine';
-import ToolBar from '../component/ToolBar';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SlidingUpPanel, {SlidingUpPanelProps} from 'rn-sliding-up-panel';
 import {FlatGrid} from '../component/Grid';
+import Profile from '../component/Profile';
 
 interface PlayerProps {
   ref?: RefObject<any>; // 播放器的ref
@@ -70,13 +59,7 @@ interface PlayerProps {
 }
 
 const {useRealm} = Context;
-
 const Command = () => <View style={{flex: 1}}></View>;
-const targets = {
-  Anime: 'Video',
-  Comic: 'Image',
-  Novel: 'Text',
-};
 const emptyInfoSub = {
   author: '未知',
   alias: '',
@@ -141,7 +124,7 @@ const InfoPage: React.FC<{
   const [index, setIndex] = useState(0);
   //播放器相关，从infoPage获得player的页面，然后解析出具体的url
   const [playerData, setPlayerData] = useState<any>(); //具体的播放所需的数据, 可能是{url, type}，也可能是string[]
-  const width = useRef(layout.width) //不希望profile宽度被修改
+  const width = useRef(layout.width); //不希望profile宽度被修改
   const [dataAvailable, setDataAvailable] = useState(false); //playerd的数据源是否可用
   const dataAvailableRef = useRef(false); //playerd的数据源是否可用
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
@@ -163,37 +146,10 @@ const InfoPage: React.FC<{
   const history = useRef<History | null>(); //历史记录查询结果
 
   const navigation = useNavigation<VideoPageProps['navigation']>();
-  const [followed, setFollowed] = useState(false); //是否追番
   const panelRef = useRef<SlidingUpPanel | null>(); // profile panel的ref
   const [flashData, setFlashData] = useState(true); //如果不是通过nextSource切换，则flash
   const [anthologyTitle, setAnthologyTitle] = useState(' '); //选集的名字，在player中显示
 
-  useEffect(() => {
-    //查看数据库看是否追番
-    const _follow = realm.objectForPrimaryKey(Follow, url);
-    setFollowed(!!_follow && _follow!.following);
-  }, []);
-
-  const onPressRecommand = (item: RecommandInfo) => {
-    navigation.push(targets[tabName] as any, {url: item.href, apiName});
-  };
-
-  //点击追番按钮的回调函数
-  const handlePressFollowed = useCallback(() => {
-    setFollowed(!followed);
-    realm.write(() => {
-      realm.create(
-        Follow,
-        {
-          href: url,
-          following: !followed,
-          tabName,
-        },
-        UpdateMode.Modified,
-      );
-    });
-    alert(`${!followed ? '' : '取消'}追番成功`);
-  }, []);
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
   const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
 
@@ -201,120 +157,51 @@ const InfoPage: React.FC<{
     switch (route.key) {
       case 'profile':
         return (
-          <LoadingContainer
+          <Profile
             loading={loading}
-            style={{paddingTop: 40}}
-            backgroundColor="grey"
-            color="grey"
-            text="加载中...">
-            <FlatList
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              ListHeaderComponent={
-                <>
-                  <View style={{padding: 10, width:'100%'}}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}>
-                      <Title style={{width: '70%'}} title={title} />
-                      <FollowButton
-                        onPress={handlePressFollowed}
-                        followed={followed}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            title={title}
+            infoSub={infoSub}
+            relatives={relatives}
+            recommands={recommands}
+            url={url}
+            tabName={tabName}
+            setDetailSheetVisible={setDetailSheetVisible}
+            setAnthologySheetVisible={setAnthologySheetVisible}
+            renderAnthologys={() => (
+              <FlatList
+                ref={ProfileAnthologyListRef}
+                getItemLayout={(item, index) => ({
+                  length: 170,
+                  offset: 170 * index,
+                  index,
+                })}
+                style={{marginBottom: 20}}
+                horizontal={true}
+                data={anthologys}
+                renderItem={({item, index}) => (
+                  <Pressable
+                    onPress={() => {
+                      setFlashData(true);
+                      changeAnthology(item.id);
+                    }}>
+                    <View style={styles.itemContainer2}>
+                      <SubTitle
+                        title={item.title}
+                        style={{
+                          color: PlayerStyle.textColor(
+                            anthologyIndex === index,
+                          ),
+                        }}
                       />
                     </View>
-                    {/* author和详情栏 */}
-                    <View
-                      style={{
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                      }}>
-                      <InfoText
-                        style={{paddingTop: 2, color: 'gray', flex: 1}}
-                        title={infoSub.author}
-                      />
-                      <TextButton
-                        title={'详情'}
-                        onPress={() => setDetailSheetVisible(true)}
-                      />
-                    </View>
-                    <ToolBar />
-                    <ListTitleLine
-                      title={'选集'}
-                      buttonText={infoSub?.state}
-                      onPress={() => setAnthologySheetVisible(true)}
-                    />
-                    {relatives.length == 0 ? null : (
-                      <FlatList
-                        horizontal={true}
-                        data={relatives}
-                        renderItem={({item}) => (
-                          <Pressable
-                            onPress={() =>
-                              navigation.push(targets[tabName] as any, {
-                                url: item.data,
-                                apiName,
-                              })
-                            }>
-                            <SubTitle
-                              style={{padding: 12}}
-                              title={item.title}
-                            />
-                          </Pressable>
-                        )}
-                        keyExtractor={item => `${item.id}`}
-                      />
-                    )}
-                    <FlatList
-                      ref={ProfileAnthologyListRef}
-                      getItemLayout={(item, index) => ({
-                        length: 170,
-                        offset: 170 * index,
-                        index,
-                      })}
-                      style={{marginBottom: 20}}
-                      horizontal={true}
-                      data={anthologys}
-                      renderItem={({item, index}) => (
-                        <Pressable
-                          onPress={() => {
-                            setFlashData(true);
-                            changeAnthology(item.id);
-                          }}>
-                          <View style={styles.itemContainer2}>
-                            <SubTitle
-                              title={item.title}
-                              style={{
-                                color: PlayerStyle.textColor(
-                                  anthologyIndex === index,
-                                ),
-                              }}
-                            />
-                          </View>
-                        </Pressable>
-                      )}
-                      keyExtractor={item => `${item.id}`}
-                    />
-                  </View>
-                  <Divider />
-                </>
-              }
-              data={recommands}
-              ItemSeparatorComponent={() => <Divider />}
-              renderItem={({item, index}) => (
-                <V1RecommandInfoItem
-                  index={index}
-                  item={item}
-                  onPress={onPressRecommand}>
-                  <RateText title="9.7" />
-                </V1RecommandInfoItem>
-              )}
-              keyExtractor={item => `${item.href}`}
-              ListFooterComponent={() => <EndLine />}
-            />
-          </LoadingContainer>
+                  </Pressable>
+                )}
+                keyExtractor={item => `${item.id}`}
+              />
+            )}
+          />
         );
       case 'command':
         return <Command />;
@@ -342,13 +229,7 @@ const InfoPage: React.FC<{
       realm.write(() => {
         realm.create(
           RecmdInfoDb,
-          {
-            href: url,
-            apiName,
-            img,
-            state: infoSub.state,
-            title,
-          },
+          RecmdInfoDb.generate(url, apiName, img, infoSub.state, title),
           UpdateMode.Modified,
         );
       });
@@ -357,18 +238,7 @@ const InfoPage: React.FC<{
       realm.write(() => {
         history.current = realm.create(
           History,
-          {
-            tabName,
-            href: url,
-            apiName,
-            time: new Date().getTime(),
-            anthologyIndex: _history ? _history.anthologyIndex : 0,
-            progress: _history ? _history.progress : 0,
-            progressPer: _history ? _history.progressPer : 0,
-            anthologyTitle: _history //这个title是在历史记录中显示的
-              ? _history.anthologyTitle
-              : _anthologys[0].title,
-          },
+          History.mergeData(tabName, url, apiName, _history!, _anthologys[0]),
           UpdateMode.Modified,
         );
       });

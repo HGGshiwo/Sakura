@@ -1,5 +1,5 @@
 import RecommandInfo from '../type/RecommandInfo';
-import { Realm } from '@realm/react';
+import {Realm} from '@realm/react';
 
 // 番剧的信息
 export default class RecmdInfoDb extends Realm.Object implements RecommandInfo {
@@ -8,7 +8,22 @@ export default class RecmdInfoDb extends Realm.Object implements RecommandInfo {
   img!: string;
   state!: string;
   title!: string;
-
+  
+  static generate(
+    href: string,
+    apiName: string,
+    img: string,
+    state: string,
+    title: string,
+  ) {
+    return {
+      href,
+      apiName,
+      img,
+      state,
+      title,
+    };
+  }
   // To use a class as a Realm object type, define the object schema on the static property "schema".
   static schema = {
     name: 'RecmdInfoDb',
