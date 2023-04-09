@@ -26,6 +26,7 @@
     "@realm/react": "^0.4.3",
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.7",
+    "css-select": "^5.1.0",
     "domutils": "^3.0.1",
     "htmlparser2": "^8.0.1",
     "iconv-lite": "^0.6.3",

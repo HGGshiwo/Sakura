@@ -1,0 +1,169 @@
+{
+  "name": "樱花A",
+  "routes": [{"key": "http://www.scyinghua.com", "title": "首页"}],
+  "pages": {
+    "info": {
+      "data": {
+        "title": {"selector": ".page-title"},
+        "img": {
+          "selector": ".url_img",
+          "attr": "src",
+          "func": [
+            {"name": "imgsafe"},
+            {"name": "replace", "arg1": "https", "arg2": "http"}
+          ]
+        },
+        "author": {"selector": ".video-info-items a"},
+        "alias": {"selector": ".video-subtitle"},
+        "state": {
+          "selector": ".video-info-items:nth-child(4) .video-info-item"
+        },
+        "time": {
+          "selector": ".video-info-items:nth-child(3) .video-info-item"
+        },
+        "type": {
+          "selector": ".video-info-aux a",
+          "type": "list",
+          "value": {
+            "title": {"selector": "*", "attr": "title"},
+            "id": {"selector": "*", "attr": "title"}
+          }
+        },
+        "produce": {},
+        "info": {"selector": ".video-info-item.video-info-content"},
+        "sources": {
+          "selector": ".scroll-content > a",
+          "func": [{"name": "sort", "arg1": "title"}],
+          "type": "list",
+          "value": {
+            "title": {"selector": "span"},
+            "data": {
+              "selector": "*",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
+            },
+            "id": {
+              "selector": "*",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
+            }
+          }
+        },
+        "recommands": {
+          "selector": ".col-6.col-sm-4.col-lg-12",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
+            },
+            "img": {
+              "selector": "img",
+              "attr": "data-src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": "h6 > a"},
+            "state": {"selector": ".label"}
+          }
+        },
+        "relatives": {"type": "list"}
+      }
+    },
+    "home": {
+      "data": {
+        "sections": {
+          "selector": "section:nth-child(n + 2):not(:nth-child(3))",
+          "type": "list",
+          "value": {
+            "href": {"selector": ".more a", "attr": "href"},
+            "title": {"selector": ".h3-md"},
+            "data": {
+              "selector": ".video-img-box.mb-e-20",
+              "type": "list",
+              "value": {
+                "img": {
+                  "selector": "img",
+                  "attr": "data-src",
+                  "func": [
+                    {"name": "imgsafe"},
+                    {"name": "replace", "arg1": "https", "arg2": "http"}
+                  ]
+                },
+                "id": {"selector": "a", "attr": "href"},
+                "href": {
+                  "selector": "a",
+                  "attr": "href",
+                  "func": [
+                    {"name": "addbase", "arg1": "https://www.scyinghua.com"}
+                  ]
+                },
+                "title": {"selector": "h6 > a"},
+                "state": {"selector": ".label"}
+              }
+            }
+          }
+        },
+        "carousels": {
+          "selector": "section:first-child .video-img-box.mb-e-20",
+          "type": "list",
+          "value": {
+            "img": {
+              "selector": "img",
+              "attr": "data-src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
+            },
+            "title": {"selector": "h6 > a"},
+            "state": {"selector": ".label"}
+          }
+        }
+      }
+    },
+    "player": {
+      "data": {
+        "uri": {
+          "selector": ".img-box.bofang_box script",
+          "func": [
+            {"name": "regexec", "arg1": "(?<=\"url\":\").*(?=\",\"url_next\")"},
+            {"name": "replace", "arg1": "\\", "arg2": ""}
+          ]
+        },
+        "type": {
+          "selector": ".img-box.bofang_box script",
+          "func": [{"name": "regexec", "arg1": "m3u8|mp4"}]
+        }
+      }
+    },
+    "search": {
+      "baseUrl": "https://www.scyinghua.com/search/-------------.html?wd=",
+      "data": {
+        "results": {
+          "selector": ".video-img-box.mb-e-20",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
+            },
+            "img": {
+              "selector": "img",
+              "attr": "data-src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": "h6 > a"},
+            "state": {"selector": ".label"}
+          }
+        }
+      }
+    }
+  }
+}

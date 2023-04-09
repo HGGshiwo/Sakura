@@ -5,8 +5,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable, View, ViewStyle} from 'react-native';
-import {InfoText, SubInfoText} from './Text';
-import {Transform, IconProp} from '@fortawesome/fontawesome-svg-core';
+import {SubInfoText} from './Text';
+import {IconProp} from '@fortawesome/fontawesome-svg-core';
 import {faQq, faWeixin} from '@fortawesome/free-brands-svg-icons';
 
 type TextIconButtonProps = {

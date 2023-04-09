@@ -21,6 +21,7 @@ import appTheme from './theme';
 import storage from './storage';
 import AppContext from './context';
 import { routes } from './route';
+import parseConfig from './api';
 
 const {RealmProvider} = Context;
 
@@ -31,6 +32,7 @@ function App(): JSX.Element {
   const [theme, setTheme] = useState<any>(appTheme.red);
   const [themeName, setThemeName] = useState('');
   const [source, setSource] = useState({Anime: '', Novel: '', Comic: ''});
+  const [api, setApi] = useState<Record<string, Record<string, Record<string, any>>>>(parseConfig())
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -91,6 +93,7 @@ function App(): JSX.Element {
           changeTheme,
           source,
           changeSource,
+          api,
         }}>
         <NavigationContainer>
           <GestureHandlerRootView style={{flex: 1}}>

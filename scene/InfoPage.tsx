@@ -16,16 +16,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import {ListItemInfo} from '../type/ListItemInfo';
-import InfoSub from '../type/InfoSub';
 import {DetailSheet} from '../component/DetailSheet';
 import {AnthologySheet} from '../component/AnthologySheet';
-import RecommandInfo from '../type/RecommandInfo';
 import Context from '../models';
 import History from '../models/History';
-import {UpdateMode} from 'realm';
 import RecmdInfoDb from '../models/RecmdInfoDb';
 import Container from '../component/Container';
-import api, {loadInfoPage} from '../api';
 import {InfoText, SubTitle} from '../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
 import AppContext from '../context';
@@ -35,6 +31,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SlidingUpPanel, {SlidingUpPanelProps} from 'rn-sliding-up-panel';
 import {FlatGrid} from '../component/Grid';
 import Profile from '../component/Profile';
+import DownloadSheet from '../component/DownloadSheet';
+import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
 
 interface PlayerProps {
   ref?: RefObject<any>; // 播放器的ref
@@ -60,14 +58,6 @@ interface PlayerProps {
 
 const {useRealm} = Context;
 const Command = () => <View style={{flex: 1}}></View>;
-const emptyInfoSub = {
-  author: '未知',
-  alias: '',
-  state: '',
-  time: '',
-  type: [],
-  produce: '',
-};
 
 const routes = [
   {key: 'profile', title: '简介'},
@@ -127,18 +117,18 @@ const InfoPage: React.FC<{
   const width = useRef(layout.width); //不希望profile宽度被修改
   const [dataAvailable, setDataAvailable] = useState(false); //playerd的数据源是否可用
   const dataAvailableRef = useRef(false); //playerd的数据源是否可用
+
+  //页面展示的数据
+  const [pageInfo, setPageInfo] = useState<InfoPageInfo>();
+
+  //sheet是否可见
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
   const [anthologySheetVisible, setAnthologySheetVisible] = useState(false);
+  const [downloadSheetVisible, setDownloadSheetVisible] = useState(false);
+
   const [defaultProgress, setDefaultProgress] = useState(0);
   const [nextDataAvailable, setNextDataAvailable] = useState(false);
-  const [title, setTitle] = useState('');
-  const [imgUrl, setImgUrl] = useState('');
-  const [infoSub, setInfoSub] = useState<InfoSub>(emptyInfoSub);
-  const [info, setInfo] = useState('');
 
-  const [relatives, setRelatives] = useState<ListItemInfo[]>([]); //同系列列表
-  const [anthologys, setAnthologys] = useState<ListItemInfo[]>([]); //选集列表
-  const [recommands, setRecommands] = useState<RecommandInfo[]>([]); //同系列列表
   const [anthologyIndex, setAnthologyIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false); //是否刷新
   const [loading, setLoading] = useState(true); //页面是否在加载中
@@ -153,6 +143,9 @@ const InfoPage: React.FC<{
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
   const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
 
+  const {theme: {PlayerStyle}, api} = useContext(AppContext);
+  const {textColor, playerTextColor, indicatorColor} = PlayerStyle;
+
   const renderScene = ({route}: any) => {
     switch (route.key) {
       case 'profile':
@@ -161,14 +154,12 @@ const InfoPage: React.FC<{
             loading={loading}
             refreshing={refreshing}
             onRefresh={onRefresh}
-            title={title}
-            infoSub={infoSub}
-            relatives={relatives}
-            recommands={recommands}
+            pageInfo={pageInfo!}
             url={url}
             tabName={tabName}
             setDetailSheetVisible={setDetailSheetVisible}
             setAnthologySheetVisible={setAnthologySheetVisible}
+            setDownloadSheetVisible={setDownloadSheetVisible}
             renderAnthologys={() => (
               <FlatList
                 ref={ProfileAnthologyListRef}
@@ -179,7 +170,7 @@ const InfoPage: React.FC<{
                 })}
                 style={{marginBottom: 20}}
                 horizontal={true}
-                data={anthologys}
+                data={pageInfo?.sources}
                 renderItem={({item, index}) => (
                   <Pressable
                     onPress={() => {
@@ -189,11 +180,7 @@ const InfoPage: React.FC<{
                     <View style={styles.itemContainer2}>
                       <SubTitle
                         title={item.title}
-                        style={{
-                          color: PlayerStyle.textColor(
-                            anthologyIndex === index,
-                          ),
-                        }}
+                        style={{color: textColor(anthologyIndex === index)}}
                       />
                     </View>
                   </Pressable>
@@ -209,60 +196,46 @@ const InfoPage: React.FC<{
         return null;
     }
   };
-  const {PlayerStyle} = useContext(AppContext).theme;
+
   //数据相关
   const realm = useRealm();
 
   const onRefresh = () => {
     setRefreshing(true);
     console.log(tabName, apiName, url);
-    const loadPage: loadInfoPage = api[tabName][apiName].info!;
-    loadPage(url, data => {
-      const {title, img, infoSub, recommands, sources, info, relatives} = data;
-      const _anthologys = sources.map((_source, index) => {
-        return {id: index, data: _source.data, title: _source.key};
-      });
-
-      let _history = realm.objectForPrimaryKey(History, url);
-
-      //更新番剧数据库
-      realm.write(() => {
-        realm.create(
-          RecmdInfoDb,
-          RecmdInfoDb.generate(url, apiName, img, infoSub.state, title),
-          UpdateMode.Modified,
+    const loadPage = api[tabName][apiName].pages.info!;
+    loadPage(
+      url,
+      (pageInfo: InfoPageInfo) => {
+        const {img, state, title, sources} = pageInfo;
+        let _history = realm.objectForPrimaryKey(History, url);
+        //更新番剧数据库
+        RecmdInfoDb.update(realm, url, apiName, img, state, title);
+        //更新历史记录数据库
+        history.current = History.update(
+          realm,
+          tabName,
+          url,
+          apiName,
+          _history!,
+          sources[0],
         );
-      });
+        setPageInfo(pageInfo);
+        setDefaultProgress(history.current!.progress);
 
-      //更新历史记录数据库
-      realm.write(() => {
-        history.current = realm.create(
-          History,
-          History.mergeData(tabName, url, apiName, _history!, _anthologys[0]),
-          UpdateMode.Modified,
+        setLoading(false); //页面内容获取成功，页面不再加载
+        setRefreshing(false);
+        const _anthologyIndex = history.current!.anthologyIndex;
+        setNextDataAvailable(_anthologyIndex < pageInfo.sources.length);
+        setAnthologyIndex(_anthologyIndex); //当前播放第一集
+        setAnthologyTitle(
+          `${pageInfo.title} ${history.current!.anthologyTitle}`,
         );
-      });
-
-      setTitle(title);
-      setImgUrl(img);
-      setInfoSub(infoSub);
-      setRecommands(recommands);
-      setRelatives(relatives);
-
-      setAnthologys(_anthologys);
-      setInfo(info);
-      setRelatives(relatives);
-      setDefaultProgress(history.current!.progress);
-
-      setLoading(false); //页面内容获取成功，页面不再加载
-      setRefreshing(false);
-      const _anthologyIndex = history.current!.anthologyIndex;
-      setNextDataAvailable(_anthologyIndex < _anthologys.length);
-      setAnthologyIndex(_anthologyIndex); //当前播放第一集
-      setAnthologyTitle(`${title} ${history.current!.anthologyTitle}`);
-      setFlashData(true);
-      getPlayerData(_anthologys[_anthologyIndex].data, 0);
-    });
+        setFlashData(true);
+        getPlayerData(pageInfo.sources[_anthologyIndex].data);
+      },
+      (err: string) => console.log(err),
+    );
   };
 
   useEffect(onRefresh, []);
@@ -287,18 +260,19 @@ const InfoPage: React.FC<{
 
   //切换选集
   const changeAnthology = (index: number) => {
+    const {sources, title} = pageInfo!;
     //更新数据库, 记录下当前的位置
     realm.write(() => {
       history.current!.anthologyIndex = index;
-      history.current!.anthologyTitle = anthologys[index].title;
+      history.current!.anthologyTitle = sources[index].title;
     });
     setDefaultProgress(0);
-    setNextDataAvailable(index + 1 < anthologys.length);
+    setNextDataAvailable(index + 1 < sources.length);
     setAnthologyIndex(index);
-    setAnthologyTitle(`${title} ${anthologys[index].title}`);
+    setAnthologyTitle(`${title} ${sources[index].title}`);
     setDataAvailable(false);
     dataAvailableRef.current = false;
-    getPlayerData(anthologys[index].data, 0);
+    getPlayerData(sources[index].data);
   };
 
   //在全屏下切换下一个source
@@ -306,25 +280,30 @@ const InfoPage: React.FC<{
     if (!dataAvailableRef.current) {
       return; //不允许在加载页面的时候切换
     }
-    console.log('next');
     setFlashData(false);
     changeAnthology(anthologyIndex + 1);
   };
 
   //获取player的数据源
-  const getPlayerData = (playerPageUrls: string[], curIndex: number) => {
-    const loadPlayerSrc = api[tabName][apiName].player!;
-    if (curIndex < playerPageUrls.length) {
-      const vUrl = playerPageUrls[curIndex];
-      loadPlayerSrc(vUrl, (state: boolean, data: any) => {
-        if (state) {
+  const getPlayerData = (playerPageUrl: string, _times?: number) => {
+    let times = _times === undefined ? 3 : _times; //默认尝试3次
+    const loadPlayerSrc = api[tabName][apiName].pages.player!;
+    if (times > 0) {
+      loadPlayerSrc(
+        playerPageUrl,
+        (data: any) => {
           setPlayerData(data);
           setDataAvailable(true);
           dataAvailableRef.current = true;
-        } else {
-          getPlayerData(playerPageUrls, curIndex + 1);
-        }
-      });
+        },
+        (err: string) => {
+          console.log(err, "下一次尝试开始")
+          getPlayerData(playerPageUrl, times - 1)
+        },
+      );
+    }
+    else {
+      console.log('无法获取到播放地址...')
     }
   };
 
@@ -340,18 +319,7 @@ const InfoPage: React.FC<{
     show: boolean,
     setVisible: (visible: boolean) => void,
   ) => (
-    <View
-      style={{
-        display: show ? 'flex' : 'none',
-        position: 'absolute',
-        height: '100%',
-        backgroundColor: 'rgba(0,0,0,1)',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        right: 0,
-        bottom: 0,
-      }}>
+    <View style={[{display: show ? 'flex' : 'none'}, styles.listContainer]}>
       <FlatList
         ref={playerAnthologyListRef}
         getItemLayout={(item, index) => ({
@@ -359,7 +327,7 @@ const InfoPage: React.FC<{
           offset: 45 * index,
           index,
         })}
-        data={anthologys}
+        data={pageInfo?.sources}
         renderItem={({item, index}) => (
           <Pressable
             style={{flex: 1}}
@@ -369,25 +337,15 @@ const InfoPage: React.FC<{
               setVisible(false);
             }}>
             <View
-              style={{
-                borderWidth: 2,
-                height: 40,
-                padding: 10,
-                margin: 5,
-                width: 160,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                borderRadius: 5,
-                borderColor: PlayerStyle.playerTextColor(
-                  index === anthologyIndex,
-                ),
-              }}>
+              style={[
+                styles.card,
+                {borderColor: playerTextColor(index === anthologyIndex)},
+              ]}>
               <InfoText
                 title={item.title}
                 style={{
                   fontWeight: index === anthologyIndex ? 'bold' : 'normal',
-                  color: PlayerStyle.playerTextColor(index === anthologyIndex),
+                  color: playerTextColor(index === anthologyIndex),
                 }}
               />
             </View>
@@ -438,14 +396,14 @@ const InfoPage: React.FC<{
               scrollEnabled
               {...props}
               indicatorStyle={{
-                backgroundColor: PlayerStyle.indicatorColor,
+                backgroundColor: indicatorColor,
                 width: 0.5,
               }}
               renderLabel={({route, focused}) => (
                 <InfoText
                   title={route.title!}
                   style={{
-                    color: PlayerStyle.textColor(focused),
+                    color: textColor(focused),
                     paddingHorizontal: 5,
                     fontWeight: focused ? 'bold' : 'normal',
                   }}
@@ -465,10 +423,7 @@ const InfoPage: React.FC<{
       <DetailSheet
         top={playerHeight}
         height={layout.height + insets.top - playerHeight}
-        title={title}
-        src={imgUrl}
-        infoSub={infoSub}
-        info={info}
+        pageInfo={pageInfo!}
         visible={detailLineVisible}
         onPress={() => setDetailSheetVisible(false)}
       />
@@ -476,15 +431,13 @@ const InfoPage: React.FC<{
       <AnthologySheet
         top={playerHeight}
         height={layout.height + insets.top - playerHeight}
-        state={infoSub.state}
+        state={pageInfo?.state}
         visible={anthologySheetVisible}
-        onClose={() => {
-          setAnthologySheetVisible(false);
-        }}>
+        onClose={() => setAnthologySheetVisible(false)}>
         <FlatGrid
           contentContainerStyle={{paddingBottom: 50}}
           numColumns={2}
-          data={anthologys}
+          data={pageInfo?.sources}
           renderItem={({index, item}) => (
             <Pressable
               style={{flex: 1}}
@@ -496,20 +449,52 @@ const InfoPage: React.FC<{
               <View style={styles.itemContainer}>
                 <SubTitle
                   title={item.title}
-                  style={{
-                    color: PlayerStyle.textColor(index === anthologyIndex),
-                  }}
+                  style={{color: textColor(index === anthologyIndex)}}
                 />
               </View>
             </Pressable>
           )}
         />
       </AnthologySheet>
+
+      <DownloadSheet
+        title={pageInfo?.title}
+        tabName={tabName}
+        apiName={apiName}
+        top={playerHeight}
+        height={layout.height + insets.top - playerHeight}
+        state={pageInfo?.state}
+        visible={downloadSheetVisible}
+        url={url}
+        onClose={() => setDownloadSheetVisible(false)}
+        data={pageInfo?.sources}
+      />
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
+  card: {
+    borderWidth: 2,
+    height: 40,
+    padding: 10,
+    margin: 5,
+    width: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 5,
+  },
+  listContainer: {
+    position: 'absolute',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,1)',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    right: 0,
+    bottom: 0,
+  },
   itemContainer: {
     backgroundColor: '#f1f2f3',
     flex: 1,

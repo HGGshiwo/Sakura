@@ -18,11 +18,8 @@ import {
   faSun,
   faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
-import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import Orientation, {
-  LANDSCAPE,
-  LANDSCAPE_LEFT,
-  OrientationLocker,
   PORTRAIT,
 } from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
@@ -40,7 +37,6 @@ import {Bar} from 'react-native-progress';
 import AppContext from '../../../context';
 import React from 'react';
 import {PlayerProps} from '../../InfoPage';
-import LinearGradient from 'react-native-linear-gradient';
 import ControlBar, {ControlBarRow} from '../../../component/ControlBar';
 
 //时间转化函数
@@ -143,7 +139,6 @@ const Player: React.FC<PlayerProps> = ({
     const interval = setInterval(() => {
       //每15s更新数据库
       if (durationRef.current && !pausedRef.current) {
-        console.log(progressRef.current, durationRef.current);
         onProgress(
           progressRef.current,
           progressRef.current / durationRef.current,
@@ -370,10 +365,7 @@ const Player: React.FC<PlayerProps> = ({
           {/* <OrientationLocker orientation={orientation} /> */}
           <Video
             ref={videoRef}
-            source={{
-              uri: data.src,
-              type: data.type,
-            }}
+            source={data}
             onLoad={onLoad} // Callback when remote video is buffering
             onError={videoError} // Callback when video cannot be loaded
             onSeek={onSeek}

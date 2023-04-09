@@ -36,16 +36,12 @@ import AppContext from '../context';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
   faBusinessTime,
-  faCarrot,
   faClockRotateLeft,
-  faHeart,
-  faLemon,
   faRankingStar,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {NavBarButton} from '../component/Button';
 import alert from '../component/Toast';
-import {FlatGrid} from '../component/Grid';
 
 type Data = {
   title: string;
@@ -144,6 +140,7 @@ const SubPage: React.FC<{
           url: 'japan/',
           title: '全部内容',
           tabName,
+          apiName,
         });
         break;
       case 'japan':
@@ -324,7 +321,7 @@ const SettingPage = () => {
                 onValueChange={newValue => {
                   if (newValue) {
                     changeSource('Anime', item);
-                    alert('切换数据源成功');
+                    // alert('切换数据源成功');
                   }
                 }}
               />

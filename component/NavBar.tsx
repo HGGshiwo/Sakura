@@ -37,7 +37,7 @@ const NavBar: React.FC<{}> = () => {
     {title: '我的追番', icon: faHeart, data: 'Follow'},
   ];
   const tabName = 'Anime';
-
+  const apiName = 'yinghuacd';
   const onPress = (item: Data) => {
     switch (item.data) {
       case 'all':
@@ -45,6 +45,7 @@ const NavBar: React.FC<{}> = () => {
           url: 'japan',
           title: '全部内容',
           tabName,
+          apiName,
         });
         break;
       case 'japan':
@@ -52,6 +53,7 @@ const NavBar: React.FC<{}> = () => {
           url: 'japan',
           title: '日本动漫',
           tabName,
+          apiName,
         });
         break;
       case 'china':
@@ -59,6 +61,7 @@ const NavBar: React.FC<{}> = () => {
           url: 'china',
           title: '国产动漫',
           tabName,
+          apiName,
         });
         break;
       default:

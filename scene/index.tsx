@@ -7,7 +7,7 @@ import IndexPage from './IndexPage';
 import UserPage from './UserPage';
 import HistoryPage from './HistoryPage';
 import FollowPage from './FollowPage';
-import SchedulePage from './SchedulePage';
+import SchedulePage from './DailyPage';
 import RankingPage from './RankingPage';
 import TabPage from './TabPage';
 import TextPage from './novel/TextPage';

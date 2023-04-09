@@ -17,7 +17,7 @@ import {StyleProp, TextStyle, Text, View} from 'react-native';
 import {ViewStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 interface Props {
-  title: string;
+  title: string | undefined;
   active?: boolean;
   style?: TextStyle;
   numberOfLines?: any;
@@ -96,7 +96,7 @@ const SubInfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
 };
 
 const NumberText: React.FC<Props> = ({title, style, containerStyle}) => {
-  const nums = title.split('');
+  const nums = title?.split('');
   const map = {
     '0': fa0,
     '1': fa1,
@@ -112,7 +112,7 @@ const NumberText: React.FC<Props> = ({title, style, containerStyle}) => {
   return (
     <View
       style={[{flexDirection: 'row', alignItems: 'flex-end'}, containerStyle]}>
-      {nums.map((num, index) => {
+      {nums?.map((num, index) => {
         return num === '.' ? (
           <FontAwesomeIcon
             key={index}

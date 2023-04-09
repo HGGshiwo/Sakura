@@ -1,0 +1,359 @@
+{
+  "name": "樱花B",
+  "routes": [
+    {"key": "http://www.yinghuacd.com", "title": "首页"},
+    {"key": "http://www.yinghuacd.com/ribendongman/", "title": "日本动漫"},
+    {"key": "http://www.yinghuacd.com/guochandongman/", "title": "国产动漫"},
+    {"key": "http://www.yinghuacd.com/meiguodongman/", "title": "美国动漫"},
+    {"key": "http://www.yinghuacd.com/movie/", "title": "动漫电影"},
+    {"key": "http://www.yinghuacd.com/qinzi/", "title": "亲子动漫"}
+  ],
+  "pages": {
+    "info": {
+      "data": {
+        "title": {"selector": "h1"},
+        "img": {
+          "selector": ".thumb.l img",
+          "attr": "src",
+          "func": [{"name": "imgsafe"}]
+        },
+        "author": {
+          "selector": ".sinfo span:nth-child(5)",
+          "func": [{"name": "replace", "arg1": "\\s", "arg2": ""}]
+        },
+        "alias": {"selector": ".sinfo p:first-child"},
+        "state": {"selector": ".sinfo p:last-child"},
+        "time": {"selector": ".sinfo span a"},
+        "type": {
+          "selector": ".sinfo span:nth-child(3) a",
+          "type": "list",
+          "value": {
+            "title": {"selector": "*"},
+            "id": {"selector": "*"}
+          }
+        },
+        "produce": {"selector": ".sinfo span:nth-child(2) a"},
+        "info": {"selector": ".info"},
+        "sources": {
+          "selector": ".movurl li",
+          "type": "list",
+          "func": [{"name": "sort", "arg1": "title"}],
+          "value": {
+            "title": {"selector": "a"},  
+            "data": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
+            },
+            "id": {"selector": "a"}
+          }
+        },
+        "recommands": {
+          "selector": ".pics li",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
+            },
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": "h2 > a"},
+            "state": {"selector": "font"}
+          }
+        },
+        "relatives": {
+          "type": "list",
+          "selector": ".img thame",
+          "value": {
+            "title": {"selector": "a"},
+            "id": {"selector": "a", "attr": "href"},
+            "data": {"selector": "a", "attr": "href"}
+          }
+        }
+      }
+    },
+    "home": {
+      "data": {
+        "sections": {
+          "selector": [".firs.l .dtit", ".firs.l .img"],
+          "type": "list",
+          "value": [
+            {
+              "href": {
+                "selector": "span a",
+                "attr": "href",
+                "func": [
+                  {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                ]
+              },
+              "title": {"selector": "h2 a"}
+            },
+            {
+              "data": {
+                "selector": "li",
+                "type": "list",
+                "value": {
+                  "img": {
+                    "selector": "img",
+                    "attr": "src",
+                    "func": [{"name": "imgsafe"}]
+                  },
+                  "id": {"selector": "a", "attr": "href"},
+                  "href": {
+                    "selector": "a",
+                    "attr": "href",
+                    "func": [
+                      {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                    ]
+                  },
+                  "title": {"selector": "p > a"},
+                  "state": {"selector": "p:nth-child(3) a"}
+                }
+              }
+            }
+          ]
+        },
+        "carousels": {
+          "selector": ".heros li",
+          "type": "list",
+          "value": {
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
+            },
+            "title": {"selector": "p"},
+            "state": {"selector": "em"}
+          }
+        }
+      }
+    },
+    "other": {
+      "data": {
+        "sections": {
+          "selector": [".dtit", ".imgs"],
+          "type": "list",
+          "value": [
+            {
+              "title": {"selector": "h2"}
+            },
+            {
+              "data": {
+                "selector": "li",
+                "type": "list",
+                "value": {
+                  "img": {
+                    "selector": "img",
+                    "attr": "src",
+                    "func": [{"name": "imgsafe"}]
+                  },
+                  "id": {"selector": "a", "attr": "href"},
+                  "href": {
+                    "selector": "a",
+                    "attr": "href",
+                    "func": [
+                      {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                    ]
+                  },
+                  "title": {"selector": "p > a"},
+                  "state": {"selector": "p:nth-child(2) a"}
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "player": {
+      "data": {
+        "uri": {
+          "selector": "#playbox",
+          "attr": "data-vid",
+          "func": [{"name": "regexec", "arg1": "[^$]*(?=\\$)"}]
+        },
+        "type": {
+          "selector": "#playbox",
+          "attr": "data-vid",
+          "func": [{"name": "regexec", "arg1": "(?<=\\.)m3u8|(?<=\\.)mp4"}]
+        }
+      }
+    },
+    "search": {
+      "baseUrl": "http://www.yinghuacd.com/search/",
+      "data": {
+        "results": {
+          "selector": ".lpic li",
+          "type": "list",
+          "value": {
+            "id": {
+              "selector": "h2 a",
+              "attr": "href"
+            },
+            "href": {
+              "selector": "h2 a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
+            },
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": "h2 a"},
+            "state": {"selector": "span"}
+          }
+        }
+      }
+    },
+    "index": {
+      "data": {
+        "results": {
+          "selector": ".lpic li",
+          "type": "list",
+          "value": {
+            "id": {
+              "selector": "h2 a",
+              "attr": "href"
+            },
+            "href": {
+              "selector": "h2 a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
+            },
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": "h2 a"},
+            "state": {"selector": "span"}
+          }
+        }
+      }
+    },
+    "category": {
+      "data": {
+        "carousels": {"type": "list"},
+        "sections": {
+          "selector": [".firs.l .dtit", ".firs.l .img"],
+          "type": "list",
+          "value": [
+            {
+              "href": {
+                "selector": "span a",
+                "func": [
+                  {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                ]
+              },
+              "title": {"selector": "h2 a"}
+            },
+            {
+              "data": {
+                "selector": "li",
+                "type": "list",
+                "value": {
+                  "img": {
+                    "selector": "img",
+                    "attr": "src",
+                    "func": [{"name": "imgsafe"}]
+                  },
+                  "id": {"selector": "a", "attr": "href"},
+                  "href": {
+                    "selector": "a",
+                    "attr": "href",
+                    "func": [
+                      {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                    ]
+                  },
+                  "title": {"selector": "p > a"},
+                  "state": {"selector": "p:nth-child(2) a"}
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "daily": {
+      "data": {
+        "dailys": {
+          "selector": ".tlist ul",
+          "type": "list",
+          "value": {
+            "data": {
+              "selector": "li",
+              "type": "list",
+              "value": {
+                "id": {
+                  "selector": "a",
+                  "attr": "href",
+                  "func": [
+                    {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                  ]
+                },
+                "href1": {
+                  "selector": "a",
+                  "attr": "href",
+                  "func": [
+                    {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                  ]
+                },
+                "href2": {
+                  "selector": "a:nth-child(1)",
+                  "attr": "href",
+                  "func": [
+                    {"name": "addbase", "arg1": "http://www.yinghuacd.com"}
+                  ]
+                },
+                "title": {"selector": "a:nth-child(1)"},
+                "state": {"selector": "a"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "rank": {
+      "data": {
+        "rankings": {
+          "selector": ".pics li",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a"},
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "state": {"selector": "span font"},
+            "title": {"selector": "h2 a"},
+            "href": {
+              "selector": "a",
+              "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
+            },
+            "type": {
+              "selector": "span:nth-child(2) a",
+              "type": "list",
+              "value": {
+                "title": {"selector": "*"}
+              }
+            },
+            "info": {"selector": "p"}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { apiName } from ".";
-import { AnimePageInfo } from "../../../type/PageInfo/AnimePageInfo";
+import HomePageInfo from "../../../type/PageInfo/HomePageInfo";
 import RecommandInfo from "../../../type/RecommandInfo";
 import { Section } from "../../../type/Section";
 import { Dom, getDomFromString } from "../../Dom";

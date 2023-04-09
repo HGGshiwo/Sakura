@@ -1,18 +1,15 @@
-import InfoSub from '../type/InfoSub';
 import {Text, Image} from '@rneui/themed';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {InfoText, RateText, SubTitleBold, Title} from './Text';
 import {Tag} from './Tag';
 import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
+import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
 
 type detailSheetProps = {
   height: number;
   top: number;
-  title: string;
-  src: string;
-  infoSub: InfoSub;
-  info: string;
+  pageInfo: InfoPageInfo | undefined;
   visible: boolean;
   onPress: () => void;
 };
@@ -20,10 +17,7 @@ type detailSheetProps = {
 const DetailSheet = ({
   height,
   top,
-  title,
-  src,
-  infoSub,
-  info,
+  pageInfo,
   visible,
   onPress,
 }: detailSheetProps) => {
@@ -42,13 +36,13 @@ const DetailSheet = ({
               uri: 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png',
             }}
             containerStyle={styles.imageContainer}
-            source={{uri: src}}
+            source={{uri: pageInfo?.img}}
           />
           <View style={styles.titleContainer}>
-            <Title title={title} />
+            <Title title={pageInfo?.title} />
             <View>
-              <InfoText title={infoSub.produce} />
-              <InfoText title={infoSub.state} />
+              <InfoText title={pageInfo?.produce} />
+              <InfoText title={pageInfo?.state} />
             </View>
           </View>
           <View style={styles.rateContainer}>
@@ -57,27 +51,31 @@ const DetailSheet = ({
         </View>
         <View style={styles.nameRow}>
           <Text style={styles.nameRowText}>别名</Text>
-          <Text style={{flex: 1}}>{infoSub.alias}</Text>
+          <Text style={{flex: 1}}>{pageInfo?.alias}</Text>
         </View>
         <View style={styles.typeRow}>
           <Text style={styles.nameRowText}>风格</Text>
           <FlatList
             horizontal
-            data={infoSub.type}
-            renderItem={({item, index}) => (
-              <Tag text={item} key={index} style={styles.buttonContainer} />
+            data={pageInfo?.type}
+            renderItem={({item}) => (
+              <Tag
+                text={item.title}
+                key={item.id}
+                style={styles.buttonContainer}
+              />
             )}
           />
         </View>
         <View style={styles.produceRow}>
           <Title title="制作信息" style={styles.produceTitle} />
-          <InfoText numberOfLines={-1} title={infoSub.author} />
+          <InfoText numberOfLines={-1} title={pageInfo?.author} />
         </View>
         <View style={styles.infoRow}>
           <Title title="简介" style={styles.produceTitle} />
           <InfoText
             numberOfLines={-1}
-            title={info}
+            title={pageInfo?.info}
             style={{paddingHorizontal: 10}}
           />
         </View>

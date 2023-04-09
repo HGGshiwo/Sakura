@@ -1,58 +1,44 @@
 import {View, useWindowDimensions} from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {SearchBar} from '../../component/SearchBar';
-import {TabBar, TabView} from 'react-native-tab-view';
+import {Route, TabBar, TabView} from 'react-native-tab-view';
 import Home from './Home';
-import Other from './Other';
 import Container from '../../component/Container';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {MainPageProps} from '../../route';
 import {InfoText} from '../../component/Text';
 import AppContext from '../../context';
-const config = {
-  Anime: {
-    routes: [
-      {key: 'home', title: '首页'},
-      {key: 'rbdm', title: '日本动漫'},
-      {key: 'gcdm', title: '国产动漫'},
-      {key: 'mgdm', title: '美国动漫'},
-      {key: 'qzdm', title: '亲子动漫'},
-    ],
-    url: {
-      rbdm: {url: 'ribendongman/', title: '日本动漫'},
-      gcdm: {url: 'guochandongman/', title: '国产动漫'},
-      mgdm: {url: 'meiguodongman/', title: '美国动漫'},
-      dmdy: {url: 'movie/', title: '动漫电影'},
-      qzdm: {url: 'qinzi/', title: '亲子动漫'},
-    },
-  },
-  Comic: {
-    routes: [{key: 'home', title: '首页'}],
-    url: {},
-  },
-  Novel: {
-    routes: [{key: 'home', title: '首页'}],
-    url: {},
-  },
-};
+
 const MainPage: React.FC<MainPageProps> = () => {
   const navigation = useNavigation<MainPageProps['navigation']>();
   const route = useRoute<MainPageProps['route']>();
   const {tabName} = route.params;
-  const url = config[tabName].url;
   const layout = useWindowDimensions();
-  const [routes] = useState(config[tabName].routes);
+  const {source, api} = useContext(AppContext);
+  const apiName = source[tabName];
+  const [routes, setRoutes] = useState<Route[]>(api[tabName][apiName].routes);
   const [index, setIndex] = useState(0);
   const {HeaderStyle} = useContext(AppContext).theme;
-  
-  const renderScene = ({route}: any) =>
-    route.key === 'home' ? (
-      <Home tabName={tabName} />
-    ) : (
-      <Other {...(url as any)[route.key]} tabName={tabName} />
-    );
-  
-    return (
+
+  useEffect(()=>{
+    setRoutes(api[tabName][apiName].routes);
+  }, [])
+
+  useEffect(() => {
+    console.log(tabName, apiName)
+    setRoutes(api[tabName][apiName].routes);
+  }, [apiName]);
+
+  const renderScene = ({route}: any) => (
+    <Home
+      home={route.title === '首页'}
+      apiName={apiName}
+      url={route.key}
+      tabName={tabName}
+    />
+  );
+
+  return (
     <Container>
       <View
         style={{

@@ -2,7 +2,6 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
 import React, {useContext, useEffect, useState} from 'react';
 import {View, FlatList, useWindowDimensions, Pressable} from 'react-native';
-import loadPage from '../api/Anime/yinghuacd/daily';
 import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
@@ -11,6 +10,7 @@ import {SchedulePageProps, targets} from '../route';
 import DailyInfo from '../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
 import AppContext from '../context';
+import DailyPageInfo from '../type/PageInfo/DailyPageInfo';
 
 const routes = [
   {key: '0', title: '星期一'},
@@ -22,15 +22,29 @@ const routes = [
   {key: '6', title: '星期天'},
 ];
 
-const SchedulePage: React.FC<{}> = () => {
+const DailyPage: React.FC<{}> = () => {
   const route = useRoute<SchedulePageProps['route']>();
-  const {tabName} = route.params;
+  const {tabName, apiName} = route.params;
   const [dailys, setDailys] = useState<DailyInfo[][]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<SchedulePageProps['navigation']>();
   const [index, setIndex] = useState(0);
   const layout = useWindowDimensions();
+  const {
+    theme: {TabBarStyle},
+    api,
+  } = useContext(AppContext);
 
+  useEffect(() => {
+    console.log(tabName, apiName)
+    const loadPage = api[tabName][apiName].pages.daily;
+    loadPage(({dailys}: DailyPageInfo) => {
+      console.log(dailys)
+      setDailys(dailys);
+      setLoading(false);
+    });
+  }, []);
+  
   const renderScene = ({route}: any) => (
     <FlatList
       ItemSeparatorComponent={() => <Divider />}
@@ -63,14 +77,7 @@ const SchedulePage: React.FC<{}> = () => {
       )}
     />
   );
-  useEffect(() => {
-    loadPage(dailys => {
-      setDailys(dailys);
-      setLoading(false);
-    });
-  }, []);
 
-  const {TabBarStyle} = useContext(AppContext).theme;
 
   return (
     <Container>
@@ -115,4 +122,4 @@ const SchedulePage: React.FC<{}> = () => {
   );
 };
 
-export default SchedulePage;
+export default DailyPage;

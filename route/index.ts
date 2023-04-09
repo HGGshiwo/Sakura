@@ -32,13 +32,13 @@ type RootStackParamList = {
   Image: { url: string, apiName: string }; //Comic信息页面
   Text: { url: string, apiName: string }; //Novel信息页面
   Search: { tabName: TabName };
-  Category: { tabName: TabName, url: string; title: string };
-  Index: { tabName: TabName, url: string, title: string };
+  Category: { tabName: TabName, apiName: string, url: string; title: string };
+  Index: { tabName: TabName, apiName: string, url: string, title: string };
+  Ranking: { tabName: TabName, apiName: string };
+  Schedule: { tabName: TabName, apiName: string };
   User: undefined;
   History: { tabName: TabName };
   Follow: { tabName: TabName };
-  Ranking: { tabName: TabName };
-  Schedule: { tabName: TabName };
 };
 type TabPageProps = NativeStackScreenProps<RootStackParamList, 'TabPage'>;
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;

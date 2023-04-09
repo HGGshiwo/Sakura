@@ -1,4 +1,4 @@
-import * as scyinghua from './scyinghua'
-import * as yinghuacd from './yinghuacd'
+import * as scyinghua from './scyinghua.json'
+import * as yinghuacd from './yinghuacd.json'
 
 export { scyinghua, yinghuacd }

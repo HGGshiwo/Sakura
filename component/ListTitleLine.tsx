@@ -4,7 +4,7 @@ import {TextButton} from './Button';
 
 type listTitleLineProps = {
   title: string;
-  buttonText: string;
+  buttonText: string | undefined;
   onPress: (event: any) => void;
   show?: boolean;
   style?: ViewStyle;
@@ -20,13 +20,14 @@ const ListTitleLine = ({
   return (
     <View style={[styles.container, {display: show ? 'flex' : 'none'}, style]}>
       <SubTitleBold title={title} />
-      <TextButton onPress={onPress} title={buttonText} />
+      {buttonText !== "" && <TextButton onPress={onPress} title={buttonText} />}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    height: 38,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

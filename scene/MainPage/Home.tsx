@@ -11,17 +11,22 @@ import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
 import RecmdInfoDb from '../../models/RecmdInfoDb';
 import {useNavigation} from '@react-navigation/native';
-import {MainPageProps, targets} from '../../route';
+import {MainPageProps, TabName, targets} from '../../route';
 import api from '../../api';
 import alert from '../../component/Toast';
 import AppContext from '../../context';
 import {SectionGrid} from '../../component/Grid';
+import HomePageInfo from '../../type/PageInfo/HomePageInfo';
 
 const {useRealm, useQuery} = Context;
 
-const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
-  const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
-  const [sections, setSections] = useState<any[]>([]);
+const Home: React.FC<{
+  tabName: TabName;
+  home: boolean;
+  apiName: string;
+  url: string;
+}> = ({tabName, home, apiName, url}) => {
+  const [pageInfo, setPageInfo] = useState<HomePageInfo>();
   const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('加载中...');
@@ -29,25 +34,24 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
   const realm = useRealm();
   const navigation = useNavigation<MainPageProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
-  const {source} = useContext(AppContext);
+  const {source, api} = useContext(AppContext);
 
   const onRefresh = () => {
     setRefreshing(true);
-    const curSource = source[tabName];
-    const loadPage = api[tabName][curSource].home;
+    console.log(tabName, apiName, url);
+    const _api = api[tabName][apiName].pages;
+    const loadPage = home ? _api.home : _api.other;
     loadPage(
-      (carousels, sections) => {
-        setCarousels(carousels);
-        setSections(sections);
+      url,
+      (data: any) => {
+        setPageInfo(data);
         setLoading(false);
         setRefreshing(false);
         if (!loading) {
           alert('刷新成功');
         }
       },
-      (err: string) => {
-        setText(err);
-      },
+      (err: string) => console.log(err),
     );
   };
 
@@ -95,28 +99,37 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
           <>
-            <ParallaxCarousel onPress={handlePressItem} carousels={carousels} />
-            <NavBar />
-            <ListTitleLine
-              show={historys.length !== 0}
-              title="最近在看"
-              buttonText="更多"
-              onPress={() => navigation.navigate('History', {tabName})}
-            />
-            <FlatList
-              horizontal
-              data={historys}
-              renderItem={({item, index}) => (
-                <H1HistoryInfoItem
-                  item={item}
-                  index={index}
-                  onPress={handlePressItem}
+            {pageInfo?.carousels?.length && (
+              <ParallaxCarousel
+                onPress={handlePressItem}
+                carousels={pageInfo.carousels}
+              />
+            )}
+            {home && (
+              <>
+                <NavBar />
+                <ListTitleLine
+                  show={historys.length !== 0}
+                  title="最近在看"
+                  buttonText="更多"
+                  onPress={() => navigation.navigate('History', {tabName})}
                 />
-              )}
-            />
+                <FlatList
+                  horizontal
+                  data={historys}
+                  renderItem={({item, index}) => (
+                    <H1HistoryInfoItem
+                      item={item}
+                      index={index}
+                      onPress={handlePressItem}
+                    />
+                  )}
+                />
+              </>
+            )}
           </>
         }
-        sections={sections}
+        sections={pageInfo ? pageInfo.sections : []}
         numColumns={2}
         keyExtractor={item => item.href}
         renderItem={({index, item}) => (
@@ -130,11 +143,14 @@ const Home: React.FC<{tabName: 'Comic' | 'Anime' | 'Novel'}> = ({tabName}) => {
         renderSectionHeader={({section: {title, href}}) => (
           <ListTitleLine
             title={title}
-            buttonText="更多"
+            buttonText={(!!href && href !== '') ? '更多' : ''}
             onPress={() =>
-              title === '最新更新'
-                ? navigation.navigate('Schedule', {tabName})
-                : navigation.navigate('Index', {url: href, title, tabName})
+              navigation.navigate('Index', {
+                url: href,
+                title,
+                tabName,
+                apiName,
+              })
             }
           />
         )}

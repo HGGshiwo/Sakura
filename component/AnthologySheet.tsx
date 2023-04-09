@@ -1,13 +1,13 @@
 import {Text} from '@rneui/themed';
 import {StyleSheet, View} from 'react-native';
 import {SubTitleBold} from './Text';
-import { ReactNode } from 'react';
-import { CloseButton } from './Button';
+import {ReactNode} from 'react';
+import {CloseButton} from './Button';
 
 type anthologySheetProps = {
   height: number;
   top: number;
-  state: string;
+  state: string | undefined;
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
@@ -21,14 +21,13 @@ const AnthologySheet = ({
   onClose,
   children,
 }: anthologySheetProps) => {
-
   return !visible ? (
     <></>
   ) : (
     <View style={{...styles.container, height, top}}>
       <View style={styles.headerRow}>
         <SubTitleBold title="选集" />
-        <CloseButton onPress={onClose}/>
+        <CloseButton onPress={onClose} />
       </View>
       <View style={styles.stateRow}>
         <Text style={styles.text2}>{state}</Text>

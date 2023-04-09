@@ -1,7 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {View} from 'react-native';
-import loadPage from '../api/Anime/yinghuacd/category';
 import Container from '../component/Container';
 import EndLine from '../component/EndLine';
 import HeadBar from '../component/HeadBar';
@@ -15,6 +14,8 @@ import RecommandInfo from '../type/RecommandInfo';
 import {CategoryPageProps, targets} from '../route';
 import {Section} from '../type/Section';
 import {SectionGrid} from '../component/Grid';
+import CategoryPageInfo from '../type/PageInfo/CategoryPageInfo';
+import AppContext from '../context';
 
 const CategoryPage: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
@@ -22,10 +23,12 @@ const CategoryPage: React.FC<{}> = () => {
   const route = useRoute<CategoryPageProps['route']>();
   const navigation = useNavigation<CategoryPageProps['navigation']>();
   const [loading, setLoading] = useState(true);
-  const {url, title, tabName} = route.params;
+  const {url, title, tabName, apiName} = route.params;
+  const {api} = useContext(AppContext)
 
   useEffect(() => {
-    loadPage(url, (carousels, sections) => {
+    const loadPage = api[tabName][apiName].pages.category
+    loadPage(url, ({carousels, sections}: CategoryPageInfo) => {
       setCarousels(carousels);
       setSections(sections);
       setLoading(false);

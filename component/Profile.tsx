@@ -6,7 +6,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {Divider} from '@rneui/base';
 import {FlatList, View, Pressable} from 'react-native';
-import {apiName} from '../api/Comic/biquege';
 import {TabName, VideoPageProps, targets} from '../route';
 import {FollowButton, TextButton} from './Button';
 import EndLine from './EndLine';
@@ -15,70 +14,62 @@ import {ListTitleLine} from './ListTitleLine';
 import {LoadingContainer} from './Loading';
 import {Title, InfoText, SubTitle, RateText} from './Text';
 import TextIconButton from './ToolBar';
-import InfoSub from '../type/InfoSub';
-import {ListItemInfo} from '../type/ListItemInfo';
 import RecommandInfo from '../type/RecommandInfo';
 import {ReactNode, useCallback, useEffect, useState} from 'react';
-import {UpdateMode} from 'realm';
 import Follow from '../models/Follow';
 import alert from './Toast';
 import Context from '../models';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
 const {useRealm} = Context;
 const Profile: React.FC<{
   loading: boolean;
   refreshing: boolean;
   onRefresh: () => void;
-  title: string;
-  infoSub: InfoSub;
-  relatives: ListItemInfo[];
-  recommands: RecommandInfo[];
-  url: string;
+  url: string; //需要传入番剧url作为主键
+  pageInfo: InfoPageInfo | undefined;
   tabName: TabName;
   setDetailSheetVisible: (data: boolean) => void;
   setAnthologySheetVisible: (data: boolean) => void;
+  setDownloadSheetVisible: (data: boolean) => void;
   renderAnthologys: () => ReactNode;
 }> = ({
   loading,
   refreshing,
   onRefresh,
-  title,
-  infoSub,
-  relatives,
   url,
+  pageInfo,
   tabName,
   setDetailSheetVisible,
   setAnthologySheetVisible,
+  setDownloadSheetVisible,
   renderAnthologys,
-  recommands,
 }) => {
   const realm = useRealm();
   const [followed, setFollowed] = useState(false); //是否追番
+
   //点击追番按钮的回调函数
   const handlePressFollowed = useCallback(() => {
     setFollowed(!followed);
-    realm.write(() => {
-      realm.create(
-        Follow,
-        {
-          href: url,
-          following: !followed,
-          tabName,
-        },
-        UpdateMode.Modified,
-      );
-    });
+    Follow.update(realm, url, !followed, tabName);
     alert(`${!followed ? '' : '取消'}追番成功`);
-  }, []);
+  }, [followed]);
+
   const navigation = useNavigation<VideoPageProps['navigation']>();
+
   const onPressRecommand = (item: RecommandInfo) => {
-    navigation.push(targets[tabName] as any, {url: item.href, apiName});
+    navigation.push(targets[tabName] as any, {
+      url: item.href,
+      apiName: item.apiName,
+    });
   };
+
   useEffect(() => {
     //查看数据库看是否追番
     const _follow = realm.objectForPrimaryKey(Follow, url);
     setFollowed(!!_follow && _follow!.following);
   }, []);
+
   return (
     <LoadingContainer
       loading={loading}
@@ -97,7 +88,7 @@ const Profile: React.FC<{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                 }}>
-                <Title style={{width: '70%'}} title={title} />
+                <Title style={{width: '70%'}} title={pageInfo?.title} />
                 <FollowButton
                   onPress={handlePressFollowed}
                   followed={followed}
@@ -112,7 +103,7 @@ const Profile: React.FC<{
                 }}>
                 <InfoText
                   style={{paddingTop: 2, color: 'gray', flex: 1}}
-                  title={infoSub.author}
+                  title={pageInfo?.author}
                 />
                 <TextButton
                   title={'详情'}
@@ -130,6 +121,7 @@ const Profile: React.FC<{
                 <TextIconButton
                   style={{marginLeft: 40}}
                   title="下载"
+                  onPress={() => setDownloadSheetVisible(true)}
                   icon={faCloudArrowDown}
                 />
                 <TextIconButton
@@ -150,19 +142,19 @@ const Profile: React.FC<{
               </View>
               <ListTitleLine
                 title={'选集'}
-                buttonText={infoSub!.state}
+                buttonText={pageInfo?.state}
                 onPress={() => setAnthologySheetVisible(true)}
               />
-              {relatives.length == 0 ? null : (
+              {pageInfo?.relatives.length == 0 ? null : (
                 <FlatList
                   horizontal={true}
-                  data={relatives}
+                  data={pageInfo?.relatives}
                   renderItem={({item}) => (
                     <Pressable
                       onPress={() =>
                         navigation.push(targets[tabName] as any, {
-                          url: item.data,
-                          apiName,
+                          url: item.data.url,
+                          apiName: item.data.apiName,
                         })
                       }>
                       <SubTitle style={{padding: 12}} title={item.title} />
@@ -176,7 +168,7 @@ const Profile: React.FC<{
             <Divider />
           </>
         }
-        data={recommands}
+        data={pageInfo?.recommands}
         ItemSeparatorComponent={() => <Divider />}
         renderItem={({item, index}) => (
           <V1RecommandInfoItem

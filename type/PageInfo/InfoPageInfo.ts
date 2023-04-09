@@ -1,14 +1,17 @@
-import  InfoSub  from "../InfoSub";
 import { ListItemInfo } from "../ListItemInfo";
-import { RecommandInfo } from "../RecommandInfo";
-import { Source } from "../Source";
+import  RecmdInfo  from "../RecommandInfo";
 
 interface InfoPageInfo {
     title: string,
     img: string,
-    infoSub: InfoSub,
-    recommands: RecommandInfo[],
-    sources: Source[],
+    author: string,
+    alias: string,
+    state: string,
+    time: string,
+    type: ListItemInfo[]
+    produce: string,
+    recommands: RecmdInfo[],
+    sources: ListItemInfo[],
     info: string,
     relatives: ListItemInfo[]
 }

@@ -8,38 +8,38 @@ import {V1SearchInfoItem} from '../component/ListItem';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {SearchPageProps, TabName, TabPageProps, targets} from '../route';
+import {SearchPageProps, TabName, targets} from '../route';
 import Container from '../component/Container';
 import {FollowButton, RoundButton} from '../component/Button';
 import Context from '../models';
 import RecmdInfoDb from '../models/RecmdInfoDb';
-import {UpdateMode} from 'realm';
 import Follow from '../models/Follow';
 import alert from '../component/Toast';
-import api, {loadSearchPage} from '../api';
 
 import {TabBar, TabView} from 'react-native-tab-view';
 import AppContext from '../context';
+import SearchPageInfo from '../type/PageInfo/SearchPageInfo';
 
 const {useRealm} = Context;
 
 const ResultView: React.FC<{
   searchValue: string;
-  loadPage: loadSearchPage;
   apiName: string;
   tabName: TabName;
-}> = ({searchValue, loadPage, apiName, tabName}) => {
+}> = ({searchValue, apiName, tabName}) => {
   const [results, setResults] = useState<SearchInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
   const navigation = useNavigation<SearchPageProps['navigation']>();
   const realm = useRealm();
-
+  const {api} = useContext(AppContext)
+  
   useEffect(() => {
     setLoading(true);
-    loadPage(searchValue, _results => {
-      setResults(_results);
-      const _follows = _results.map(_result => {
+    const loadPage = api[tabName][apiName].pages.search;
+    loadPage(searchValue, ({results}: SearchPageInfo) => {
+      setResults(results);
+      const _follows = results.map(_result => {
         const follow = realm.objectForPrimaryKey(Follow, _result.href);
         return !!follow && follow.following;
       });
@@ -50,31 +50,16 @@ const ResultView: React.FC<{
 
   const onPress = (item: SearchInfo, index: number) => {
     //更新番剧数据库
-    realm.write(() => {
-      realm.create(
-        RecmdInfoDb,
-        {
-          href: item.href,
-          apiName,
-          img: item.img,
-          state: item.state,
-          title: item.title,
-        },
-        UpdateMode.Modified,
-      );
-    });
+    RecmdInfoDb.update(
+      realm,
+      item.href,
+      apiName,
+      item.img,
+      item.state,
+      item.title,
+    );
     //更新追番记录
-    realm.write(() => {
-      realm.create(
-        Follow,
-        {
-          href: item.href,
-          following: !follows[index],
-          tabName,
-        },
-        UpdateMode.Modified,
-      );
-    });
+    Follow.update(realm, item.href, !follows[index], tabName);
     const _follows = [...follows];
     _follows[index] = !_follows[index];
     setFollows([..._follows]);
@@ -127,19 +112,15 @@ const SearchPage: React.FC<{}> = () => {
   const [searchValue2, setSearchValue2] = useState('');
   const [historyVisible, setHistoryVisible] = useState(true);
   const [index, setIndex] = useState(0);
+  const {theme: {TabBarStyle}, api} = useContext(AppContext);
 
-  const _routes = {
-    Comic: [{key: 'biquge', title: 'biquge'}],
-    Anime: [
-      {key: 'yinghuacd', title: 'yinghuacd'},
-      {key: 'scyinghua', title: 'scyinghua'},
-    ],
-    Novel: [{key: 'fz', title: '风筝小说'}],
-  };
-  const [routes] = useState(_routes[tabName]);
+  const [routes] = useState(
+    Object.entries(api[tabName]).map(([apiName, apiObj]) => ({
+      key: apiName,
+      title: apiObj.name,
+    })),
+  );
   const layout = useWindowDimensions();
-
-  const {TabBarStyle} = useContext(AppContext).theme;
 
   const handleSearch = () => {
     setHistoryVisible(false);
@@ -193,7 +174,6 @@ const SearchPage: React.FC<{}> = () => {
           renderScene={({route}) => (
             <ResultView
               searchValue={searchValue2}
-              loadPage={api[tabName][route.key as any].search}
               apiName={route.key}
               tabName={tabName}
             />
