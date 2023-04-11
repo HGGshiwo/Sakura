@@ -181,12 +181,12 @@
         "uri": {
           "selector": "#playbox",
           "attr": "data-vid",
-          "func": [{"name": "regexec", "arg1": "[^$]*(?=\\$)"}]
+          "func": [{"name": "regexec", "arg1": "[^$]*(?=\\$)", "arg2": 0}]
         },
         "type": {
           "selector": "#playbox",
           "attr": "data-vid",
-          "func": [{"name": "regexec", "arg1": "(?<=\\.)m3u8|(?<=\\.)mp4"}]
+          "func": [{"name": "regexec", "arg1": "(?<=\\.)m3u8|(?<=\\.)mp4", "arg2": 0}]
         }
       }
     },

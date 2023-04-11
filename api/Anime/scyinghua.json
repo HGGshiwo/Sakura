@@ -131,13 +131,13 @@
         "uri": {
           "selector": ".img-box.bofang_box script",
           "func": [
-            {"name": "regexec", "arg1": "(?<=\"url\":\").*(?=\",\"url_next\")"},
+            {"name": "regexec", "arg1": "(?<=\"url\":\").*(?=\",\"url_next\")", "arg2": 0},
             {"name": "replace", "arg1": "\\", "arg2": ""}
           ]
         },
         "type": {
           "selector": ".img-box.bofang_box script",
-          "func": [{"name": "regexec", "arg1": "m3u8|mp4"}]
+          "func": [{"name": "regexec", "arg1": "m3u8|mp4", "arg2": 0}]
         }
       }
     },

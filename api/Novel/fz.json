@@ -116,14 +116,10 @@
       "data": {
         "data": {
           "selector": "#content",
-          "func": [
-            {"name": "split", "arg1": "\n\n"},
-            {"name": "slice", "arg1": 0, "arg2": -1}
-          ]
+          "type": "innerHTML",
+          "func": [{"name": "split", "arg1": "<br><br>"}]
         },
-        "title": {
-          "selector": "h1"
-        }
+        "title": {"selector": "h1"}
       }
     },
     "search": {

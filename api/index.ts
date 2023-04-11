@@ -3,11 +3,12 @@ import * as Anime from "./Anime"
 import * as Comic from "./Comic"
 import * as Novel from "./Novel"
 import { selectAll, selectOne } from 'css-select';
-import { getAttributeValue, innerText } from 'domutils';
+import { getAttributeValue, getInnerHTML, innerText } from 'domutils';
 import { Element } from 'domhandler';
 import { Route } from 'react-native-tab-view';
 var iconv = require('iconv-lite');
 import { Buffer } from 'buffer';
+import render from 'dom-serializer';
 
 const err_img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png';
 
@@ -15,7 +16,7 @@ const err_img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-
 type Func = {
   "name": "addbase" | "imgsafe" | "regexec" | "replace" | string,
   "arg1"?: string;
-  "arg2"?: string;
+  "arg2"?: any;
 }
 
 type ApiConfig = {
@@ -96,7 +97,7 @@ const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
     }
   } else {
     const { attr } = configValue;
-    let childElem = configValue.selector !== "*" ? selectOne(configValue.selector as any, elem) : elem;
+    var childElem = configValue.selector !== "*" ? selectOne(configValue.selector as any, elem) : elem;
     if (!childElem) {
       result = ''; //查找不到
     }
@@ -106,6 +107,10 @@ const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
     else if ((configValue.selector as string).includes('script')) {
       result = (childElem.children[0] as any).data
     }
+    else if (configValue.type === "innerHTML") {
+      result = render(childElem, { encodeEntities: "utf8" })
+      console.log(result)
+    }
     else {
       result = innerText(childElem);
     }
@@ -114,7 +119,8 @@ const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
   if (configValue.func) {
     result = configValue.func.reduce((pre, cur) => {
       if (cur.name === "regexec") {
-        return RegExp(cur.arg1!).exec(pre!)![0]
+        let a = pre.match(RegExp(cur.arg1!, "g"))
+        return cur.arg2 !== undefined ? a[cur.arg2!] : a
       }
       else if (cur.name === "addbase") {
         return cur.arg1 + pre
@@ -131,7 +137,7 @@ const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
         return pre?.sort((a: any, b: any) => collator.compare(a[key], b[key]));
       }
       else if (cur.name === "split") {
-        return pre?.split(RegExp(cur.arg1!))
+        return pre?.split(RegExp(cur.arg1!)).filter((e: any) => e)
       }
       else if (cur.name === "slice") {
         return pre.slice(cur.arg1, cur.arg2)
@@ -179,7 +185,7 @@ const parseConfig = () => {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', _url);
             xhr.responseType = 'arraybuffer';
-            xhr.onerror = (err)=>{
+            xhr.onerror = (err) => {
               reject(`Error while requesting: ${err}`)
             }
             xhr.onload = function () {

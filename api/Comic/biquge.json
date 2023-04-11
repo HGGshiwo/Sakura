@@ -105,14 +105,18 @@
     },
     "player": {
       "data": {
-        "urls": {
+        "data": {
           "type": "list",
           "selector": ".lazyload",
           "value": {
-            "url": {"selector": "*", "attr": "data-original"},
-            "func": [{"name": "imgsafe"}]
+            "uri": {
+              "selector": "*",
+              "attr": "data-original",
+              "func": [{"name": "imgsafe"}]
+            }
           }
-        }
+        },
+        "title": {"selector": ".comic-title a"}
       }
     },
     "search": {

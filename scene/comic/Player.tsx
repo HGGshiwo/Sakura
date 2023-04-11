@@ -28,40 +28,43 @@ import AppContext from '../../context';
 import {NextButton} from '../anime/Player/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-const ResizeImage = React.memo<{uri: string; onPress: () => void}>(
-  ({uri, onPress}) => {
-    const [aspectRatio, setAspectRatio] = useState(1);
-    const layout = useWindowDimensions();
-    const [dataAvailable, setDataAvailable] = useState(false);
-    useEffect(() => {
-      setDataAvailable(uri !== '');
-      Image.getSize(uri, (width, height) => {
+const ResizeImage = React.memo<ImageProps & {onPress: () => void}>(props => {
+  const [aspectRatio, setAspectRatio] = useState(1);
+  const layout = useWindowDimensions();
+  const [dataAvailable, setDataAvailable] = useState(false);
+  useEffect(() => {
+    setDataAvailable((props.source as any).uri !== '');
+    Image.getSize(
+      (props.source as any).uri,
+      (width, height) => {
         setAspectRatio(width / height);
-      });
-    }, [uri]);
-    console.log(uri)
-    return (
-      <Pressable onPress={() => onPress()} style={{flex: 1}}>
-        {dataAvailable ? (
-          <Image
-            style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
-            source={{uri}}
-          />
-        ) : (
-          <View
-            style={{
-              height: 300,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <InfoText title="加载图片地址中..." />
-          </View>
-        )}
-      </Pressable>
+      },
+      err => {
+        console.log(`${err}`);
+      },
     );
-  },
-);
+  }, [props.source]);
+  return (
+    <Pressable onPress={() => props.onPress()} style={{flex: 1}}>
+      {dataAvailable ? (
+        <Image
+          style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
+          source={props.source}
+        />
+      ) : (
+        <View
+          style={{
+            height: 300,
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <InfoText title="加载图片地址中..." />
+        </View>
+      )}
+    </Pressable>
+  );
+});
 const ComicPlayer: React.FC<PlayerProps> = ({
   dataAvailable,
   nextDataAvailable,
@@ -94,13 +97,11 @@ const ComicPlayer: React.FC<PlayerProps> = ({
     //切换了下一个选集，则需要更新长度，加入到累计数据，
     if (data) {
       if (flashData) {
-        setTotalData([{title, data, index: 0}]);
+        setTotalData([{...data, index: 0}]);
         setSectionIndex(0);
         setProgress(0);
       } else {
-        setTotalData(
-          totalData.concat([{title, data, index: totalData.length}]),
-        );
+        setTotalData(totalData.concat([{...data, index: totalData.length}]));
       }
     }
   }, [data]);
@@ -177,22 +178,19 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
       <SectionList
-      
         renderSectionHeader={({section}) => (
           <Text style={{fontSize: 16, margin: 10, fontWeight: 'bold'}}>
             {section.title}
           </Text>
         )}
-        keyExtractor={item => item}
+        keyExtractor={item => item.uri}
         ListEmptyComponent={
           <InfoText
             style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
             title="加载图片地址中..."
           />
         }
-        ListHeaderComponent={
-          <View style={{height: 30, width: '100%'}}/>
-        }
+        ListHeaderComponent={<View style={{height: 30, width: '100%'}} />}
         ListFooterComponent={
           totalData.length !== 0 ? (
             <InfoText
@@ -211,7 +209,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
         onEndReached={nextDataAvailable ? toNextSource : null}
         onEndReachedThreshold={0.8}
         renderItem={({item}) => (
-          <ResizeImage uri={item} onPress={handlePress} />
+          <ResizeImage source={item} onPress={handlePress} />
         )}
       />
 

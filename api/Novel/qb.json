@@ -31,15 +31,15 @@
           "func": [{"name": "sort", "arg1": "title"}],
           "value": {
             "title": {
-              "selector": "*",
+              "selector": "a",
               "func": [{"name": "replace", "arg1": "\\s", "arg2": ""}]
             },
             "data": {
-              "selector": "*",
+              "selector": "a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
             },
-            "id": {"selector": "*", "attr": "href"}
+            "id": {"selector": "a", "attr": "href"}
           }
         },
         "recommands": {
@@ -49,7 +49,8 @@
             "id": {"selector": "a", "attr": "href"},
             "href": {
               "selector": "a",
-              "attr": "href"
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
             },
             "img": {
               "selector": "img",
@@ -117,7 +118,10 @@
       "data": {
         "data": {
           "selector": "#TextContent",
-          "func": [{"name": "split", "arg1": "\n\n"}]
+          "type": "innerHTML",
+          "func": [
+            {"name": "regexec", "arg1": "(?<=\\<p\\>)[^p]*(?=\\</p\\>)"}
+          ]
         },
         "title": {"selector": "h1"}
       }

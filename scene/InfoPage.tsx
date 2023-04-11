@@ -175,7 +175,7 @@ const InfoPage: React.FC<{
                   <Pressable
                     onPress={() => {
                       setFlashData(true);
-                      changeAnthology(item.id);
+                      changeAnthology(index);
                     }}>
                     <View style={styles.itemContainer2}>
                       <SubTitle
