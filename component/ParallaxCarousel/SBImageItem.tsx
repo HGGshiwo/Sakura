@@ -5,12 +5,15 @@ import {StyleProp, ViewStyle, ImageURISource, Pressable} from 'react-native';
 import {StyleSheet, View, ActivityIndicator, Text, Image} from 'react-native';
 import RecommandInfo from '../../type/RecommandInfo';
 import {MainPageProps, TabName, targets} from '../../route';
+import {ImageBackground} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {InfoText} from '../Text';
 
 interface Props {
   style?: StyleProp<ViewStyle>;
   item: RecommandInfo;
   showIndex?: boolean;
-  onPress: (item: RecommandInfo)=>void;
+  onPress: (item: RecommandInfo) => void;
 }
 
 const SBImageItem: React.FC<Props> = ({
@@ -20,35 +23,41 @@ const SBImageItem: React.FC<Props> = ({
   showIndex = true,
 }) => {
   return (
-    <Pressable
-      style={{flex: 1}}
-      onPress={()=>onPress(item)}>
-      <View style={[styles.container, style]}>
-        <ActivityIndicator size="small" />
-        <Image key={item.href} style={styles.image} source={{uri: item.img}} />
-        <Text
-          style={{
-            position: 'absolute',
-            color: 'white',
-            bottom: 5,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            borderRadius: 5,
-            overflow: 'hidden',
-            paddingHorizontal: 10,
-            paddingTop: 2,
-          }}>
-          {showIndex ? item.title : ''}
-        </Text>
-      </View>
+    <Pressable style={{flex: 1}} onPress={() => onPress(item)}>
+      <ImageBackground
+        key={item.href}
+        imageStyle={styles.image}
+        style={styles.container}
+        source={{uri: item.img}}>
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          start={{x: 0, y: 0}}
+          end={{x: 0, y: 1}}
+          style={styles.textContainer}>
+          <InfoText
+            title={showIndex ? item.title : ''}
+            style={{color: 'white', flex: 1, overflow: 'hidden'}}
+          />
+        </LinearGradient>
+      </ImageBackground>
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
+  textContainer: {
+    width: '100%',
+    borderRadius: 5,
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    padding: 2,
+    justifyContent: 'space-around',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 5,
     overflow: 'hidden',
   },
   image: {

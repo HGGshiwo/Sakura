@@ -1,3 +1,3 @@
-import * as qb from './qb'
-import * as fz from './fz'
+import * as qb from './qb.json'
+import * as fz from './fz.json'
 export { qb, fz }

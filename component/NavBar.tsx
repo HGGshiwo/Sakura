@@ -75,7 +75,6 @@ const NavBar: React.FC<{}> = () => {
       horizontal
       contentContainerStyle={styles.container}
       data={data}
-      ItemSeparatorComponent={() => <View style={{width: 10}} />}
       renderItem={({item}) => {
         return (
           <NavBarButton
@@ -91,7 +90,6 @@ const NavBar: React.FC<{}> = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
     marginVertical: 10,
     justifyContent: 'flex-start',
     backgroundColor: 'white',

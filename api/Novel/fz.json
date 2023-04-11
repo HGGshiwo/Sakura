@@ -1,0 +1,159 @@
+{
+  "name": "风筝",
+  "routes": [{"key": "https://www.56fz.net/", "title": "首页"}],
+  "pages": {
+    "info": {
+      "data": {
+        "title": {"selector": "h1"},
+        "img": {
+          "selector": "#fmimg img",
+          "attr": "src",
+          "func": [
+            {"name": "addbase", "arg1": "https://www.56fz.net"},
+            {"name": "imgsafe"}
+          ]
+        },
+        "author": {"selector": "#info p"},
+        "alias": "暂无别名",
+        "state": {"selector": "#info p:nth-child(4) a"},
+        "time": {"selector": "#info p:nth-child(3) a"},
+        "type": {
+          "selector": "#info p:nth-child(5) a",
+          "type": "list",
+          "value": {
+            "title": {"selector": "*"},
+            "id": {"selector": "*"}
+          }
+        },
+        "produce": "暂无制作信息",
+        "info": {"selector": "#intro p"},
+        "sources": {
+          "selector": "#list a",
+          "type": "list",
+          "func": [{"name": "sort", "arg1": "title"}],
+          "value": {
+            "title": {
+              "selector": "*",
+              "func": [{"name": "replace", "arg1": "\\s", "arg2": ""}]
+            },
+            "data": {
+              "selector": "*",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.56fz.net"}]
+            },
+            "id": {"selector": "*", "attr": "href"}
+          }
+        },
+        "recommands": {
+          "selector": "#listtj a",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.56fz.net"}]
+            },
+            "img": "https://www.56fz.net/Public/images/nocover.jpg",
+            "title": {"selector": "a"},
+            "state": "暂无状态"
+          }
+        },
+        "relatives": []
+      }
+    },
+    "home": {
+      "data": {
+        "sections": {
+          "selector": ".coverecom.w_440.left.mbottom, coverecom.w_440.right.mbottom",
+          "type": "list",
+          "value": {
+            "href": "",
+            "title": {"selector": "em"},
+            "data": {
+              "selector": "dl",
+              "type": "list",
+              "value": {
+                "img": {
+                  "selector": "img",
+                  "attr": "_src",
+                  "func": [{"name": "imgsafe"}]
+                },
+                "id": {"selector": "a", "attr": "href"},
+                "href": {
+                  "selector": "a",
+                  "attr": "href",
+                  "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
+                },
+                "title": {"selector": "dd a"},
+                "state": {"selector": ".tit"}
+              }
+            }
+          }
+        },
+        "carousels": {
+          "selector": ".coverecom.mbottom dl",
+          "type": "list",
+          "value": {
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
+            },
+            "title": {"selector": "dd a"},
+            "state": {"selector": ".tit"}
+          }
+        }
+      }
+    },
+    "player": {
+      "data": {
+        "data": {
+          "selector": "#content",
+          "func": [
+            {"name": "split", "arg1": "\n\n"},
+            {"name": "slice", "arg1": 0, "arg2": -1}
+          ]
+        },
+        "title": {
+          "selector": "h1"
+        }
+      }
+    },
+    "search": {
+      "baseUrl": "https://www.56fz.net/home/search",
+      "method": "POST",
+      "headers": "Content-Type':'application/x-www-form-urlencoded",
+      "body": "action=search&q=",
+      "data": {
+        "results": {
+          "selector": ".item-cover",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.56fz.net"}]
+            },
+            "title": {"selector": "a h3"},
+            "type": [],
+            "info": "暂无信息",
+            "img": {
+              "selector": "a img",
+              "attr": "data-original",
+              "func": [{"name": "imgsafe"}]
+            },
+            "state": "暂无状态"
+          }
+        }
+      }
+    }
+  }
+}

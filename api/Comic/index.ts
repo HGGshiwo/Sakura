@@ -1,2 +1,2 @@
-import * as biquge from './biquege'
+import * as biquge from './biquge.json'
 export { biquge }

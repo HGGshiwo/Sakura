@@ -69,12 +69,12 @@ const TextPlayer: React.FC<PlayerProps> = ({
     //切换了下一个选集，则需要更新长度，加入到累计数据，
     if (data) {
       if (flashData) {
-        setTotalData([{title, data, index: 0}]);
+        setTotalData([{data, index: 0}]);
         setSectionIndex(0);
         setProgress(0);
       } else {
         setTotalData(
-          totalData.concat([{title, data, index: totalData.length}]),
+          totalData.concat([{data, index: totalData.length}]),
         );
       }
     }

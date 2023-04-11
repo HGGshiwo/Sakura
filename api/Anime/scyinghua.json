@@ -29,7 +29,7 @@
             "id": {"selector": "*", "attr": "title"}
           }
         },
-        "produce": {},
+        "produce": "暂无制作信息",
         "info": {"selector": ".video-info-item.video-info-content"},
         "sources": {
           "selector": ".scroll-content > a",
@@ -68,7 +68,7 @@
             "state": {"selector": ".label"}
           }
         },
-        "relatives": {"type": "list"}
+        "relatives": []
       }
     },
     "home": {

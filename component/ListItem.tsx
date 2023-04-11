@@ -4,6 +4,7 @@ import {InfoText, SubInfoText, SubTitle} from '../component/Text';
 import HistoryInfo from '../type/HistoryInfo';
 import RecommandInfo from '../type/RecommandInfo';
 import {SearchInfo} from '../type/SearchInfo';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface Props<T> {
   index: number;
@@ -55,11 +56,19 @@ const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
         }}
         key={index}>
         <ImageBackground
-          loadingIndicatorSource={{uri: 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png'}}
+          loadingIndicatorSource={{
+            uri: 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png',
+          }}
           style={{flex: 1, height: 80}}
           imageStyle={styles.ibImage}
           source={{uri: item.img}}>
-          <InfoText style={styles.ibText} title={item.state} />
+          <LinearGradient
+            style={styles.ibTextContainer}
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            start={{x: 0, y: 0}}
+            end={{x: 0, y: 1}}>
+            <InfoText style={styles.ibText} title={item.state} />
+          </LinearGradient>
         </ImageBackground>
       </Pressable>
       <InfoText title={item.title} />
@@ -85,12 +94,18 @@ const H1HistoryInfoItem: React.FC<Props<HistoryInfo & RecommandInfo>> = ({
           imageStyle={styles.ibImage}
           source={{uri: item.img}}
           resizeMode="cover">
-          <InfoText style={styles.ibText} title={item.state} />
+          <LinearGradient
+            style={styles.ibTextContainer}
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            start={{x: 0, y: 0}}
+            end={{x: 0, y: 1}}>
+            <InfoText style={styles.ibText} title={item.state} />
+          </LinearGradient>
         </ImageBackground>
       </Pressable>
       <InfoText style={{width: 120}} title={item.title} />
       <SubInfoText
-        style={{ width: 120}}
+        style={{width: 120}}
         title={`看到${item.anthologyTitle} ${(item.progressPer * 100).toFixed(
           0,
         )}%`}
@@ -164,7 +179,13 @@ const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
           imageStyle={styles.ibImage}
           source={{uri: item.img}}
           resizeMode="cover">
-          <InfoText style={styles.ibText} title={item.state} />
+          <LinearGradient
+            style={styles.ibTextContainer}
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            start={{x: 0, y: 0}}
+            end={{x: 0, y: 1}}>
+            <InfoText style={styles.ibText} title={item.state} />
+          </LinearGradient>
         </ImageBackground>
       </Pressable>
       <InfoText style={{width: 120}} title={item.title} />
@@ -193,9 +214,7 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
           <InfoText title={item.type.join('/')} />
           <InfoText title={item.info} numberOfLines={3} />
         </View>
-        <View style={{alignItems: 'center', flex: 1}}>
-         {children}
-        </View>
+        <View style={{alignItems: 'center', flex: 1}}>{children}</View>
       </View>
     </Pressable>
   );
@@ -219,7 +238,13 @@ const V3RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
           imageStyle={styles.ibImage}
           source={{uri: item.img}}
           resizeMode="cover">
-          <InfoText style={styles.ibText} title={item.state} />
+          <LinearGradient
+            style={styles.ibTextContainer}
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            start={{x: 0, y: 0}}
+            end={{x: 0, y: 1}}>
+            <InfoText style={styles.ibText} title={item.state} />
+          </LinearGradient>
         </ImageBackground>
       </Pressable>
       <InfoText title={item.title} />
@@ -234,7 +259,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 5,
     flexDirection: 'row',
-    backgroundColor:'white',
+    backgroundColor: 'white',
   },
   itemContainerV: {
     justifyContent: 'space-between',
@@ -244,7 +269,15 @@ const styles = StyleSheet.create({
   },
   ibImage: {
     borderRadius: 5,
-    backgroundColor:'grey',
+    backgroundColor: 'grey',
+  },
+  ibTextContainer:{
+    width: '100%', 
+    bottom: 0, 
+    right: 0, 
+    position: 'absolute',
+    borderRadius: 5,
+    padding: 2,
   },
   ibContainer60H: {
     //height 60, horizantal
@@ -268,13 +301,9 @@ const styles = StyleSheet.create({
     width: 80,
   },
   ibText: {
-    bottom: 2,
-    right: 2,
-    position: 'absolute',
     color: 'white',
-    backgroundColor: '#rgba(0,0,0,0.5)',
     fontSize: 12,
-    maxWidth: '80%'
+    maxWidth: '80%',
   },
   infoContainer: {
     justifyContent: 'space-between',

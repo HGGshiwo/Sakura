@@ -6,6 +6,8 @@ import { selectAll, selectOne } from 'css-select';
 import { getAttributeValue, innerText } from 'domutils';
 import { Element } from 'domhandler';
 import { Route } from 'react-native-tab-view';
+var iconv = require('iconv-lite');
+import { Buffer } from 'buffer';
 
 const err_img = 'https://s1.hdslb.com/bfs/static/laputa-home/client/assets/load-error.685235d2.png';
 
@@ -27,19 +29,24 @@ type ApiConfig = {
 type TabConfig = {
   name: string,
   routes: Route[];
+  encode?: string;
   pages: Record<string, PageConfig>
 }
 
-type PageConfig = { baseUrl?: string, data: Record<string, ApiConfig> };
-type AppConfig = Record<string, Record<string, TabConfig>>
+type PageConfig = {
+  baseUrl?: string,
+  method?: string,
+  body?: any,
+  headers?: any,
+  data: Record<string, ApiConfig | any>
+};
 
-const appConfig: AppConfig = { Anime }
+type AppConfig = Record<string, Record<string, TabConfig>>
+const appConfig: AppConfig = { Anime, Comic, Novel }
 
 const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
   if (configValue.selector === undefined) {
-    if (configValue.type === "list") return []
-    if (configValue.type === undefined) return ''
-    if (configValue.type === "raw") return configValue //如果没有select，说明是一个写死的数据
+    return configValue //如果没有select，说明是一个写死的数据
   }
   let result: any;
   if (configValue.type === 'list') {
@@ -123,6 +130,12 @@ const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
         const key = cur.arg1!
         return pre?.sort((a: any, b: any) => collator.compare(a[key], b[key]));
       }
+      else if (cur.name === "split") {
+        return pre?.split(RegExp(cur.arg1!))
+      }
+      else if (cur.name === "slice") {
+        return pre.slice(cur.arg1, cur.arg2)
+      }
     }, result)
   }
   return result;
@@ -147,25 +160,52 @@ const parseConfig = () => {
         ) => {
           const data: any = {};
           //对url 进行处理
-          let _url = pageObj.baseUrl !== undefined ? pageObj.baseUrl + url : url;
-          fetch(_url)
-            .then(response => response.text())
-            .then(responseText => {
-              const document = parseDocument(responseText) as unknown as Element;
-              //每个数据都query一次
-              if (!pageObj.data) {
-                console.log(`${apiName} ${pageName}.data is null`)
-                return;
-              }
-              Object.entries(pageObj.data).forEach(([itemName, configValue]) => {
-                data[itemName] = getData(document, configValue, apiName);
-              });
-              //返回query结果
-              resolve(data);
-            })
-            .catch(err => {
-              reject(`${err}`);
+          let _url = (pageObj.baseUrl !== undefined && pageObj.method !== "POST") ? pageObj.baseUrl + url : url;
+          //获取页面之后的操作
+          const parseText = (responseText: string) => {
+            const document = parseDocument(responseText) as unknown as Element;
+            //每个数据都query一次
+            if (!pageObj.data) {
+              console.log(`${apiName} ${pageName}.data is null`)
+              return;
+            }
+            Object.entries(pageObj.data).forEach(([itemName, configValue]) => {
+              data[itemName] = getData(document, configValue, apiName);
             });
+            //返回query结果
+            resolve(data);
+          }
+          if (apiObj.encode !== undefined) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', _url);
+            xhr.responseType = 'arraybuffer';
+            xhr.onerror = (err)=>{
+              reject(`Error while requesting: ${err}`)
+            }
+            xhr.onload = function () {
+              if (this.status == 200) {
+                const responseText = iconv.decode(Buffer.from(this.response), apiObj.encode)
+                parseText(responseText)
+              } else {
+                reject(`Error while requesting: ${this}`)
+              }
+            };
+            xhr.send()
+          } else {
+            let { method, headers, body } = pageObj;
+            let data: any = {}
+            if (!!body) {
+              data["body"] = body + url
+            }
+            if (!!method) {
+              data["method"] = method
+            }
+            if (!!headers) {
+              data["headers"] = headers
+            }
+
+            fetch(_url, data).then(response => response.text()).then(parseText).catch(err => reject(`${err}`));
+          }
         };
       });
     });

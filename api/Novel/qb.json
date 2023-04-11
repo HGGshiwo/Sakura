@@ -1,0 +1,126 @@
+{
+  "name": "铅笔",
+  "routes": [{"key": "https://www.23qb.com", "title": "首页"}],
+  "encode": "gbk",
+  "pages": {
+    "info": {
+      "data": {
+        "title": {"selector": ".d_title h1"},
+        "img": {
+          "selector": ".coverecom.w_770.left img",
+          "attr": "src",
+          "func": [{"name": "imgsafe"}]
+        },
+        "author": {"selector": ".bookright li a"},
+        "alias": "暂无别名",
+        "state": {"selector": ".bookright li:nth-child(3) span"},
+        "time": {"selector": ".bookright li:nth-child(4) span"},
+        "type": {
+          "selector": ".bookright li:nth-child(3) span",
+          "type": "list",
+          "value": {
+            "title": {"selector": "*"},
+            "id": {"selector": "*"}
+          }
+        },
+        "produce": "暂无制作信息",
+        "info": {"selector": ".hm-scroll p"},
+        "sources": {
+          "selector": ".chaw_c li",
+          "type": "list",
+          "func": [{"name": "sort", "arg1": "title"}],
+          "value": {
+            "title": {
+              "selector": "*",
+              "func": [{"name": "replace", "arg1": "\\s", "arg2": ""}]
+            },
+            "data": {
+              "selector": "*",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
+            },
+            "id": {"selector": "*", "attr": "href"}
+          }
+        },
+        "recommands": {
+          "selector": "#product ul li",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href"
+            },
+            "img": {
+              "selector": "img",
+              "attr": "_src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": "h3"},
+            "state": "暂无状态"
+          }
+        },
+        "relatives": []
+      }
+    },
+    "home": {
+      "data": {
+        "sections": {
+          "selector": ".coverecom.w_440.left.mbottom, coverecom.w_440.right.mbottom",
+          "type": "list",
+          "value": {
+            "href": "",
+            "title": {"selector": "em"},
+            "data": {
+              "selector": "dl",
+              "type": "list",
+              "value": {
+                "img": {
+                  "selector": "img",
+                  "attr": "_src",
+                  "func": [{"name": "imgsafe"}]
+                },
+                "id": {"selector": "a", "attr": "href"},
+                "href": {
+                  "selector": "a",
+                  "attr": "href",
+                  "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
+                },
+                "title": {"selector": "dd a"},
+                "state": {"selector": ".tit"}
+              }
+            }
+          }
+        },
+        "carousels": {
+          "selector": ".coverecom.mbottom dl",
+          "type": "list",
+          "value": {
+            "img": {
+              "selector": "img",
+              "attr": "_src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": "a",
+              "attr": "href",
+              "func": [{"name": "addbase", "arg1": "https://www.23qb.com"}]
+            },
+            "title": {"selector": "dd a"},
+            "state": {"selector": ".tit"}
+          }
+        }
+      }
+    },
+    "player": {
+      "data": {
+        "data": {
+          "selector": "#TextContent",
+          "func": [{"name": "split", "arg1": "\n\n"}]
+        },
+        "title": {"selector": "h1"}
+      }
+    }
+  }
+}

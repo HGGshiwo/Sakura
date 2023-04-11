@@ -1,0 +1,139 @@
+{
+  "name": "笔趣阁",
+  "routes": [{"key": "https://www.biqug.org/", "title": "首页"}],
+  "pages": {
+    "info": {
+      "data": {
+        "title": {"selector": ".comic-title.j-comic-title"},
+        "img": {
+          "selector": ".de-info__cover img",
+          "attr": "src",
+          "func": [{"name": "imgsafe"}]
+        },
+        "author": {"selector": ".comic-author .name a"},
+        "alias": "暂无别名",
+        "state": {"selector": ".update-time"},
+        "time": {"selector": "2023年3月26日"},
+        "type": {
+          "selector": ".comic-status b a",
+          "type": "list",
+          "value": {
+            "title": {"selector": "*"},
+            "id": {"selector": "*"}
+          }
+        },
+        "produce": {"selector": ".comic-author .name a"},
+        "info": {"selector": ".comic-intro span"},
+        "sources": {
+          "selector": ".chapter__list-box.clearfix li",
+          "type": "list",
+          "func": [{"name": "sort", "arg1": "title"}],
+          "value": {
+            "title": {
+              "selector": "a",
+              "func": [{"name": "replace", "arg1": "\\s", "arg2": ""}]
+            },
+            "data": {
+              "selector": "a",
+              "attr": "href"
+            },
+            "id": {"selector": "a"}
+          }
+        },
+        "recommands": {
+          "selector": ".guess-item.slide-item",
+          "type": "list",
+          "value": {
+            "id": {"selector": "a", "attr": "href"},
+            "href": {
+              "selector": ".cover a",
+              "attr": "href"
+            },
+            "img": {
+              "selector": ".cover img",
+              "attr": "data-original",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": ".comic__title a"},
+            "state": {"selector": ".cover__tag"}
+          }
+        },
+        "relatives": []
+      }
+    },
+    "home": {
+      "data": {
+        "sections": {
+          "selector": ".in-sec-wr:nth-child(n+6)",
+          "type": "list",
+          "value": {
+            "href": {"selector": ".in-sec__head a", "attr": "href"},
+            "title": {"selector": ".in-sec__head span"},
+            "data": {
+              "selector": ".in-comic--type-b.cs-item",
+              "type": "list",
+              "value": {
+                "img": {
+                  "selector": ".cover img",
+                  "attr": "data-original",
+                  "func": [{"name": "imgsafe"}]
+                },
+                "id": {"selector": ".cover a", "attr": "href"},
+                "href": {"selector": ".cover a", "attr": "href"},
+                "title": {"selector": ".comic__title a"},
+                "state": {"selector": ".comic-feature a"}
+              }
+            }
+          }
+        },
+        "carousels": {
+          "selector": ".slide-item",
+          "type": "list",
+          "value": {
+            "img": {
+              "selector": "img",
+              "attr": "src",
+              "func": [{"name": "imgsafe"}]
+            },
+            "id": {"selector": "a", "attr": "href"},
+            "href": {"selector": "a", "attr": "href"},
+            "title": {"selector": "p"},
+            "state": {"selector": "p"}
+          }
+        }
+      }
+    },
+    "player": {
+      "data": {
+        "urls": {
+          "type": "list",
+          "selector": ".lazyload",
+          "value": {
+            "url": {"selector": "*", "attr": "data-original"},
+            "func": [{"name": "imgsafe"}]
+          }
+        }
+      }
+    },
+    "search": {
+      "baseUrl": "https://www.biqug.org/index.php/search?key=",
+      "data": {
+        "results": {
+          "selector": ".common-comic-item",
+          "type": "list",
+          "value": {
+            "id": {"selector": ".cover a", "attr": "href"},
+            "href": {"selector": ".cover a", "attr": "href"},
+            "img": {
+              "selector": ".cover img",
+              "attr": "data-original",
+              "func": [{"name": "imgsafe"}]
+            },
+            "title": {"selector": ".comic__title a"},
+            "state": {"selector": ".comic-feature a"}
+          }
+        }
+      }
+    }
+  }
+}
