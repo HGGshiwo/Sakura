@@ -131,7 +131,11 @@
         "uri": {
           "selector": ".img-box.bofang_box script",
           "func": [
-            {"name": "regexec", "arg1": "(?<=\"url\":\").*(?=\",\"url_next\")", "arg2": 0},
+            {
+              "name": "regexec",
+              "arg1": "(?<=\"url\":\").*(?=\",\"url_next\")",
+              "arg2": 0
+            },
             {"name": "replace", "arg1": "\\", "arg2": ""}
           ]
         },
@@ -157,10 +161,15 @@
             "img": {
               "selector": "img",
               "attr": "data-src",
-              "func": [{"name": "imgsafe"}]
+              "func": [
+                {"name": "imgsafe"},
+                {"name": "replace", "arg1": "https", "arg2": "http"}
+              ]
             },
             "title": {"selector": "h6 > a"},
-            "state": {"selector": ".label"}
+            "state": {"selector": ".label"},
+            "type": [],
+            "info": "暂无信息"
           }
         }
       }

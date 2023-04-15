@@ -48,7 +48,6 @@ interface FollowButtonProps extends Props {
 
 const FollowButton: React.FC<FollowButtonProps> = React.memo(({onPress, followed}) => {
   const {FollowButtonStyle} = useContext(AppContext).theme;
-  console.log(1)
   return (
     <Pressable
       android_ripple={{

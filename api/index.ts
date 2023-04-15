@@ -109,7 +109,6 @@ const getData = (elem: Element, configValue: ApiConfig, apiName: string) => {
     }
     else if (configValue.type === "innerHTML") {
       result = render(childElem, { encodeEntities: "utf8" })
-      console.log(result)
     }
     else {
       result = innerText(childElem);

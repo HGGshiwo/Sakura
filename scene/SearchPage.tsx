@@ -161,6 +161,7 @@ const SearchPage: React.FC<{}> = () => {
                     color: TabBarStyle.textColor(focused),
                     paddingHorizontal: 5,
                     fontWeight: focused ? '900' : 'normal',
+                    width: 50
                   }}
                 />
               )}

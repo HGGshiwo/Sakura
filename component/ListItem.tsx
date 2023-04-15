@@ -211,7 +211,7 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
         <View style={styles.infoContainer}>
           <SubTitle numberOfLines={1} title={item.title} />
           <InfoText title={item.state} />
-          <InfoText title={item.type.join('/')} />
+          <InfoText title={item.type.map(type=>type.title).join('/')} />
           <InfoText title={item.info} numberOfLines={3} />
         </View>
         <View style={{alignItems: 'center', flex: 1}}>{children}</View>

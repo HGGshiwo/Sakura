@@ -39,7 +39,7 @@
           "type": "list",
           "func": [{"name": "sort", "arg1": "title"}],
           "value": {
-            "title": {"selector": "a"},  
+            "title": {"selector": "a"},
             "data": {
               "selector": "a",
               "attr": "href",
@@ -186,7 +186,9 @@
         "type": {
           "selector": "#playbox",
           "attr": "data-vid",
-          "func": [{"name": "regexec", "arg1": "(?<=\\.)m3u8|(?<=\\.)mp4", "arg2": 0}]
+          "func": [
+            {"name": "regexec", "arg1": "(?<=\\.)m3u8|(?<=\\.)mp4", "arg2": 0}
+          ]
         }
       }
     },
@@ -212,7 +214,16 @@
               "func": [{"name": "imgsafe"}]
             },
             "title": {"selector": "h2 a"},
-            "state": {"selector": "span"}
+            "state": {"selector": "span"},
+            "type": {
+              "selector": "span:nth-child(4) a",
+              "type": "list",
+              "value": {
+                "title": {"selector": "*"},
+                "id": {"selector": "*"}
+              }
+            },
+            "info": {"selector": "p"}
           }
         }
       }
