@@ -15,7 +15,7 @@ import {CategoryPageProps, targets} from '../route';
 import {Section} from '../type/Section';
 import {SectionGrid} from '../component/Grid';
 import CategoryPageInfo from '../type/PageInfo/CategoryPageInfo';
-import AppContext from '../context';
+import { ApiContext } from '../context/ApiContext';
 
 const CategoryPage: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecommandInfo[]>([]);
@@ -24,7 +24,7 @@ const CategoryPage: React.FC<{}> = () => {
   const navigation = useNavigation<CategoryPageProps['navigation']>();
   const [loading, setLoading] = useState(true);
   const {url, title, tabName, apiName} = route.params;
-  const {api} = useContext(AppContext)
+  const {api} = useContext(ApiContext)
 
   useEffect(() => {
     const loadPage = api[tabName][apiName].pages.category

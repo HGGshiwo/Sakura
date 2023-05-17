@@ -1,6 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Divider} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import Container from '../component/Container';
 import EndLine from '../component/EndLine';
@@ -12,6 +12,7 @@ import RecommandInfo from '../type/RecommandInfo';
 import {RankingPageProps, targets} from '../route';
 import api from '../api';
 import RankingPageInfo from '../type/PageInfo/RankingPageInfo';
+import { ApiContext } from '../context/ApiContext';
 
 const RankingPage: React.FC<{}> = () => {
   const route = useRoute<RankingPageProps['route']>();
@@ -20,6 +21,8 @@ const RankingPage: React.FC<{}> = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<RankingPageProps['navigation']>();
 
+  const {api} = useContext(ApiContext)
+  
   useEffect(() => {
     const loadPage = api[tabName][apiName].pages.rank
     loadPage(({rankings}: RankingPageInfo) => {

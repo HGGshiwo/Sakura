@@ -36,8 +36,9 @@ import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
 import AppContext from '../../../context';
 import React from 'react';
-import {PlayerProps} from '../../InfoPage';
 import ControlBar, {ControlBarRow} from '../../../component/ControlBar';
+import PlayerProps from '../../../type/Player';
+import { ThemeContext } from '../../../context/ThemeContext';
 
 //时间转化函数
 var sec_to_time = (s: number): string => {
@@ -355,7 +356,7 @@ const Player: React.FC<PlayerProps> = ({
     nextDataAvailable ? toNextSource() : null;
   };
 
-  const {PlayerStyle} = useContext(AppContext).theme;
+  const {PlayerStyle} = useContext(ThemeContext).theme;
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
       {!dataAvailable ? (

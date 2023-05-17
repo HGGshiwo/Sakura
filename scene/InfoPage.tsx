@@ -33,28 +33,9 @@ import {FlatGrid} from '../component/Grid';
 import Profile from '../component/Profile';
 import DownloadSheet from '../component/DownloadSheet';
 import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
-
-interface PlayerProps {
-  ref?: RefObject<any>; // 播放器的ref
-  dataAvailable: boolean; //数据源是否解析成功
-  defaultFullscreen?: boolean; //是否全屏
-  nextDataAvailable: boolean; //是否有下一个数据源
-  data: any; //数据源，video要求指定type
-  title: string; //播放器显示的标题
-  onErr: Function; //数据加载错误
-  onBack: () => void; //返回
-  toNextSource: () => void; //加载下一个数据源
-  onProgress: (progress: number, perProgress: number) => void; //进度更新时调用
-  defaultProgress: number; //初始的进度
-  renderAnthologys: (
-    visible: boolean,
-    setVisible: (visible: boolean) => void,
-  ) => ReactNode; //如何渲染选集列表
-  showPanel: () => void; //展示profile panel
-  hidePanel: () => void;
-  playerHeight: number; //player高度
-  flashData?: boolean; //是否需要删除之前缓存的数据
-}
+import PlayerProps from '../type/Player';
+import { ThemeContext } from '../context/ThemeContext';
+import { ApiContext } from '../context/ApiContext';
 
 const {useRealm} = Context;
 const Command = () => <View style={{flex: 1}}></View>;
@@ -143,7 +124,9 @@ const InfoPage: React.FC<{
   const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
   const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
 
-  const {theme: {PlayerStyle}, api} = useContext(AppContext);
+  const {PlayerStyle} = useContext(ThemeContext).theme;
+  const {api} = useContext(ApiContext)
+  
   const {textColor, playerTextColor, indicatorColor} = PlayerStyle;
 
   const renderScene = ({route}: any) => {
@@ -516,4 +499,3 @@ const styles = StyleSheet.create({
 });
 
 export default InfoPage;
-export type {PlayerProps};

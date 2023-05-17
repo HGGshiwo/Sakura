@@ -9,8 +9,9 @@ import {InfoText, SubTitleBold} from '../component/Text';
 import {SchedulePageProps, targets} from '../route';
 import DailyInfo from '../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
-import AppContext from '../context';
 import DailyPageInfo from '../type/PageInfo/DailyPageInfo';
+import {ThemeContext} from '../context/ThemeContext';
+import {ApiContext} from '../context/ApiContext';
 
 const routes = [
   {key: '0', title: '星期一'},
@@ -30,21 +31,19 @@ const DailyPage: React.FC<{}> = () => {
   const navigation = useNavigation<SchedulePageProps['navigation']>();
   const [index, setIndex] = useState(0);
   const layout = useWindowDimensions();
-  const {
-    theme: {TabBarStyle},
-    api,
-  } = useContext(AppContext);
+  const {TabBarStyle} = useContext(ThemeContext).theme;
+  const {api} = useContext(ApiContext);
 
   useEffect(() => {
-    console.log(tabName, apiName)
+    console.log(tabName, apiName);
     const loadPage = api[tabName][apiName].pages.daily;
     loadPage(({dailys}: DailyPageInfo) => {
-      console.log(dailys)
+      console.log(dailys);
       setDailys(dailys);
       setLoading(false);
     });
   }, []);
-  
+
   const renderScene = ({route}: any) => (
     <FlatList
       ItemSeparatorComponent={() => <Divider />}
@@ -77,7 +76,6 @@ const DailyPage: React.FC<{}> = () => {
       )}
     />
   );
-
 
   return (
     <Container>

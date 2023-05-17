@@ -10,7 +10,7 @@ import RecommandInfo from '../type/RecommandInfo';
 import {IndexPageProps, targets} from '../route';
 import {FlatGrid} from '../component/Grid';
 import IndexPageInfo from '../type/PageInfo/IndexPageInf';
-import AppContext from '../context';
+import { ApiContext } from '../context/ApiContext';
 
 const IndexPage: React.FC<{}> = () => {
   const [results, setResults] = useState<RecommandInfo[]>([]);
@@ -18,7 +18,7 @@ const IndexPage: React.FC<{}> = () => {
   const route = useRoute<IndexPageProps['route']>();
   const navigation = useNavigation<IndexPageProps['navigation']>();
   const {url, title, tabName, apiName} = route.params;
-  const {api} = useContext(AppContext);
+  const {api} = useContext(ApiContext);
   const loadPage = api[tabName][apiName].pages.index!;
   useEffect(() => {
     loadPage(url, ({results}: IndexPageInfo) => {

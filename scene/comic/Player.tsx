@@ -19,7 +19,6 @@ import {
   Text,
 } from 'react-native';
 import {Image, ImageProps, useWindowDimensions} from 'react-native';
-import {PlayerProps} from '../InfoPage';
 import {BackButton} from '../../component/Button';
 import {InfoText, LoadingText} from '../../component/Text';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -27,6 +26,8 @@ import Scrubber from '../../component/Scrubber';
 import AppContext from '../../context';
 import {NextButton} from '../anime/Player/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import PlayerProps from '../../type/Player';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const ResizeImage = React.memo<ImageProps & {onPress: () => void}>(props => {
   const [aspectRatio, setAspectRatio] = useState(1);
@@ -85,7 +86,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   const controlVisibleRef = useRef(false); //control是否可见
   const controlTimer = useRef(undefined); //当前的计时器
   const insents = useSafeAreaInsets();
-  const {PlayerStyle} = useContext(AppContext).theme;
+  const {PlayerStyle} = useContext(ThemeContext).theme;
   const [progress, setProgress] = useState(defaultProgress); //当前视频播放进度
   const [sectionIndex, setSectionIndex] = useState(0); //当前的section的位置
   const seekingRef = useRef(false); //是否在加载

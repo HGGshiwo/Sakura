@@ -9,8 +9,8 @@ import {faHeart} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {ViewStyle, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useContext} from 'react';
-import AppContext from '../context';
 import React from 'react';
+import {ThemeContext} from '../context/ThemeContext';
 
 interface Props {
   onPress?: (event: any) => void;
@@ -46,47 +46,56 @@ interface FollowButtonProps extends Props {
   onPress: () => void;
 }
 
-const FollowButton: React.FC<FollowButtonProps> = React.memo(({onPress, followed}) => {
-  const {FollowButtonStyle} = useContext(AppContext).theme;
-  return (
-    <Pressable
-      android_ripple={{
-        color: FollowButtonStyle.rippleColor,
-        radius: 30,
-        borderless: false,
-      }}
-      style={[
-        {
-          backgroundColor: FollowButtonStyle.backgroundColor(followed),
-        },
-        styles.buttonContainer,
-      ]}
-      onPress={() => {
-        if (onPress) onPress();
-      }}>
-      <>
-        <FontAwesomeIcon
-          color={FollowButtonStyle.textColor(followed)}
-          size={14}
-          icon={followed ? faBars : faHeart}
-        />
-        <Text
-          style={[styles.text, {color: FollowButtonStyle.textColor(followed)}]}>
-          {followed ? '已' : ''}追番
-        </Text>
-      </>
-    </Pressable>
-  );
-});
+const FollowButton: React.FC<FollowButtonProps> = React.memo(
+  ({onPress, followed}) => {
+    const {FollowButtonStyle} = useContext(ThemeContext).theme;
+    return (
+      <Pressable
+        android_ripple={{
+          color: FollowButtonStyle.rippleColor,
+          radius: 30,
+          borderless: false,
+        }}
+        style={[
+          {
+            backgroundColor: FollowButtonStyle.backgroundColor(followed),
+          },
+          styles.buttonContainer,
+        ]}
+        onPress={() => {
+          if (onPress) onPress();
+        }}>
+        <>
+          <FontAwesomeIcon
+            color={FollowButtonStyle.textColor(followed)}
+            size={14}
+            icon={followed ? faBars : faHeart}
+          />
+          <Text
+            style={[
+              styles.text,
+              {color: FollowButtonStyle.textColor(followed)},
+            ]}>
+            {followed ? '已' : ''}追番
+          </Text>
+        </>
+      </Pressable>
+    );
+  },
+);
 
 const RoundButton: React.FC<Props> = ({title, style, onPress}) => {
-  const {RoundButtonStyle} = useContext(AppContext).theme;
+  const {RoundButtonStyle} = useContext(ThemeContext).theme;
   return (
     <Pressable onPress={onPress}>
       <View
         style={[
           styles.buttonContainer,
-          {width: 60, height: 35, backgroundColor: RoundButtonStyle.backgroundColor},
+          {
+            width: 60,
+            height: 35,
+            backgroundColor: RoundButtonStyle.backgroundColor,
+          },
           style,
         ]}>
         <Text style={[{color: RoundButtonStyle.textColor}]}>{title}</Text>
@@ -110,7 +119,7 @@ const BackButton: React.FC<{
 };
 
 const NavBarButton: React.FC<Props> = ({onPress, title, icon, style}) => {
-  const {NavBarStyle} = useContext(AppContext).theme;
+  const {NavBarStyle} = useContext(ThemeContext).theme;
   return (
     <Pressable onPress={onPress}>
       <View style={[styles.itemContainer, style]}>

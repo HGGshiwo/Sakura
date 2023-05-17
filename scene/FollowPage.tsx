@@ -18,8 +18,8 @@ import {UpdateMode} from 'realm';
 import EndLine from '../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import alert from '../component/Toast';
-import AppContext from '../context';
 import {targets} from '../route';
+import { ThemeContext } from '../context/ThemeContext';
 
 const {useRealm, useQuery} = Context;
 
@@ -32,7 +32,7 @@ const FollowPage: React.FC<{}> = () => {
   const curItem = useRef<RecommandInfo>();
   const realm = useRealm();
   const [follows, setFollows] = useState<RecommandInfo[]>([]);
-  const {DialogStyle} = useContext(AppContext).theme;
+  const {DialogStyle} = useContext(ThemeContext).theme;
   useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)

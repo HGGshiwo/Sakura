@@ -19,6 +19,7 @@ import alert from '../component/Toast';
 import AppContext from '../context';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import RecommandInfo from '../type/RecommandInfo';
+import { ThemeContext } from '../context/ThemeContext';
 
 const {useRealm, useQuery} = Context;
 const targets = {
@@ -35,7 +36,7 @@ const HistoryPage: React.FC<{}> = () => {
   const curItem = useRef<HistoryInfo>();
   const realm = useRealm();
   const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
-  const {DialogStyle} = useContext(AppContext).theme;
+  const {DialogStyle} = useContext(ThemeContext).theme;
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)]

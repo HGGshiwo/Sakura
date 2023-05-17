@@ -3,10 +3,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBook, faPalette, faUser} from '@fortawesome/free-solid-svg-icons';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {InfoText} from '../component/Text';
-import MainPage from './MainPage';
 import {useContext} from 'react';
-import AppContext from '../context';
 import {tabRoutes} from '../route';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const tabs = {
@@ -17,7 +16,7 @@ const tabs = {
 };
 
 const TabPage = () => {
-  const {BottomStyle} = useContext(AppContext).theme;
+  const {BottomStyle} = useContext(ThemeContext).theme;
 
   return (
     <Tab.Navigator

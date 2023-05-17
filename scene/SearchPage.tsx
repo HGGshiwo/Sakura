@@ -15,10 +15,10 @@ import Context from '../models';
 import RecmdInfoDb from '../models/RecmdInfoDb';
 import Follow from '../models/Follow';
 import alert from '../component/Toast';
-
 import {TabBar, TabView} from 'react-native-tab-view';
-import AppContext from '../context';
 import SearchPageInfo from '../type/PageInfo/SearchPageInfo';
+import {ApiContext} from '../context/ApiContext';
+import {ThemeContext} from '../context/ThemeContext';
 
 const {useRealm} = Context;
 
@@ -32,8 +32,8 @@ const ResultView: React.FC<{
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
   const navigation = useNavigation<SearchPageProps['navigation']>();
   const realm = useRealm();
-  const {api} = useContext(AppContext)
-  
+  const {api} = useContext(ApiContext);
+
   useEffect(() => {
     setLoading(true);
     const loadPage = api[tabName][apiName].pages.search;
@@ -112,8 +112,8 @@ const SearchPage: React.FC<{}> = () => {
   const [searchValue2, setSearchValue2] = useState('');
   const [historyVisible, setHistoryVisible] = useState(true);
   const [index, setIndex] = useState(0);
-  const {theme: {TabBarStyle}, api} = useContext(AppContext);
-
+  const {TabBarStyle} = useContext(ThemeContext).theme;
+  const {api} = useContext(ApiContext);
   const [routes] = useState(
     Object.entries(api[tabName]).map(([apiName, apiObj]) => ({
       key: apiName,
@@ -161,7 +161,7 @@ const SearchPage: React.FC<{}> = () => {
                     color: TabBarStyle.textColor(focused),
                     paddingHorizontal: 5,
                     fontWeight: focused ? '900' : 'normal',
-                    width: 50
+                    width: 50,
                   }}
                 />
               )}

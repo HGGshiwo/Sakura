@@ -32,7 +32,6 @@ import Container from '../component/Container';
 import {Divider} from '@rneui/themed';
 import {StyleSheet} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import AppContext from '../context';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {
   faBusinessTime,
@@ -42,6 +41,8 @@ import {
 
 import {NavBarButton} from '../component/Button';
 import alert from '../component/Toast';
+import {ThemeContext} from '../context/ThemeContext';
+import { SrcContext } from '../context/SrcContext';
 
 type Data = {
   title: string;
@@ -134,6 +135,8 @@ const SubPage: React.FC<{
   useEffect(onRefresh, []);
 
   const onPress = (item: Data) => {
+    const apiName = "yinghuacd"
+    
     switch (item.data) {
       case 'all':
         navigation.navigate('Index', {
@@ -148,6 +151,7 @@ const SubPage: React.FC<{
           url: 'japan/',
           title: '日本动漫',
           tabName,
+          apiName,
         });
         break;
       case 'china':
@@ -155,6 +159,7 @@ const SubPage: React.FC<{
           url: 'china/',
           title: '国产动漫',
           tabName,
+          apiName,
         });
         break;
       default:
@@ -275,8 +280,9 @@ const SubPage: React.FC<{
 };
 
 const SettingPage = () => {
-  const {theme, themeName, changeTheme, source, changeSource} =
-    useContext(AppContext);
+  const {theme, themeName, changeTheme} = useContext(ThemeContext);
+  const {source, changeSource} = useContext(SrcContext)
+
   return (
     <View style={{padding: 10}}>
       <View style={styles.cardContainer}>
@@ -352,7 +358,7 @@ const UserPage: React.FC<{}> = () => {
     );
 
   const layout = useWindowDimensions();
-  const {HeaderStyle} = useContext(AppContext).theme;
+  const {HeaderStyle} = useContext(ThemeContext).theme;
 
   return (
     <Container style={{backgroundColor: '#f7f8f9'}}>

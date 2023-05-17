@@ -17,6 +17,8 @@ import alert from '../../component/Toast';
 import AppContext from '../../context';
 import {SectionGrid} from '../../component/Grid';
 import HomePageInfo from '../../type/PageInfo/HomePageInfo';
+import { SrcContext } from '../../context/SrcContext';
+import { ApiContext } from '../../context/ApiContext';
 
 const {useRealm, useQuery} = Context;
 
@@ -34,7 +36,8 @@ const Home: React.FC<{
   const realm = useRealm();
   const navigation = useNavigation<MainPageProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
-  const {source, api} = useContext(AppContext);
+  const {source} = useContext(SrcContext);
+  const {api} = useContext(ApiContext)
 
   const onRefresh = () => {
     setRefreshing(true);

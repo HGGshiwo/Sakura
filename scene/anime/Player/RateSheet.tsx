@@ -4,6 +4,7 @@ import {Text, View, Pressable} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {InfoText} from '../../../component/Text';
 import AppContext from '../../../context';
+import {ThemeContext} from '../../../context/ThemeContext';
 
 interface Props {
   show: boolean;
@@ -20,7 +21,7 @@ const RateSheet: React.FC<Props> = ({show, onPress, defaultActive}) => {
     {title: '1.5X', id: 4, data: 1.5},
     {title: '2.0X', id: 5, data: 2},
   ];
-  const {PlayerStyle} = useContext(AppContext).theme
+  const {PlayerStyle} = useContext(ThemeContext).theme;
   return (
     <View
       style={{
@@ -42,10 +43,16 @@ const RateSheet: React.FC<Props> = ({show, onPress, defaultActive}) => {
             onPress={() => {
               onPress(item.data, item.id === 2 ? '默认' : item.title, item.id);
             }}>
-            <View style={{flex: 1, justifyContent: 'center', marginVertical: 15}}>
+            <View
+              style={{flex: 1, justifyContent: 'center', marginVertical: 15}}>
               <InfoText
                 title={item.title}
-                style={{color: defaultActive === index ?  PlayerStyle.textColor(true):'white' }}
+                style={{
+                  color:
+                    defaultActive === index
+                      ? PlayerStyle.textColor(true)
+                      : 'white',
+                }}
               />
             </View>
           </Pressable>

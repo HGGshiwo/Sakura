@@ -3,7 +3,7 @@ import * as Anime from "./Anime"
 import * as Comic from "./Comic"
 import * as Novel from "./Novel"
 import { selectAll, selectOne } from 'css-select';
-import { getAttributeValue, getInnerHTML, innerText } from 'domutils';
+import { getAttributeValue, innerText } from 'domutils';
 import { Element } from 'domhandler';
 import { Route } from 'react-native-tab-view';
 var iconv = require('iconv-lite');
