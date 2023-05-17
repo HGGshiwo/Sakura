@@ -1,0 +1,11 @@
+name: React Native Build
+  # You may pin to the exact commit or the version.
+  # uses: bamachoub/react-native-build-action@e22503879aef405ec33f920950990eb586177204
+  uses: bamachoub/react-native-build-action@v1.0.0
+  with:
+    # Platform to build
+    platform: # optional, default is android
+    # Type can be any of: build | assemble
+    type: # optional, default is assemble
+    # Keystore file name
+    keystore-name: # default is release
