@@ -1,55 +1,89 @@
 // 下载信息，只记录下载完成的
-import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader';
 import {Realm} from '@realm/react';
 import {TabName} from '../route';
+import {UpdateMode} from 'realm';
+import Task from '../type/Task';
 
-//download 只允许开始下载和结束下载，不允许中断后再下载
 export default class Download extends Realm.Object {
-  destination!: string; //下载的位置
-  tabName!: TabName;
-  url!: string; //信息页
-  key!: string; //选集的key
-  taskId!: string; //url_key
-  done!: boolean; //是否下载完成
-  expectedBytes!: number; //需要下载的大小
+  id!: string; //第n集的url
+  tabName!: TabName; //应该如何处理下载的数据
+  froms!: string[]; //文件下载的网址
+  tos!: string[]; //下载完成的位置
+  infoUrl!: string; //信息页的url
+  finish!: boolean; //是否已完成，如果已完成就直接打开
 
-  static getDestination(url: string, type: string) {
-    let _url = (url as any).replace(/\W/g, '');
-    return `${RNBackgroundDownloader.directories.documents}/${_url}.${type}`;
+  //新建一个下载任务
+  static create(realm: Realm, infoUrl: string, url: string, tabName: TabName) {
+    //查看task是否存在
+    let task = realm.objectForPrimaryKey(Download, url)!;
+    if (!task) {
+      switch (tabName) {
+        case 'Anime':
+          //获取u3m8文件
+          realm.write(() => {
+            task = realm.create(
+              Download,
+              {
+                id: url,
+                tabName,
+                tos: [],
+                froms: [],
+                infoUrl,
+                finish: false,
+              },
+              UpdateMode.Modified,
+            );
+          });
+          break;
+        case 'Comic':
+          break;
+        case 'Novel':
+          break;
+      }
+    }
+    return task;
   }
 
-  static getTaskId(title: string, key: string | number) {
-    return `${title}_${key}`;
+  //更新froms
+  static updateFroms(realm: Realm, url: string, froms: string[]) {
+    const task = realm.objectForPrimaryKey(Download, url)!;
+    realm.write(() => {
+      task.froms = froms;
+    });
+    return task;
   }
-  static generate(
-    url: string,
-    key: string | number,
-    tabName: TabName,
-    destination: string,
-    expectedBytes: number,
-  ) {
-    return {
-      taskId: Download.getTaskId(url, key),
-      url: url,
-      key: `${key}`,
-      destination,
-      tabName,
-      expectedBytes,
-      done: false,
-    };
+
+  //完成一个子任务时调用
+  static done(realm: Realm, task: Task) {
+    let download = realm.objectForPrimaryKey(Download, task.downloadId)!;
+    realm.write(() => {
+      const froms = download.froms.filter(url => url !== task.from);
+      const finish = froms.length === 0;
+      download = realm.create(
+        Download,
+        {
+          id: task.downloadId,
+          finish,
+          froms,
+          tos: [...download.tos, task.to],
+        },
+        UpdateMode.Modified,
+      );
+    });
+    return download;
   }
+
   // To use a class as a Realm object type, define the object schema on the static property "schema".
   static schema = {
     name: 'Download',
-    primaryKey: 'taskId',
+    primaryKey: 'id',
     properties: {
-      destination: 'string',
+      id: 'string',
       tabName: 'string',
-      url: 'string',
-      key: 'string',
-      taskId: 'string',
-      done: 'bool',
-      expectedBytes: 'int',
+      doneUrls: 'string[]',
+      waitUrls: 'string[]',
+      infoUrl: 'string',
+      finish: 'bool',
     },
   };
 }

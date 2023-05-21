@@ -34,7 +34,6 @@ import Blank from './Blank';
 import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
-import AppContext from '../../../context';
 import React from 'react';
 import ControlBar, {ControlBarRow} from '../../../component/ControlBar';
 import PlayerProps from '../../../type/Player';

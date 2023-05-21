@@ -22,6 +22,7 @@ interface Props {
   style?: TextStyle;
   numberOfLines?: any;
   containerStyle?: ViewStyle;
+  onPress?: ()=>void;
 }
 
 const SubTitleBold: React.FC<Props> = ({title, style}) => {

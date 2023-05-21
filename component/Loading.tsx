@@ -1,6 +1,5 @@
 import {ReactNode, useContext} from 'react';
 import {View, ViewStyle, ActivityIndicator} from 'react-native';
-import AppContext from '../context';
 import {LoadingText} from './Text';
 import { ThemeContext } from '../context/ThemeContext';
 

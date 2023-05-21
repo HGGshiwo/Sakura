@@ -2,14 +2,17 @@ import React, {createContext} from 'react';
 import ApiWrapper from './ApiContext';
 import SrcWrapper from './SrcContext';
 import ThemeWrapper from './ThemeContext';
+import DownloadWrapper from './DownloadContext';
 
 const ContentWrapper: React.FC<{children: any}> = ({children}) => {
   return (
-    <ThemeWrapper>
-      <ApiWrapper>
-        <SrcWrapper>{children}</SrcWrapper>
-      </ApiWrapper>
-    </ThemeWrapper>
+    <DownloadWrapper>
+      <ThemeWrapper>
+        <ApiWrapper>
+          <SrcWrapper>{children}</SrcWrapper>
+        </ApiWrapper>
+      </ThemeWrapper>
+    </DownloadWrapper>
   );
 };
 

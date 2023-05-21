@@ -136,7 +136,7 @@
               "arg1": "(?<=\"url\":\").*(?=\",\"url_next\")",
               "arg2": 0
             },
-            {"name": "replace", "arg1": "\\", "arg2": ""}
+            {"name": "replace", "arg1": "\\\\", "arg2": ""}
           ]
         },
         "type": {

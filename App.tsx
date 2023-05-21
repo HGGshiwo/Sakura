@@ -29,11 +29,11 @@ function App(): JSX.Element {
 
   return (
     <SafeAreaProvider style={backgroundStyle}>
-      <ContentWrapper>
-        <NavigationContainer>
-          <GestureHandlerRootView style={{flex: 1}}>
-            <RealmProvider>
-              <RootSiblingParent>
+      <NavigationContainer>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <RealmProvider>
+            <RootSiblingParent>
+              <ContentWrapper>
                 <Stack.Navigator screenOptions={{headerShown: false}}>
                   {routes.map((route, index) => (
                     <Stack.Screen
@@ -43,11 +43,11 @@ function App(): JSX.Element {
                     />
                   ))}
                 </Stack.Navigator>
-              </RootSiblingParent>
-            </RealmProvider>
-          </GestureHandlerRootView>
-        </NavigationContainer>
-      </ContentWrapper>
+              </ContentWrapper>
+            </RootSiblingParent>
+          </RealmProvider>
+        </GestureHandlerRootView>
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }

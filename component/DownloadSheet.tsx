@@ -1,15 +1,19 @@
 import {Text} from '@rneui/themed';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {InfoText, SubInfoText, SubTitle, SubTitleBold} from './Text';
-import {ReactNode} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
 import {ListItemInfo} from '../type/ListItemInfo';
-import {Platform} from 'react-native';
-import RNBackgroundDownloader, {
-  download,
-  completeHandler,
-} from '@kesha-antonov/react-native-background-downloader';
+import Context from '../models';
+import Download from '../models/Download';
+import alert from './Toast';
+import {TabName} from '../route';
+import {DownloadContext} from '../context/DownloadContext';
+import {faCircleCheck, faCircleDown} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+
+const {useRealm, useQuery, useObject} = Context;
 
 type anthologySheetProps = {
   height: number;
@@ -23,12 +27,9 @@ type anthologySheetProps = {
   apiName: string;
   title: string | undefined;
 };
-import Context from '../models';
-import Download from '../models/Download';
-import alert from './Toast';
-import api from '../api';
-import {TabName} from '../route';
-const {useRealm} = Context;
+
+type DownloadState = 'finish' | 'run' | 'ready';
+type DownloadItem = ListItemInfo & {state: DownloadState};
 
 const DownloadSheet = ({
   height,
@@ -43,76 +44,36 @@ const DownloadSheet = ({
   title,
 }: anthologySheetProps) => {
   const realm = useRealm();
+  const {download} = useContext(DownloadContext);
+  const downloads = useQuery(Download); //数据库中下载的内容
+  const [items, setItems] = useState<DownloadItem[]>([]);
 
-  const handlePressItem = (item: ListItemInfo) => {
+  useEffect(() => {
+    if (!!data) {
+      setItems(
+        data!.map(dataObj => {
+          const downloadObj = realm.objectForPrimaryKey(Download, dataObj.data);
+          const state = !downloadObj
+            ? 'ready'
+            : downloadObj!.finish
+            ? 'finish'
+            : 'run';
+          return {...dataObj, state};
+        }),
+      );
+    }
+  }, [downloads, data]);
+
+  const handlePressItem = (item: DownloadItem) => {
+    console.log(downloads);
     //是否已经下载过了
-    const taskId = Download.getTaskId(url, item.id);
-    let taskRecord = realm.objectForPrimaryKey(Download, taskId)!;
-    if (!!taskRecord && taskRecord.done) {
-      alert('该集已下载!');
+    if (item.state !== 'ready') {
+      alert(`该集已${item.state === 'finish' ? '下载完成' : '在下载队列中'}!`);
       return;
     }
-    //是否已经在下载了?
-    RNBackgroundDownloader.checkForExistingDownloads()
-      .then(lostTasks => {
-        let task = lostTasks.find(task => task.id === taskId);
-        if (!!task) {
-          alert('该集已在下载队列!');
-          task.done(() => {
-            realm.write(() => {
-              let taskRecord = realm.objectForPrimaryKey(Download, taskId)!;
-              taskRecord.done = true;
-            });
-            alert(`${title} ${item.title}下载完成!`);
-          });
-        } else {
-          //开始下载
-          const loadPlayerSrc = api[tabName][apiName].player!;
-          loadPlayerSrc(item.data[0], (state: boolean, data: any) => {
-            if (state) {
-              const destination = Download.getDestination(data.src, data.type);
-              download({
-                id: taskId,
-                url: data.src,
-                destination,
-              })
-                .begin(({expectedBytes}) => {
-                  realm.write(() => {
-                    realm.create(
-                      Download,
-                      Download.generate(
-                        url,
-                        item.id,
-                        tabName,
-                        destination,
-                        expectedBytes,
-                      ),
-                    );
-                  });
-                })
-                .done(() => {
-                  realm.write(() => {
-                    let taskRecord = realm.objectForPrimaryKey(
-                      Download,
-                      taskId,
-                    )!;
-                    taskRecord.done = true;
-                  });
-                  alert(`${title} ${item.title}下载完成!`);
-                });
 
-              alert(`开始下载 ${title} ${item.title}`);
-
-              console.log(
-                `地址为: ${Download.getDestination(data.src, data.type)}`,
-              );
-            } else {
-              alert(`${title} ${item.title}地址获取失败!`);
-            }
-          });
-        }
-      })
-      .catch(err => console.log(err));
+    download(url, item.data, tabName);
+    alert(`开始下载 ${title} ${item.title}`);
   };
 
   return !visible ? (
@@ -128,7 +89,7 @@ const DownloadSheet = ({
       </View>
       <FlatList
         contentContainerStyle={{paddingBottom: 50}}
-        data={data}
+        data={items}
         renderItem={({index, item}) => (
           <Pressable
             style={{flex: 1}}
@@ -138,6 +99,14 @@ const DownloadSheet = ({
             key={index}>
             <View style={styles.itemContainer}>
               <SubTitle title={item.title} />
+              {item.state === 'ready' ? (
+                <></>
+              ) : (
+                <FontAwesomeIcon
+                  color='gray'
+                  icon={item.state === 'finish' ? faCircleCheck : faCircleDown}
+                />
+              )}
             </View>
           </Pressable>
         )}
@@ -148,6 +117,8 @@ const DownloadSheet = ({
           width: '100%',
           padding: 10,
           justifyContent: 'space-between',
+          borderTopWidth: 1,
+          borderColor: "lightgrey"
         }}>
         <InfoText
           style={{paddingHorizontal: 20, paddingVertical: 10}}
@@ -204,6 +175,7 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   itemContainer: {
+    flexDirection: "row",
     borderWidth: 1,
     borderColor: 'lightgrey',
     flex: 1,
