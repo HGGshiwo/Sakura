@@ -53,8 +53,7 @@
           "selector": ".col-6.col-sm-4.col-lg-12",
           "type": "list",
           "value": {
-            "id": {"selector": "a", "attr": "href"},
-            "href": {
+            "infoUrl": {
               "selector": "a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
@@ -91,8 +90,7 @@
                     {"name": "replace", "arg1": "https", "arg2": "http"}
                   ]
                 },
-                "id": {"selector": "a", "attr": "href"},
-                "href": {
+                "infoUrl": {
                   "selector": "a",
                   "attr": "href",
                   "func": [
@@ -114,8 +112,7 @@
               "attr": "data-src",
               "func": [{"name": "imgsafe"}]
             },
-            "id": {"selector": "a", "attr": "href"},
-            "href": {
+            "infoUrl": {
               "selector": "a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]
@@ -152,8 +149,7 @@
           "selector": ".video-img-box.mb-e-20",
           "type": "list",
           "value": {
-            "id": {"selector": "a", "attr": "href"},
-            "href": {
+            "infoUrl": {
               "selector": "a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "https://www.scyinghua.com"}]

@@ -1,5 +1,5 @@
-import { ListItemInfo } from "../ListItemInfo";
-import  RecmdInfo  from "../RecommandInfo";
+import ListItemInfo from "../ListItemInfo";
+import  RecmdInfo  from "../RecmdInfo";
 
 interface InfoPageInfo {
     title: string,
@@ -8,12 +8,12 @@ interface InfoPageInfo {
     alias: string,
     state: string,
     time: string,
-    type: ListItemInfo[]
+    type: ListItemInfo<string>[]
     produce: string,
     recommands: RecmdInfo[],
-    sources: ListItemInfo[],
+    sources: ListItemInfo<string>[],
     info: string,
-    relatives: ListItemInfo[]
+    relatives: ListItemInfo<any>[]
 }
 
 export default InfoPageInfo;

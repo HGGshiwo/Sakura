@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
-import RecommandInfo from '../../type/RecommandInfo';
+import RecommandInfo from '../../type/RecmdInfo';
 import {SBItem} from './SBItem';
 const colors = [
   '#26292E',

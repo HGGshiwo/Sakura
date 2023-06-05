@@ -5,10 +5,10 @@ import {FlatList} from 'react-native';
 import Container from '../component/Container';
 import EndLine from '../component/EndLine';
 import HeadBar from '../component/HeadBar';
-import {V1RecommandInfoItem} from '../component/ListItem';
+import {V1RecmdInfoItem} from '../component/ListItem';
 import {LoadingContainer} from '../component/Loading';
 import {RateText, SubTitleBold} from '../component/Text';
-import RecommandInfo from '../type/RecommandInfo';
+import RecommandInfo from '../type/RecmdInfo';
 import {RankingPageProps, targets} from '../route';
 import RankingPageInfo from '../type/PageInfo/RankingPageInfo';
 import { ApiContext } from '../context/ApiContext';
@@ -41,24 +41,24 @@ const RankingPage: React.FC<{}> = () => {
       <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
         <FlatList
           contentContainerStyle={{paddingHorizontal: 15}}
-          keyExtractor={item => item.href}
+          keyExtractor={item => item.infoUrl}
           data={rankings}
           ItemSeparatorComponent={() => <Divider />}
           ListFooterComponent={() => <EndLine />}
           renderItem={({item, index}) => (
-            <V1RecommandInfoItem
+            <V1RecmdInfoItem
               index={index}
               item={item}
               key={index}
               imgVerticle={true}
               onPress={() => {
                 navigation.navigate(targets[tabName], {
-                  url: item.href,
+                  url: item.infoUrl,
                   apiName: item.apiName,
                 });
               }}>
               <RateText title="9.7" />
-            </V1RecommandInfoItem>
+            </V1RecmdInfoItem>
           )}
         />
       </LoadingContainer>

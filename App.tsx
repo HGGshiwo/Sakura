@@ -28,8 +28,8 @@ function App(): JSX.Element {
   const Stack = createNativeStackNavigator();
 
   return (
-    <SafeAreaProvider style={backgroundStyle}>
-      <NavigationContainer>
+    <NavigationContainer>
+      <SafeAreaProvider style={backgroundStyle}>
         <GestureHandlerRootView style={{flex: 1}}>
           <RealmProvider>
             <RootSiblingParent>
@@ -47,8 +47,8 @@ function App(): JSX.Element {
             </RootSiblingParent>
           </RealmProvider>
         </GestureHandlerRootView>
-      </NavigationContainer>
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </NavigationContainer>
   );
 }
 

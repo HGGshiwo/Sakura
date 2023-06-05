@@ -4,14 +4,18 @@ import {InfoText, SubInfoText, SubTitle, SubTitleBold} from './Text';
 import {useContext, useEffect, useState} from 'react';
 import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
-import {ListItemInfo} from '../type/ListItemInfo';
+import ListItemInfo from '../type/ListItemInfo';
 import Context from '../models';
-import Download from '../models/Download';
+import Download from '../models/DownloadDb';
 import alert from './Toast';
-import {TabName} from '../route';
+import {DownloadSectionPageProps, TabName} from '../route';
 import {DownloadContext} from '../context/DownloadContext';
 import {faCircleCheck, faCircleDown} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {ApiContext} from '../context/ApiContext';
+import DownloadDb from '../models/DownloadDb';
+import DownloadItem, { DownloadState } from '../type/Download/DownloadItem';
 
 const {useRealm, useQuery, useObject} = Context;
 
@@ -21,15 +25,12 @@ type anthologySheetProps = {
   state: string | undefined;
   visible: boolean;
   onClose: () => void;
-  data: ListItemInfo[] | undefined;
-  url: string;
+  listItems: ListItemInfo<string>[] | undefined;
+  infoUrl: string;
   tabName: TabName;
   apiName: string;
   title: string | undefined;
 };
-
-type DownloadState = 'finish' | 'run' | 'ready';
-type DownloadItem = ListItemInfo & {state: DownloadState};
 
 const DownloadSheet = ({
   height,
@@ -37,43 +38,72 @@ const DownloadSheet = ({
   state,
   visible,
   onClose,
-  data,
-  url,
+  listItems,
+  infoUrl,
   tabName,
   apiName,
   title,
 }: anthologySheetProps) => {
   const realm = useRealm();
   const {download} = useContext(DownloadContext);
-  const downloads = useQuery(Download); //数据库中下载的内容
+  const downloadDb = useObject(DownloadDb, infoUrl); //数据库中下载的内容
   const [items, setItems] = useState<DownloadItem[]>([]);
+  const navigation = useNavigation<DownloadSectionPageProps['navigation']>();
+  const {api} = useContext(ApiContext);
 
   useEffect(() => {
-    if (!!data) {
+    console.log(downloadDb)
+    if (!!listItems) {
       setItems(
-        data!.map(dataObj => {
-          const downloadObj = realm.objectForPrimaryKey(Download, dataObj.data);
-          const state = !downloadObj
-            ? 'ready'
-            : downloadObj!.finish
-            ? 'finish'
-            : 'run';
-          return {...dataObj, state};
+        listItems!.map(dataObj => {
+          let taskState: DownloadState = "ready";
+          if (!!downloadDb) {
+            const taskDb = downloadDb!.tasks.find(
+              taskObj => taskObj.taskUrl === dataObj.data,
+            );
+            if (!!taskDb) {
+              taskState = taskDb!.finish ? 'finish' : 'run';
+            }
+          }
+          return {...dataObj, state: taskState};
         }),
       );
     }
-  }, [downloads, data]);
+  }, [downloadDb, listItems]);
 
   const handlePressItem = (item: DownloadItem) => {
-    console.log(downloads);
     //是否已经下载过了
     if (item.state !== 'ready') {
       alert(`该集已${item.state === 'finish' ? '下载完成' : '在下载队列中'}!`);
       return;
     }
+    getPlayerData(item);
+  };
 
-    download(url, item.data, tabName);
-    alert(`开始下载 ${title} ${item.title}`);
+  //获取player的数据源
+  const getPlayerData = (item: DownloadItem, _times?: number) => {
+    let times = _times === undefined ? 3 : _times; //默认尝试3次
+    const loadPlayerSrc = api[tabName][apiName].pages.player!;
+    if (times > 0) {
+      // debugger;
+      loadPlayerSrc(
+        item.data,
+        (data: any) => {
+          alert(`开始下载 ${title} ${item.title}`);
+          download(item.data, infoUrl, data.uri, `${title} ${item.title}`);
+        },
+        (err: string) => {
+          console.log(err, '下一次尝试开始');
+          getPlayerData(item, times - 1);
+        },
+      );
+    } else {
+      alert('无法获取到播放地址...');
+    }
+  };
+
+  const checkDownload = () => {
+    navigation.navigate('DownloadSection', {tabName});
   };
 
   return !visible ? (
@@ -103,7 +133,8 @@ const DownloadSheet = ({
                 <></>
               ) : (
                 <FontAwesomeIcon
-                  color='gray'
+                  size={20}
+                  color={item.state === 'finish' ? 'limegreen' : 'deepskyblue'}
                   icon={item.state === 'finish' ? faCircleCheck : faCircleDown}
                 />
               )}
@@ -118,7 +149,7 @@ const DownloadSheet = ({
           padding: 10,
           justifyContent: 'space-between',
           borderTopWidth: 1,
-          borderColor: "lightgrey"
+          borderColor: 'lightgrey',
         }}>
         <InfoText
           style={{paddingHorizontal: 20, paddingVertical: 10}}
@@ -127,6 +158,7 @@ const DownloadSheet = ({
         <InfoText
           style={{paddingHorizontal: 20, paddingVertical: 10}}
           title="查看缓存"
+          onPress={checkDownload}
         />
       </View>
       <View
@@ -175,7 +207,7 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   itemContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderWidth: 1,
     borderColor: 'lightgrey',
     flex: 1,

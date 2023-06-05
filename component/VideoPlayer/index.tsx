@@ -5,7 +5,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import Scrubber from '../../../component/Scrubber';
+import Scrubber from '../Scrubber';
 import Video, {
   OnBandwidthUpdateData,
   OnLoadData,
@@ -23,21 +23,21 @@ import Orientation, {
   PORTRAIT,
 } from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
-import {LoadingText} from '../../../component/Text';
+import {LoadingText} from '../Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
-import {BackButton} from '../../../component/Button';
-import {LoadingBox} from '../../../component/Loading';
+import {BackButton} from '../Button';
+import {LoadingBox} from '../Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
 import {useIsFocused} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
 import React from 'react';
-import ControlBar, {ControlBarRow} from '../../../component/ControlBar';
-import PlayerProps from '../../../type/Player';
-import { ThemeContext } from '../../../context/ThemeContext';
+import ControlBar, {ControlBarRow} from '../ControlBar';
+import PlayerProps from '../../type/Player';
+import { ThemeContext } from '../../context/ThemeContext';
 
 //时间转化函数
 var sec_to_time = (s: number): string => {

@@ -1,4 +1,4 @@
-import { RecommandInfo } from "../RecommandInfo";
+import { RecommandInfo } from "../RecmdInfo";
 
 interface RankingPageInfo {
     rankings: RecommandInfo[], //动画排行榜

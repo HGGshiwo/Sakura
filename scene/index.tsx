@@ -1,5 +1,5 @@
-import VideoPage from './anime/VideoPage'; 
-import ImagePage from './comic/ImagePage';
+import VideoPage from './InfoPage/VideoPage'; 
+import ImagePage from './InfoPage/ImagePage';
 import MainPage from './MainPage';
 import SearchPage from './SearchPage';
 import CategoryPage from './CategoryPage';
@@ -10,7 +10,9 @@ import FollowPage from './FollowPage';
 import SchedulePage from './DailyPage';
 import RankingPage from './RankingPage';
 import TabPage from './TabPage';
-import TextPage from './novel/TextPage';
+import TextPage from './InfoPage/TextPage';
+import DownloadDetailPage from './DownloadPage/DetailPage';
+import DownloadSectionPage from './DownloadPage/SectionPage';
 
 export {
   TabPage,
@@ -26,4 +28,6 @@ export {
   RankingPage,
   ImagePage,
   TextPage,
+  DownloadDetailPage,
+  DownloadSectionPage,
 };

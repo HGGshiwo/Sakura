@@ -24,6 +24,8 @@ const routes = [
   { name: 'Follow', component: scene.FollowPage },
   { name: 'Ranking', component: scene.RankingPage },
   { name: 'Schedule', component: scene.SchedulePage },
+  { name: 'DownloadDetail', component: scene.DownloadDetailPage },
+  { name: "DownloadSection", component: scene.DownloadSectionPage }
 ];
 type RootStackParamList = {
   MainPage: { tabName: TabName }; //Tab的三个页面
@@ -39,6 +41,8 @@ type RootStackParamList = {
   User: undefined;
   History: { tabName: TabName };
   Follow: { tabName: TabName };
+  DownloadSection: { tabName: TabName };
+  DownloadDetail: { infoUrl: string };
 };
 type TabPageProps = NativeStackScreenProps<RootStackParamList, 'TabPage'>;
 type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
@@ -53,6 +57,8 @@ type HistoryPageProps = NativeStackScreenProps<RootStackParamList, 'History'>;
 type FollowPageProps = NativeStackScreenProps<RootStackParamList, 'Follow'>
 type RankingPageProps = NativeStackScreenProps<RootStackParamList, 'Ranking'>
 type SchedulePageProps = NativeStackScreenProps<RootStackParamList, 'Schedule'>
+type DownloadDetailPageProps = NativeStackScreenProps<RootStackParamList, 'DownloadDetail'>
+type DownloadSectionPageProps = NativeStackScreenProps<RootStackParamList, 'DownloadSection'>
 
 export type {
   TabPageProps,
@@ -68,6 +74,8 @@ export type {
   HistoryPageProps,
   RankingPageProps,
   SchedulePageProps,
+  DownloadSectionPageProps,
+  DownloadDetailPageProps,
   TabName,
 };
 export { targets, routes, tabRoutes }

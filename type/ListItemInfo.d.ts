@@ -1,7 +1,7 @@
-type ListItemInfo = {
+type ListItemInfo<T> = {
     title: string,
-    id: number,
-    data: any,
+    id: string,
+    data: T,
 }
 
-export {ListItemInfo}
+export default ListItemInfo

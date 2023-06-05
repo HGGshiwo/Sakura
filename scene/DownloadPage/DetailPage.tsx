@@ -1,71 +1,76 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {View, Pressable, StyleSheet} from 'react-native';
 import {Divider} from '@rneui/themed';
-import Container from '../component/Container';
-import HeadBar from '../component/HeadBar';
-import {SubInfoText, SubTitleBold} from '../component/Text';
-import {HistoryPageProps} from '../route';
+import Container from '../../component/Container';
+import HeadBar from '../../component/HeadBar';
+import {SubInfoText, SubTitleBold} from '../../component/Text';
+import {DownloadDetailPageProps} from '../../route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
-import {V1HistoryInfoItem} from '../component/ListItem';
-import Context from '../models';
-import History from '../models/HistoryDb';
+import {V1DownloadInfoItem} from '../../component/ListItem';
+import Context from '../../models';
 import {useContext, useEffect, useRef, useState} from 'react';
-import RecmdInfoDb from '../models/RecmdInfoDb';
-import HistoryInfo from '../type/HistoryInfo';
+import RecmdInfoDb from '../../models/RecmdInfoDb';
 import Dialog from 'react-native-dialog';
-import EndLine from '../component/EndLine';
-import alert from '../component/Toast';
+import RecmdInfo from '../../type/RecmdInfo';
+import EndLine from '../../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import {ThemeContext} from '../context/ThemeContext';
-import RecmdInfo from '../type/RecmdInfo';
+import {targets} from '../../route';
+import {ThemeContext} from '../../context/ThemeContext';
+import TaskDb from '../../models/TaskDb';
+import DownloadDb from '../../models/DownloadDb';
+import DownloadItemInfo from '../../type/Download/DownloadItemInfo';
+
 
 const {useRealm, useQuery} = Context;
-const targets = {
-  Anime: 'Video',
-  Comic: 'Image',
-  Novel: 'Text',
-};
-const HistoryPage: React.FC<{}> = () => {
-  const route = useRoute<HistoryPageProps['route']>();
-  const {tabName} = route.params;
-  const navigation = useNavigation<HistoryPageProps['navigation']>();
-  const _historys = useQuery<History>(History);
+
+const DetailPage: React.FC<{}> = () => {
+  const route = useRoute<DownloadDetailPageProps['route']>();
+  const {infoUrl} = route.params;
+  const navigation = useNavigation<DownloadDetailPageProps['navigation']>();
   const [dialogVisible, setDialogVisible] = useState(false);
-  const curItem = useRef<HistoryInfo & RecmdInfo>();
+  const curItem = useRef<RecmdInfo & TaskDb>();
   const realm = useRealm();
-  const [historys, setHistorys] = useState<(HistoryInfo & RecmdInfo)[]>([]);
+  const [tasks, setTasks] = useState<DownloadItemInfo[]>([]);
   const {DialogStyle} = useContext(ThemeContext).theme;
+  const downloadDb = realm.objectForPrimaryKey(DownloadDb, infoUrl)!;
 
   useEffect(() => {
-    let historys = [..._historys.sorted('time', true)]
-      .map(_history => {
-        const _animes = realm.objectForPrimaryKey(
-          RecmdInfoDb,
-          _history.infoUrl,
-        )!;
-        return {
-          ..._history.extract(),
-          ..._animes.extract(),
-        };
-      })
-      .filter(history => history.tabName === tabName);
-    setHistorys(historys);
-  }, [_historys]);
+    let tasks = [...downloadDb.tasks].map(_task => {
+      const _animes = realm.objectForPrimaryKey(RecmdInfoDb, infoUrl)!;
+      const total = _task.froms.length + _task.tos.length;
+      const progress = total === 0 ? 0 : _task.froms.length / total;
+      return {
+        ..._animes.extract(),
+        taskUrl: _task.taskUrl,
+        progress,
+        title: _task.title,
+      };
+    });
+    console.log(666, tasks);
+    setTasks(tasks);
+  }, []);
 
-  const onDelete = (item: HistoryInfo & RecmdInfo) => {
-    curItem.current = item;
-    setDialogVisible(true);
+  const onDelete = (item: RecmdInfo) => {
+    // curItem.current = item;
+    // setDialogVisible(true);
   };
 
   const onOK = () => {
     const item = curItem.current;
-    setDialogVisible(false);
-    realm.write(() => {
-      const history = realm.objectForPrimaryKey(History, item!.infoUrl);
-      realm.delete(history);
-    });
-    alert('删除成功');
+    // realm.write(() => {
+    //   realm.create(
+    //     Download,
+    //     {
+    //       href: item!.href,
+    //       Downloading: false,
+    //       tabName: tabName,
+    //     },
+    //     UpdateMode.Modified,
+    //   );
+    // });
+    // setDialogVisible(false);
+    // alert('取消追番成功');
   };
 
   return (
@@ -94,7 +99,7 @@ const HistoryPage: React.FC<{}> = () => {
             alignItems: 'center',
             paddingHorizontal: 10,
           }}>
-          <SubTitleBold title="历史记录" />
+          <SubTitleBold title="下载管理" />
           <Pressable>
             <FontAwesomeIcon icon={faMagnifyingGlass} color="grey" />
           </Pressable>
@@ -102,29 +107,30 @@ const HistoryPage: React.FC<{}> = () => {
       </HeadBar>
       <Divider />
       <SwipeListView
-        data={historys}
-        keyExtractor={item => item.infoUrl}
-        ItemSeparatorComponent={() => <Divider />}
+        data={tasks}
+        // keyExtractor={item => item.taskUrl}
         renderItem={({item, index}) => (
-          <V1HistoryInfoItem
-            item={item}
-            index={index}
+          <V1DownloadInfoItem
             onPress={() =>
-              navigation.navigate(targets[tabName] as any, {
+              navigation.navigate(targets[item.tabName] as any, {
                 url: item.infoUrl,
                 apiName: item.apiName,
               })
             }
+            item={item}
+            imgVerticle={true}
+            index={index}
           />
         )}
-        rightOpenValue={-75}
         renderHiddenItem={({item, index}, rowMap) => (
           <View style={{flex: 1, flexDirection: 'row'}}>
             <Pressable style={styles.hiddenRow} onPress={() => onDelete(item)}>
-              <SubInfoText title="删除历史" style={{color: 'white'}} />
+              <SubInfoText title="删除" style={{color: 'white'}} />
             </Pressable>
           </View>
         )}
+        rightOpenValue={-75}
+        ItemSeparatorComponent={() => <Divider />}
         ListFooterComponent={
           <>
             <Divider />
@@ -149,4 +155,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HistoryPage;
+export default DetailPage;

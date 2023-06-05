@@ -1,24 +1,22 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import RecommandInfo from '../../type/RecommandInfo';
+import RecmdInfo from '../../type/RecmdInfo';
 import {ParallaxCarousel} from '../../component/ParallaxCarousel';
 import {NavBar} from '../../component/NavBar';
 import {ListTitleLine} from '../../component/ListTitleLine';
 import {FlatList} from 'react-native-gesture-handler';
-import {H1HistoryInfoItem, V2RecommandInfoItem} from '../../component/ListItem';
+import {H1HistoryInfoItem, V2RecmdInfoItem} from '../../component/ListItem';
 import Context from '../../models';
-import History from '../../models/History';
+import History from '../../models/HistoryDb';
 import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
 import RecmdInfoDb from '../../models/RecmdInfoDb';
 import {useNavigation} from '@react-navigation/native';
 import {MainPageProps, TabName, targets} from '../../route';
-import api from '../../api';
 import alert from '../../component/Toast';
-import AppContext from '../../context';
 import {SectionGrid} from '../../component/Grid';
 import HomePageInfo from '../../type/PageInfo/HomePageInfo';
-import { SrcContext } from '../../context/SrcContext';
-import { ApiContext } from '../../context/ApiContext';
+import {SrcContext} from '../../context/SrcContext';
+import {ApiContext} from '../../context/ApiContext';
 
 const {useRealm, useQuery} = Context;
 
@@ -29,7 +27,7 @@ const Home: React.FC<{
   url: string;
 }> = ({tabName, home, apiName, url}) => {
   const [pageInfo, setPageInfo] = useState<HomePageInfo>();
-  const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
+  const [historys, setHistorys] = useState<(HistoryInfo & RecmdInfo)[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('加载中...');
   const _historys = useQuery<History>(History);
@@ -37,7 +35,7 @@ const Home: React.FC<{
   const navigation = useNavigation<MainPageProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
   const {source} = useContext(SrcContext);
-  const {api} = useContext(ApiContext)
+  const {api} = useContext(ApiContext);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -47,6 +45,7 @@ const Home: React.FC<{
     loadPage(
       url,
       (data: any) => {
+        //debugger;
         setPageInfo(data);
         setLoading(false);
         setRefreshing(false);
@@ -58,27 +57,17 @@ const Home: React.FC<{
     );
   };
 
-  const mergeHistoryRecmdItem = (_history: History, _animes: RecmdInfoDb) => ({
-    href: _history.href,
-    apiName: _animes!.apiName,
-    progress: _history.progress,
-    progressPer: _history.progressPer,
-    anthologyIndex: _history.anthologyIndex,
-    anthologyTitle: _history.anthologyTitle,
-    time: _history.time,
-    img: _animes!.img,
-    title: _animes!.title,
-    state: _animes!.state,
-  });
-
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)]
-      .filter(history => history.tabName === tabName)
-      .slice(0, 10)
       .map(_history => {
-        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href)!;
-        return mergeHistoryRecmdItem(_history, _animes);
-      });
+        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.infoUrl)!;
+        return {
+          ..._history.extract(),
+          ..._animes.extract(),
+        };
+      })
+      .filter(history => history.tabName === tabName)
+      .slice(0, 10);
     setHistorys(historys);
   }, [_historys]);
 
@@ -86,9 +75,9 @@ const Home: React.FC<{
   useEffect(onRefresh, []);
 
   const handlePressItem = useCallback(
-    (item: RecommandInfo) =>
+    (item: RecmdInfo) =>
       navigation.push(targets[tabName], {
-        url: item.href,
+        url: item.infoUrl,
         apiName: item.apiName,
       }),
     [],
@@ -102,13 +91,13 @@ const Home: React.FC<{
         contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 40}}
         ListHeaderComponent={
           <>
-            {pageInfo?.carousels?.length && (
+            {!!pageInfo?.carousels?.length && (
               <ParallaxCarousel
                 onPress={handlePressItem}
                 carousels={pageInfo.carousels}
               />
             )}
-            {home && (
+            {!!home && (
               <>
                 <NavBar />
                 <ListTitleLine
@@ -134,22 +123,22 @@ const Home: React.FC<{
         }
         sections={pageInfo ? pageInfo.sections : []}
         numColumns={2}
-        keyExtractor={item => item.href}
+        keyExtractor={item => item.infoUrl}
         renderItem={({index, item}) => (
-          <V2RecommandInfoItem
+          <V2RecmdInfoItem
             index={index}
             item={item}
             key={index}
             onPress={handlePressItem}
           />
         )}
-        renderSectionHeader={({section: {title, href}}) => (
+        renderSectionHeader={({section: {title, infoUrl}}) => (
           <ListTitleLine
             title={title}
-            buttonText={(!!href && href !== '') ? '更多' : ''}
+            buttonText={!!infoUrl && infoUrl !== '' ? '更多' : ''}
             onPress={() =>
               navigation.navigate('Index', {
-                url: href,
+                url: infoUrl,
                 title,
                 tabName,
                 apiName,

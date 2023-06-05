@@ -1,7 +1,6 @@
 import {faClose, faMagnifyingGlass, faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable, View, TextInput, Text, StyleSheet} from 'react-native';
-import {useState} from 'react';
 import {ViewStyle} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 interface Props {

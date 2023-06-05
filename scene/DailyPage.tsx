@@ -38,7 +38,6 @@ const DailyPage: React.FC<{}> = () => {
     console.log(tabName, apiName);
     const loadPage = api[tabName][apiName].pages.daily;
     loadPage(({dailys}: DailyPageInfo) => {
-      console.log(dailys);
       setDailys(dailys);
       setLoading(false);
     });

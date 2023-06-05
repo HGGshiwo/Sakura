@@ -1,9 +1,9 @@
 import React, {} from 'react';
-import {Player} from './Player';
+import {Player} from '../../component/VideoPlayer';
 import {useRoute} from '@react-navigation/native';
 import {VideoPageProps} from '../../route';
 import Container from '../../component/Container';
-import InfoPage from '../InfoPage';
+import InfoPage from './InfoPage';
 import { useWindowDimensions } from 'react-native';
 
 

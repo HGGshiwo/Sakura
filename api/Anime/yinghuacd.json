@@ -52,8 +52,7 @@
           "selector": ".pics li",
           "type": "list",
           "value": {
-            "id": {"selector": "a", "attr": "href"},
-            "href": {
+            "infoUrl": {
               "selector": "a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
@@ -104,8 +103,7 @@
                     "attr": "src",
                     "func": [{"name": "imgsafe"}]
                   },
-                  "id": {"selector": "a", "attr": "href"},
-                  "href": {
+                  "infoUrl": {
                     "selector": "a",
                     "attr": "href",
                     "func": [
@@ -128,8 +126,7 @@
               "attr": "src",
               "func": [{"name": "imgsafe"}]
             },
-            "id": {"selector": "a", "attr": "href"},
-            "href": {
+            "infoUrl": {
               "selector": "a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
@@ -159,8 +156,7 @@
                     "attr": "src",
                     "func": [{"name": "imgsafe"}]
                   },
-                  "id": {"selector": "a", "attr": "href"},
-                  "href": {
+                  "infoUrl": {
                     "selector": "a",
                     "attr": "href",
                     "func": [
@@ -199,11 +195,7 @@
           "selector": ".lpic li",
           "type": "list",
           "value": {
-            "id": {
-              "selector": "h2 a",
-              "attr": "href"
-            },
-            "href": {
+            "infoUrl": {
               "selector": "h2 a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
@@ -234,11 +226,7 @@
           "selector": ".lpic li",
           "type": "list",
           "value": {
-            "id": {
-              "selector": "h2 a",
-              "attr": "href"
-            },
-            "href": {
+            "infoUrl": {
               "selector": "h2 a",
               "attr": "href",
               "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
@@ -280,8 +268,7 @@
                     "attr": "src",
                     "func": [{"name": "imgsafe"}]
                   },
-                  "id": {"selector": "a", "attr": "href"},
-                  "href": {
+                  "infoUrl": {
                     "selector": "a",
                     "attr": "href",
                     "func": [
@@ -350,7 +337,7 @@
             },
             "state": {"selector": "span font"},
             "title": {"selector": "h2 a"},
-            "href": {
+            "infoUrl": {
               "selector": "a",
               "func": [{"name": "addbase", "arg1": "http://www.yinghuacd.com"}]
             },

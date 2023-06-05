@@ -16,57 +16,29 @@ import {
   ViewToken,
   SectionList,
   SectionListData,
-  Text,
 } from 'react-native';
 import {Image, ImageProps, useWindowDimensions} from 'react-native';
-import {BackButton} from '../../component/Button';
-import {InfoText, LoadingText} from '../../component/Text';
+import {BackButton} from './Button';
+import {InfoText, LoadingText} from './Text';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Scrubber from '../../component/Scrubber';
-import AppContext from '../../context';
-import {NextButton} from '../anime/Player/NextButton';
+import Scrubber from './Scrubber';
+import AppContext from '../context';
+import {NextButton} from './VideoPlayer/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import PlayerProps from '../../type/Player';
-import { ThemeContext } from '../../context/ThemeContext';
+import {Text} from 'react-native';
+import PlayerProps from '../type/Player';
+import { ThemeContext } from '../context/ThemeContext';
 
-const ResizeImage = React.memo<ImageProps & {onPress: () => void}>(props => {
-  const [aspectRatio, setAspectRatio] = useState(1);
-  const layout = useWindowDimensions();
-  const [dataAvailable, setDataAvailable] = useState(false);
-  useEffect(() => {
-    setDataAvailable((props.source as any).uri !== '');
-    Image.getSize(
-      (props.source as any).uri,
-      (width, height) => {
-        setAspectRatio(width / height);
-      },
-      err => {
-        console.log(`${err}`);
-      },
+const Paragraph = React.memo<{data: string; onPress: () => void}>(
+  ({data, onPress}) => {
+    return (
+      <Pressable onPress={() => onPress()} style={{flex: 1, margin: 10}}>
+        <Text style={{fontSize: 16}}>{data}</Text>
+      </Pressable>
     );
-  }, [props.source]);
-  return (
-    <Pressable onPress={() => props.onPress()} style={{flex: 1}}>
-      {dataAvailable ? (
-        <Image
-          style={{resizeMode: 'contain', width: layout.width, aspectRatio}}
-          source={props.source}
-        />
-      ) : (
-        <View
-          style={{
-            height: 300,
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <InfoText title="加载图片地址中..." />
-        </View>
-      )}
-    </Pressable>
-  );
-});
-const ComicPlayer: React.FC<PlayerProps> = ({
+  },
+);
+const TextPlayer: React.FC<PlayerProps> = ({
   dataAvailable,
   nextDataAvailable,
   data,
@@ -96,13 +68,16 @@ const ComicPlayer: React.FC<PlayerProps> = ({
 
   useEffect(() => {
     //切换了下一个选集，则需要更新长度，加入到累计数据，
+    console.log(data)
     if (data) {
       if (flashData) {
         setTotalData([{...data, index: 0}]);
         setSectionIndex(0);
         setProgress(0);
       } else {
-        setTotalData(totalData.concat([{...data, index: totalData.length}]));
+        setTotalData(
+          totalData.concat([{...data, index: totalData.length}]),
+        );
       }
     }
   }, [data]);
@@ -180,23 +155,22 @@ const ComicPlayer: React.FC<PlayerProps> = ({
     <View style={{flex: 1, alignItems: 'center'}}>
       <SectionList
         renderSectionHeader={({section}) => (
-          <Text style={{fontSize: 16, margin: 10, fontWeight: 'bold'}}>
-            {section.title}
-          </Text>
+          <Text style={{fontSize: 16, margin: 10, fontWeight: 'bold'}}>{section.title}</Text>
         )}
-        keyExtractor={item => item.uri}
         ListEmptyComponent={
           <InfoText
             style={{paddingTop: layout.height / 2, alignSelf: 'center'}}
-            title="加载图片地址中..."
+            title="加载小说地址中..."
           />
         }
-        ListHeaderComponent={<View style={{height: 30, width: '100%'}} />}
+        ListHeaderComponent={
+          <View style={{height: 30, width: '100%'}}/>
+        }
         ListFooterComponent={
           totalData.length !== 0 ? (
             <InfoText
               style={{alignSelf: 'center', paddingVertical: layout.height / 2}}
-              title={nextDataAvailable ? '加载图片中...' : '没有更多了...'}
+              title={nextDataAvailable ? '加载小说中...' : '没有更多了...'}
             />
           ) : null
         }
@@ -209,9 +183,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
         onViewableItemsChanged={onViewCallBack}
         onEndReached={nextDataAvailable ? toNextSource : null}
         onEndReachedThreshold={0.8}
-        renderItem={({item}) => (
-          <ResizeImage source={item} onPress={handlePress} />
-        )}
+        renderItem={({item}) => <Paragraph data={item} onPress={handlePress} />}
       />
 
       {/* top bar  */}
@@ -334,4 +306,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ComicPlayer;
+export default TextPlayer;

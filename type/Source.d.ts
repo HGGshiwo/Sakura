@@ -1,6 +1,6 @@
-declare type Source = {
+declare type Source<T> = {
     key: string;
-    data: any[]
+    data: T[]
 }
 
-export { Source }
+export default Source;

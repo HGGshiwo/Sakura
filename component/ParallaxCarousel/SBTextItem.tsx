@@ -1,7 +1,7 @@
 import React from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import { StyleSheet, Text, View } from "react-native";
-import RecommandInfo from "../../type/RecommandInfo";
+import RecommandInfo from "../../type/RecmdInfo";
 
 interface Props {
   style?: StyleProp<ViewStyle>

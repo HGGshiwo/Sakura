@@ -1,38 +1,28 @@
 //观看历史
 import {Realm} from '@realm/react';
-import HistoryInfo from '../type/HistoryInfo';
-import RecommandInfo from '../type/RecommandInfo';
-import {TabName} from '../route';
-import {Source} from '../type/Source';
-import {ListItemInfo} from '../type/ListItemInfo';
+import ListItemInfo from '../type/ListItemInfo';
 import {UpdateMode} from 'realm';
 
-export default class History extends Realm.Object implements HistoryInfo {
-  href!: string;
+export default class HistoryDb extends Realm.Object {
+  infoUrl!: string;
   time!: number; //时间戳
-  apiName!: string;
   anthologyIndex!: number; //观看的选集
   progress!: number; //观看的进度
   progressPer!: number; //观看进度百分比
   anthologyTitle!: string; //名字
-  tabName!: 'Comic' | 'Anime' | 'Novel';
 
   static update(
     realm: Realm,
-    tabName: TabName,
     url: string,
-    apiName: string,
-    _history: History,
-    anthology: ListItemInfo,
+    _history: HistoryDb,
+    anthology: ListItemInfo<string>,
   ) {
     let history = null;
     realm.write(() => {
       history = realm.create(
-        History,
+        HistoryDb,
         {
-          tabName,
-          href: url,
-          apiName,
+          infoUrl: url,
           time: new Date().getTime(),
           anthologyIndex: _history ? _history.anthologyIndex : 0,
           progress: _history ? _history.progress : 0,
@@ -46,19 +36,28 @@ export default class History extends Realm.Object implements HistoryInfo {
     });
     return history;
   }
+
+  extract() {
+    return {
+      time: this.time,
+      anthologyIndex: this.anthologyIndex,
+      progress: this.progress,
+      progressPer: this.progressPer,
+      anthologyTitle: this.anthologyTitle,
+    }
+  }
+
   // To use a class as a Realm object type, define the object schema on the static property "schema".
   static schema = {
-    name: 'History',
-    primaryKey: 'href',
+    name: 'HistoryDb',
+    primaryKey: 'infoUrl',
     properties: {
-      href: 'string',
+      infoUrl: 'string',
       anthologyIndex: 'int',
       progress: 'float',
       progressPer: 'float',
       anthologyTitle: 'string',
       time: 'int',
-      tabName: 'string',
-      apiName: 'string',
     },
   };
 }

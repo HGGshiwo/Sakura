@@ -13,7 +13,7 @@ import {FlatList} from 'react-native-gesture-handler';
 
 interface ItemProps<T> {
   index: number;
-  datas: readonly T[];
+  datas: ArrayLike<any>;
   children: (index: number, info: T) => ReactNode;
   numberOfItem: number; //一行几个元素
   containerStyle?: ViewStyle;

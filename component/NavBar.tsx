@@ -65,7 +65,7 @@ const NavBar: React.FC<{}> = () => {
         });
         break;
       default:
-        navigation.navigate(item.data, {tabName});
+        // navigation.navigate(item.data, {tabName});
         break;
     }
   };

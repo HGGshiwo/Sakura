@@ -22,7 +22,7 @@ interface Props {
   style?: TextStyle;
   numberOfLines?: any;
   containerStyle?: ViewStyle;
-  onPress?: ()=>void;
+  onPress?: () => void;
 }
 
 const SubTitleBold: React.FC<Props> = ({title, style}) => {
@@ -74,9 +74,10 @@ const Title: React.FC<Props> = ({title, active, style}) => {
   );
 };
 
-const InfoText: React.FC<Props> = ({title, style, numberOfLines}) => {
+const InfoText: React.FC<Props> = ({title, style, numberOfLines, onPress}) => {
   return (
     <Text
+      onPress={onPress}
       ellipsizeMode="tail"
       numberOfLines={numberOfLines < 0 ? 0 : numberOfLines ? numberOfLines : 1}
       style={[{color: 'black'}, style]}>

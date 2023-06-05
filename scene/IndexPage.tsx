@@ -3,10 +3,10 @@ import {Divider} from '@rneui/themed';
 import React, {useContext, useEffect, useState} from 'react';
 import Container from '../component/Container';
 import HeadBar from '../component/HeadBar';
-import {V3RecommandInfoItem} from '../component/ListItem';
+import {V3RecmdInfoItem} from '../component/ListItem';
 import {LoadingContainer} from '../component/Loading';
 import {SubTitleBold} from '../component/Text';
-import RecommandInfo from '../type/RecommandInfo';
+import RecommandInfo from '../type/RecmdInfo';
 import {IndexPageProps, targets} from '../route';
 import {FlatGrid} from '../component/Grid';
 import IndexPageInfo from '../type/PageInfo/IndexPageInf';
@@ -39,17 +39,17 @@ const IndexPage: React.FC<{}> = () => {
       <LoadingContainer loading={loading} style={{paddingTop: '30%'}}>
         <FlatGrid
           contentContainerStyle={{paddingHorizontal: 15}}
-          keyExtractor={item => item.href}
+          keyExtractor={item => item.infoUrl}
           data={results}
           numColumns={3}
           renderItem={({item, index}) => (
-            <V3RecommandInfoItem
+            <V3RecmdInfoItem
               index={index}
               item={item}
               key={index}
               onPress={() => {
                 navigation.navigate(targets[tabName], {
-                  url: item.href,
+                  url: item.infoUrl,
                   apiName: item.apiName,
                 });
               }}

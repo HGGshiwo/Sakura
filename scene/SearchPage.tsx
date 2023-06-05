@@ -3,7 +3,7 @@ import {View, FlatList, useWindowDimensions} from 'react-native';
 import {SearchBar} from '../component/SearchBar';
 import {InfoText} from '../component/Text';
 import {Divider} from '@rneui/themed';
-import {SearchInfo} from '../type/SearchInfo';
+import SearchInfo from '../type/SearchInfo';
 import {V1SearchInfoItem} from '../component/ListItem';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
@@ -13,12 +13,13 @@ import Container from '../component/Container';
 import {FollowButton, RoundButton} from '../component/Button';
 import Context from '../models';
 import RecmdInfoDb from '../models/RecmdInfoDb';
-import Follow from '../models/Follow';
+import Follow from '../models/FollowDb';
 import alert from '../component/Toast';
 import {TabBar, TabView} from 'react-native-tab-view';
 import SearchPageInfo from '../type/PageInfo/SearchPageInfo';
 import {ApiContext} from '../context/ApiContext';
 import {ThemeContext} from '../context/ThemeContext';
+import RecmdInfo from '../type/RecmdInfo';
 
 const {useRealm} = Context;
 
@@ -27,7 +28,7 @@ const ResultView: React.FC<{
   apiName: string;
   tabName: TabName;
 }> = ({searchValue, apiName, tabName}) => {
-  const [results, setResults] = useState<SearchInfo[]>([]);
+  const [results, setResults] = useState<(SearchInfo & RecmdInfo)[]>([]);
   const [loading, setLoading] = useState(false);
   const [follows, setFollows] = useState<boolean[]>([]); //是否追番
   const navigation = useNavigation<SearchPageProps['navigation']>();
@@ -48,18 +49,19 @@ const ResultView: React.FC<{
     });
   }, [searchValue]);
 
-  const onPress = (item: SearchInfo, index: number) => {
+  const onPress = (item: SearchInfo & RecmdInfo, index: number) => {
     //更新番剧数据库
-    RecmdInfoDb.update(
+    RecmdInfoDb.create(
       realm,
-      item.href,
+      item.id,
+      tabName,
       apiName,
       item.img,
       item.state,
       item.title,
     );
     //更新追番记录
-    Follow.update(realm, item.href, !follows[index], tabName);
+    Follow.update(realm, item.infoUrl, !follows[index]);
     const _follows = [...follows];
     _follows[index] = !_follows[index];
     setFollows([..._follows]);
@@ -83,7 +85,7 @@ const ResultView: React.FC<{
               index={index}
               onPress={() => {
                 navigation.navigate(targets[tabName], {
-                  url: item.href,
+                  url: item.infoUrl,
                   apiName: item.apiName,
                 });
               }}>

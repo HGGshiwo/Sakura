@@ -15,27 +15,26 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
-import {ListItemInfo} from '../type/ListItemInfo';
-import {DetailSheet} from '../component/DetailSheet';
-import {AnthologySheet} from '../component/AnthologySheet';
-import Context from '../models';
-import History from '../models/History';
-import RecmdInfoDb from '../models/RecmdInfoDb';
-import Container from '../component/Container';
-import {InfoText, SubTitle} from '../component/Text';
+import ListItemInfo from '../../type/ListItemInfo';
+import {DetailSheet} from '../../component/DetailSheet';
+import {AnthologySheet} from '../../component/AnthologySheet';
+import Context from '../../models';
+import History from '../../models/HistoryDb';
+import RecmdInfoDb from '../../models/RecmdInfoDb';
+import Container from '../../component/Container';
+import {InfoText, SubTitle} from '../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
-import AppContext from '../context';
 import {useNavigation} from '@react-navigation/native';
-import {VideoPageProps} from '../route';
+import {VideoPageProps} from '../../route';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SlidingUpPanel, {SlidingUpPanelProps} from 'rn-sliding-up-panel';
-import {FlatGrid} from '../component/Grid';
-import Profile from '../component/Profile';
-import DownloadSheet from '../component/DownloadSheet';
-import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
-import PlayerProps from '../type/Player';
-import { ThemeContext } from '../context/ThemeContext';
-import { ApiContext } from '../context/ApiContext';
+import {FlatGrid} from '../../component/Grid';
+import Profile from '../../component/Profile';
+import DownloadSheet from '../../component/DownloadSheet';
+import InfoPageInfo from '../../type/PageInfo/InfoPageInfo';
+import PlayerProps from '../../type/Player';
+import { ThemeContext } from '../../context/ThemeContext';
+import { ApiContext } from '../../context/ApiContext';
 
 const {useRealm} = Context;
 const Command = () => <View style={{flex: 1}}></View>;
@@ -121,8 +120,8 @@ const InfoPage: React.FC<{
   const [flashData, setFlashData] = useState(true); //如果不是通过nextSource切换，则flash
   const [anthologyTitle, setAnthologyTitle] = useState(' '); //选集的名字，在player中显示
 
-  const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo>>();
-  const playerAnthologyListRef = createRef<FlatList<ListItemInfo>>();
+  const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo<string>>>();
+  const playerAnthologyListRef = createRef<FlatList<ListItemInfo<string>>>();
 
   const {PlayerStyle} = useContext(ThemeContext).theme;
   const {api} = useContext(ApiContext)
@@ -168,7 +167,6 @@ const InfoPage: React.FC<{
                     </View>
                   </Pressable>
                 )}
-                keyExtractor={item => `${item.id}`}
               />
             )}
           />
@@ -193,13 +191,11 @@ const InfoPage: React.FC<{
         const {img, state, title, sources} = pageInfo;
         let _history = realm.objectForPrimaryKey(History, url);
         //更新番剧数据库
-        RecmdInfoDb.update(realm, url, apiName, img, state, title);
+        RecmdInfoDb.create(realm, url, tabName, apiName, img, state, title);
         //更新历史记录数据库
         history.current = History.update(
           realm,
-          tabName,
           url,
-          apiName,
           _history!,
           sources[0],
         );
@@ -448,9 +444,9 @@ const InfoPage: React.FC<{
         height={layout.height + insets.top - playerHeight}
         state={pageInfo?.state}
         visible={downloadSheetVisible}
-        url={url}
+        infoUrl={url}
         onClose={() => setDownloadSheetVisible(false)}
-        data={pageInfo?.sources}
+        listItems={pageInfo?.sources}
       />
     </Container>
   );

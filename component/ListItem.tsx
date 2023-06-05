@@ -2,9 +2,12 @@ import {ReactNode} from 'react';
 import {StyleSheet, View, Pressable, ImageBackground} from 'react-native';
 import {InfoText, SubInfoText, SubTitle} from '../component/Text';
 import HistoryInfo from '../type/HistoryInfo';
-import RecommandInfo from '../type/RecommandInfo';
-import {SearchInfo} from '../type/SearchInfo';
+import RecmdInfo from '../type/RecmdInfo';
+import SearchInfo from '../type/SearchInfo';
 import LinearGradient from 'react-native-linear-gradient';
+import {Bar} from 'react-native-progress';
+import Task from '../type/Download/Task';
+import DownloadItemInfo from '../type/Download/DownloadItemInfo';
 
 interface Props<T> {
   index: number;
@@ -14,13 +17,13 @@ interface Props<T> {
   children?: ReactNode;
 }
 
-//推荐列表的一项, 列表方向: 纵向，一行1个，包含信息： RecommandInfo
-const V1RecommandInfoItem = ({
+//推荐列表的一项, 列表方向: 纵向，一行1个，包含信息： RecmdInfo
+const V1RecmdInfoItem = ({
   item,
   onPress,
   children,
   imgVerticle,
-}: Props<RecommandInfo>) => {
+}: Props<RecmdInfo>) => {
   return (
     <Pressable
       onPress={() => {
@@ -42,8 +45,8 @@ const V1RecommandInfoItem = ({
   );
 };
 
-//主页列表的一项, 列表方向: 纵向，一行2个，包含信息：RecommandInfo
-const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
+//主页列表的一项, 列表方向: 纵向，一行2个，包含信息：RecmdInfo
+const V2RecmdInfoItem: React.FC<Props<RecmdInfo>> = ({
   index,
   item,
   onPress,
@@ -77,7 +80,7 @@ const V2RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
 };
 
 //主页观看历史的一项，列表方向: 横向，一列1个，包含信息：HistoryInfo
-const H1HistoryInfoItem: React.FC<Props<HistoryInfo & RecommandInfo>> = ({
+const H1HistoryInfoItem: React.FC<Props<HistoryInfo & RecmdInfo>> = ({
   item,
   index,
   onPress,
@@ -129,7 +132,7 @@ const EmptyH1HistoryInfoItem: React.FC<{}> = ({}) => {
 };
 
 //观看历史的一项，列表方向: 纵向，一行1个，包含信息：HistoryInfo & RecmdInfo
-const V1HistoryInfoItem: React.FC<Props<HistoryInfo & RecommandInfo>> = ({
+const V1HistoryInfoItem: React.FC<Props<HistoryInfo & RecmdInfo>> = ({
   item,
   children,
   onPress,
@@ -161,8 +164,8 @@ const V1HistoryInfoItem: React.FC<Props<HistoryInfo & RecommandInfo>> = ({
   );
 };
 
-//用户追番的一项，列表方向: 横向，一列1个，包含信息：RecommandInfo
-const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
+//用户追番的一项，列表方向: 横向，一列1个，包含信息：RecmdInfo
+const H1RecmdInfoItem: React.FC<Props<RecmdInfo>> = ({
   item,
   index,
   onPress,
@@ -194,7 +197,7 @@ const H1RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
 };
 
 //搜索结果的一项，列表方向: 纵向，一行1个，包含信息：SearchInfo
-const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
+const V1SearchInfoItem: React.FC<Props<RecmdInfo & SearchInfo>> = ({
   item,
   index,
   onPress,
@@ -211,7 +214,7 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
         <View style={styles.infoContainer}>
           <SubTitle numberOfLines={1} title={item.title} />
           <InfoText title={item.state} />
-          <InfoText title={item.type.map(type=>type.title).join('/')} />
+          <InfoText title={item.type.map(type => type.title).join('/')} />
           <InfoText title={item.info} numberOfLines={3} />
         </View>
         <View style={{alignItems: 'center', flex: 1}}>{children}</View>
@@ -220,8 +223,8 @@ const V1SearchInfoItem: React.FC<Props<SearchInfo>> = ({
   );
 };
 
-//分类结果的一项，列表方向纵向，一行3个，包含信息: RecommandInfo
-const V3RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
+//分类结果的一项，列表方向纵向，一行3个，包含信息: RecmdInfo
+const V3RecmdInfoItem: React.FC<Props<RecmdInfo>> = ({
   index,
   item,
   onPress,
@@ -252,6 +255,40 @@ const V3RecommandInfoItem: React.FC<Props<RecommandInfo>> = ({
   );
 };
 
+//下载进度的一项，列表方向纵向，一行1个，包含信息：DownloadItemInfo
+const V1DownloadInfoItem: React.FC<Props<DownloadItemInfo>> = ({
+  item,
+  children,
+  onPress,
+}) => {
+  return (
+    <Pressable
+      onPress={() => {
+        onPress(item);
+      }}>
+      <View style={styles.itemContainerH}>
+        <ImageBackground
+          imageStyle={styles.ibImage}
+          style={styles.ibContainer80H}
+          source={{uri: item.img}}
+        />
+        <View style={styles.infoContainer}>
+          <SubTitle style={{color: 'black'}} title={item.title} />
+          <SubInfoText title={(item.progress * 100).toFixed(2) + '%'} />
+          <Bar
+            progress={item.progress}
+            height={3}
+            unfilledColor="lightgrey"
+            borderColor="white"
+            color='grey'
+          />
+        </View>
+        <View style={styles.rateContainer}>{children}</View>
+      </View>
+    </Pressable>
+  );
+};
+
 const styles = StyleSheet.create({
   itemContainerH: {
     justifyContent: 'space-between',
@@ -271,10 +308,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: 'grey',
   },
-  ibTextContainer:{
-    width: '100%', 
-    bottom: 0, 
-    right: 0, 
+  ibTextContainer: {
+    width: '100%',
+    bottom: 0,
+    right: 0,
     position: 'absolute',
     borderRadius: 5,
     padding: 2,
@@ -324,12 +361,13 @@ const styles = StyleSheet.create({
 });
 
 export {
-  V1RecommandInfoItem,
-  V2RecommandInfoItem,
-  V3RecommandInfoItem,
+  V1RecmdInfoItem,
+  V2RecmdInfoItem,
+  V3RecmdInfoItem,
   H1HistoryInfoItem,
   V1SearchInfoItem,
-  H1RecommandInfoItem,
+  H1RecmdInfoItem,
   EmptyH1HistoryInfoItem,
   V1HistoryInfoItem,
+  V1DownloadInfoItem,
 };

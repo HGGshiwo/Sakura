@@ -7,21 +7,23 @@ import {SubInfoText, SubTitleBold} from '../component/Text';
 import {FollowPageProps} from '../route';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
-import {V1RecommandInfoItem} from '../component/ListItem';
+import {V1RecmdInfoItem} from '../component/ListItem';
 import Context from '../models';
 import {useContext, useEffect, useRef, useState} from 'react';
 import RecmdInfoDb from '../models/RecmdInfoDb';
 import Dialog from 'react-native-dialog';
-import Follow from '../models/Follow';
-import RecommandInfo from '../type/RecommandInfo';
-import {UpdateMode} from 'realm';
+import Follow from '../models/FollowDb';
+import RecmdInfo from '../type/RecmdInfo';
 import EndLine from '../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import alert from '../component/Toast';
 import {targets} from '../route';
-import { ThemeContext } from '../context/ThemeContext';
+import {ThemeContext} from '../context/ThemeContext';
+import FollowDb from '../models/FollowDb';
 
 const {useRealm, useQuery} = Context;
+
+type FollowItem = RecmdInfo & {following: boolean};
 
 const FollowPage: React.FC<{}> = () => {
   const route = useRoute<FollowPageProps['route']>();
@@ -29,47 +31,33 @@ const FollowPage: React.FC<{}> = () => {
   const navigation = useNavigation<FollowPageProps['navigation']>();
   const _follows = useQuery<Follow>(Follow);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const curItem = useRef<RecommandInfo>();
+  const curItem = useRef<FollowItem>();
   const realm = useRealm();
-  const [follows, setFollows] = useState<RecommandInfo[]>([]);
+  const [follows, setFollows] = useState<FollowItem[]>([]);
   const {DialogStyle} = useContext(ThemeContext).theme;
   useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)
       .reverse()
       .map(_follow => {
-        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _follow.href);
-        return {
-          href: _follow.href,
-          apiName: _animes!.apiName,
-          img: _animes!.img,
-          title: _animes!.title,
-          state: _animes!.state,
-          tabName: _follow.tabName,
-        };
+        const _animes = realm.objectForPrimaryKey(
+          RecmdInfoDb,
+          _follow.infoUrl,
+        )!;
+        return {..._animes.extract(), following: _follow.following};
       })
       .filter(follow => follow.tabName === tabName);
     setFollows(follows);
   }, [_follows]);
 
-  const onDelete = (item: RecommandInfo) => {
+  const onDelete = (item: FollowItem) => {
     curItem.current = item;
     setDialogVisible(true);
   };
 
   const onOK = () => {
-    const item = curItem.current;
-    realm.write(() => {
-      realm.create(
-        Follow,
-        {
-          href: item!.href,
-          following: false,
-          tabName: tabName,
-        },
-        UpdateMode.Modified,
-      );
-    });
+    const item = curItem.current!;
+    FollowDb.update(realm, item.infoUrl, false);
     setDialogVisible(false);
     alert('取消追番成功');
   };
@@ -109,12 +97,12 @@ const FollowPage: React.FC<{}> = () => {
       <Divider />
       <SwipeListView
         data={follows}
-        keyExtractor={item => item.href}
+        keyExtractor={item => item.infoUrl}
         renderItem={({item, index}) => (
-          <V1RecommandInfoItem
+          <V1RecmdInfoItem
             onPress={() =>
               navigation.navigate(targets[tabName] as any, {
-                url: item.href,
+                url: item.infoUrl,
                 apiName: item.apiName,
               })
             }

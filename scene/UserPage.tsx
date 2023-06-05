@@ -9,10 +9,10 @@ import {
 import {
   EmptyH1HistoryInfoItem,
   H1HistoryInfoItem,
-  H1RecommandInfoItem,
+  H1RecmdInfoItem,
 } from '../component/ListItem';
 import {ListTitleLine} from '../component/ListTitleLine';
-import History from '../models/History';
+import History from '../models/HistoryDb';
 import Context from '../models';
 import HistoryInfo from '../type/HistoryInfo';
 import RecmdInfoDb from '../models/RecmdInfoDb';
@@ -23,8 +23,8 @@ import {
   SubTitleBold,
   Title,
 } from '../component/Text';
-import Follow from '../models/Follow';
-import RecommandInfo from '../type/RecommandInfo';
+import Follow from '../models/FollowDb';
+import RecommandInfo from '../type/RecmdInfo';
 import {TabView, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {TabName, targets, UserPageProps} from '../route';
@@ -42,7 +42,8 @@ import {
 import {NavBarButton} from '../component/Button';
 import alert from '../component/Toast';
 import {ThemeContext} from '../context/ThemeContext';
-import { SrcContext } from '../context/SrcContext';
+import {SrcContext} from '../context/SrcContext';
+import RecmdInfo from '../type/RecmdInfo';
 
 type Data = {
   title: string;
@@ -70,8 +71,8 @@ const {useRealm, useQuery} = Context;
 const SubPage: React.FC<{
   tabName: TabName;
 }> = ({tabName}) => {
-  const [historys, setHistorys] = useState<(HistoryInfo & RecommandInfo)[]>([]);
-  const [follows, setFollows] = useState<RecommandInfo[]>([]);
+  const [historys, setHistorys] = useState<(RecmdInfo & HistoryInfo)[]>([]);
+  const [follows, setFollows] = useState<RecmdInfo[]>([]);
   const navigation = useNavigation<UserPageProps['navigation']>();
   const _historys = useQuery<History>(History);
   const _follows = useQuery<Follow>(Follow);
@@ -86,19 +87,13 @@ const SubPage: React.FC<{
   const onRefresh = () => {
     let historys = [..._historys.sorted('time', true)]
       .map(_history => {
-        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.href);
+        const _animes = realm.objectForPrimaryKey(
+          RecmdInfoDb,
+          _history.infoUrl,
+        )!;
         return {
-          href: _history.href,
-          progress: _history.progress,
-          progressPer: _history.progressPer,
-          anthologyIndex: _history.anthologyIndex,
-          anthologyTitle: _history.anthologyTitle,
-          time: _history.time,
-          img: _animes!.img,
-          title: _animes!.title,
-          state: _animes!.state,
-          apiName: _animes!.apiName,
-          tabName: _history.tabName,
+          ..._history.extract(),
+          ..._animes.extract(),
         };
       })
       .filter(history => history.tabName === tabName);
@@ -107,15 +102,11 @@ const SubPage: React.FC<{
       .filter(follow => follow.following)
       .reverse()
       .map(_follow => {
-        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _follow.href);
-        return {
-          href: _follow.href,
-          apiName: _animes!.apiName,
-          img: _animes!.img,
-          title: _animes!.title,
-          state: _animes!.state,
-          tabName: _follow.tabName,
-        };
+        const _animes = realm.objectForPrimaryKey(
+          RecmdInfoDb,
+          _follow.infoUrl,
+        )!;
+        return {..._animes.extract()};
       })
       .filter(item => item.tabName === tabName);
     setFollows(follows);
@@ -135,8 +126,8 @@ const SubPage: React.FC<{
   useEffect(onRefresh, []);
 
   const onPress = (item: Data) => {
-    const apiName = "yinghuacd"
-    
+    const apiName = 'yinghuacd';
+
     switch (item.data) {
       case 'all':
         navigation.navigate('Index', {
@@ -169,9 +160,9 @@ const SubPage: React.FC<{
   };
 
   const handlePressItem = useCallback(
-    (item: RecommandInfo) =>
+    (item: RecmdInfo) =>
       navigation.push(targets[tabName], {
-        url: item.href,
+        url: item.infoUrl,
         apiName: item.apiName,
       }),
     [],
@@ -246,7 +237,7 @@ const SubPage: React.FC<{
           horizontal
           data={follows}
           renderItem={({item, index}) => (
-            <H1RecommandInfoItem
+            <H1RecmdInfoItem
               item={item}
               index={index}
               onPress={handlePressItem}
@@ -259,14 +250,14 @@ const SubPage: React.FC<{
         <ListTitleLine
           title="下载管理"
           buttonText="更多"
-          onPress={() => navigation.navigate('Follow', {tabName})}
+          onPress={() => navigation.navigate('DownloadSection', {tabName})}
         />
         <Divider />
         <FlatList
           horizontal
           data={[]}
           renderItem={({item, index}) => (
-            <H1RecommandInfoItem
+            <H1RecmdInfoItem
               item={item}
               index={index}
               onPress={handlePressItem}
@@ -281,7 +272,7 @@ const SubPage: React.FC<{
 
 const SettingPage = () => {
   const {theme, themeName, changeTheme} = useContext(ThemeContext);
-  const {source, changeSource} = useContext(SrcContext)
+  const {source, changeSource} = useContext(SrcContext);
 
   return (
     <View style={{padding: 10}}>

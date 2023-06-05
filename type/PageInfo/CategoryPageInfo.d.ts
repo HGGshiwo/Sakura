@@ -1,4 +1,4 @@
-import { RecommandInfo } from "../RecommandInfo";
+import { RecommandInfo } from "../RecmdInfo";
 import { Section } from "../Section";
 
 interface CategoryPageInfo {

@@ -1,6 +1,6 @@
 import { InfoSub } from "../InfoSub";
 import { ListItemInfo } from "../ListItemInfo";
-import { RecommandInfo } from "../RecommandInfo";
+import { RecommandInfo } from "../RecmdInfo";
 import { Source } from "../Source";
 
 type ComicPageInfo = {

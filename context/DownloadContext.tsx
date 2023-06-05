@@ -1,31 +1,61 @@
 import {createContext, useEffect, useRef, useState} from 'react';
 import RNFS, {DocumentDirectoryPath} from 'react-native-fs';
 import {TabName} from '../route';
-import Download from '../models/Download';
+import Download from '../models/DownloadDb';
 import Context from '../models';
-import Task from '../type/Task';
+import Task from '../type/Download/Task';
+import RecmdInfoDb from '../models/RecmdInfoDb';
+import DownloadItem from '../type/Download/DownloadItem';
 //下载的单位是章节/一集，现实的进度也是一个章节的进度
 
 const DownloadContext = createContext<{
-  download: (infoUrl: string, url: string, tabName: TabName) => void;
+  download: (
+    data: string,
+    infoUrl: string,
+    m3u8Url: string,
+    title: string,
+  ) => void;
 }>({
-  download: (infoUrl, url, tabName) => {},
+  download: (data, infoUrl, m3u8Url, title) => {},
 });
+
+//获取到ts的完整路径
+const getRemotePath = (m3u8Url: string, tsUrl: string) => {
+  if (tsUrl[0] === '/') {
+    // /xxx.ts
+    const baseRegx = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/g;
+    const baseUrl = baseRegx.exec(m3u8Url)![0];
+    return baseUrl + tsUrl;
+  } else {
+    let baseUrl = m3u8Url.split('/').slice(0, -1).join('/');
+    return baseUrl + '/' + tsUrl;
+  }
+};
+
+//tsUrl映射到本地路径
+const getLocalPath = (tsUrl: string) => {
+  if (/^#\w+/.test(tsUrl)) {
+    return tsUrl; //注释
+  }
+  if (tsUrl[0] === '/') {
+    tsUrl = tsUrl.replace('/', ''); // /xxx.ts => xxx.ts
+  }
+  return tsUrl.split(/:|[/]/).join('');
+};
 
 /**
  * 获得m3u8文件内容
  * @param url 远程的m3u8文件地址
  **/
-const getM3u8Text = async (baseUrl: string, url: string): Promise<string> => {
-  const _url = url.includes('http') ? url : baseUrl + url;
-  return fetch(_url)
+const getM3u8Text = async (url: string): Promise<string> => {
+  return fetch(url)
     .then(response => response.text())
     .then(responseText => {
       //去掉注释
       let urls = responseText.split('\n').filter(a => a && a[0] === '#');
       if (urls.length == 1 && /.m3u8$/.test(urls[0])) {
-        let newUrl = urls[0].includes('http') ? urls[0] : baseUrl + urls[0];
-        return getM3u8Text(baseUrl, newUrl); //内嵌m3u8链接
+        let newUrl = getRemotePath(url, urls[0]);
+        return getM3u8Text(newUrl); //内嵌m3u8链接
       } else {
         return responseText;
       }
@@ -57,7 +87,8 @@ const DownloadWrapper: React.FC<{children: any}> = ({children}) => {
         taskQue.current.length,
       );
       taskQue.current.splice(0, waitNum).forEach(task => {
-        if (task.tabName == 'Anime') {
+        const info = realm.objectForPrimaryKey(RecmdInfoDb, task.infoUrl)!;
+        if (info.tabName == 'Anime') {
           downloadTs(task);
         }
       });
@@ -67,47 +98,38 @@ const DownloadWrapper: React.FC<{children: any}> = ({children}) => {
 
   /**
    * 对一集或者一章进行下载操作
+   * @param data 该集的url
    * @param infoUrl 番剧的id
-   * @param url 该集的id
-   * @param tabName 如何处理数据
+   * @param m3u8Url m3u8结尾的url
+   * @param title 显示的标题
    **/
-  const download = (infoUrl: string, url: string, tabName: TabName) => {
+  const download = (
+    data: string,
+    infoUrl: string,
+    m3u8Url: string,
+    title: string,
+  ) => {
     //新建一个文件存放下载的ts文件
-    Download.create(realm, infoUrl, url, tabName);
+    Download.create(realm, infoUrl, data, title);
     const infoName = infoUrl.split(/:|[/]/).join('');
-    const urlName = url.split(/:|[/]/).join('');
+    const urlName = data.split(/:|[/]/).join('');
     const fileName = `${RNFS.DocumentDirectoryPath}/${infoName}/${urlName}`;
     RNFS.mkdir(fileName)
       .then(res => {
-        //需要获取到base url用来计算m3u8中的ts地址
-        const baseRegx =
-          /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/g;
-        const baseUrl = baseRegx.exec(url)![0];
-
-        //url映射到本地路径
-        const getTo = (url: string) => {
-          if (!/^#\w+/.test(url) && url) {
-            return url; //注释
-          }
-          if (url.includes('http')) {
-            return `${fileName}/${url.split(/:|[/]/).join('')}`; // https://xxx.ts => /httpsxxx.ts
-          } else {
-            return `${fileName}/${url}`; // /xxx.ts=>/xxx.ts
-          }
-        };
-        getM3u8Text(baseUrl, url).then(responseText => {
+        getM3u8Text(m3u8Url).then(responseText => {
           const m3u8Texts = responseText.split('\n');
-          const contents = m3u8Texts.map(getTo).join('\n');
+          const contents = m3u8Texts.map(getLocalPath).join('\n');
           const froms = m3u8Texts
             .filter(a => !/^#\w+/.test(a) && a) //去掉注释
             .map(item => {
-              const from = item.includes('http') ? item : baseUrl + item;
-              const to = getTo(item);
+              const from = getRemotePath(m3u8Url, item);
+              const to = fileName + '/' + getLocalPath(item);
               taskQue.current.push({
                 from,
                 to,
-                downloadId: url,
-                tabName: tabName,
+                infoUrl,
+                taskUrl: data,
+                title,
               });
               return from;
             });
@@ -115,7 +137,8 @@ const DownloadWrapper: React.FC<{children: any}> = ({children}) => {
           RNFS.writeFile(fileName + '/index.m3u8', contents).catch(err => {
             console.log('write failed: ', err);
           });
-          Download.updateFroms(realm, url, froms);
+          Download.updateFroms(realm, data, infoUrl, froms);
+          activateTask();
         });
       })
       .catch(err => {

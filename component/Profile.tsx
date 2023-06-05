@@ -9,14 +9,14 @@ import {FlatList, View, Pressable} from 'react-native';
 import {TabName, VideoPageProps, targets} from '../route';
 import {FollowButton, TextButton} from './Button';
 import EndLine from './EndLine';
-import {V1RecommandInfoItem} from './ListItem';
+import {V1RecmdInfoItem} from './ListItem';
 import {ListTitleLine} from './ListTitleLine';
 import {LoadingContainer} from './Loading';
 import {Title, InfoText, SubTitle, RateText} from './Text';
 import TextIconButton from './ToolBar';
-import RecommandInfo from '../type/RecommandInfo';
+import RecmdInfo from '../type/RecmdInfo';
 import {ReactNode, useCallback, useEffect, useState} from 'react';
-import Follow from '../models/Follow';
+import Follow from '../models/FollowDb';
 import alert from './Toast';
 import Context from '../models';
 import {useNavigation} from '@react-navigation/native';
@@ -51,15 +51,15 @@ const Profile: React.FC<{
   //点击追番按钮的回调函数
   const handlePressFollowed = useCallback(() => {
     setFollowed(!followed);
-    Follow.update(realm, url, !followed, tabName);
+    Follow.update(realm, url, !followed);
     alert(`${!followed ? '' : '取消'}追番成功`);
   }, [followed]);
 
   const navigation = useNavigation<VideoPageProps['navigation']>();
 
-  const onPressRecommand = (item: RecommandInfo) => {
+  const onPressRecmd = (item: RecmdInfo) => {
     navigation.push(targets[tabName] as any, {
-      url: item.href,
+      url: item.infoUrl,
       apiName: item.apiName,
     });
   };
@@ -171,14 +171,11 @@ const Profile: React.FC<{
         data={pageInfo?.recommands}
         ItemSeparatorComponent={() => <Divider />}
         renderItem={({item, index}) => (
-          <V1RecommandInfoItem
-            index={index}
-            item={item}
-            onPress={onPressRecommand}>
+          <V1RecmdInfoItem index={index} item={item} onPress={onPressRecmd}>
             <RateText title="9.7" />
-          </V1RecommandInfoItem>
+          </V1RecmdInfoItem>
         )}
-        keyExtractor={item => `${item.href}`}
+        keyExtractor={item => `${item.infoUrl}`}
         ListFooterComponent={() => <EndLine />}
       />
     </LoadingContainer>

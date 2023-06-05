@@ -3,7 +3,7 @@ import React from 'react';
 // import {Image} from '@rneui/themed';
 import {StyleProp, ViewStyle, ImageURISource, Pressable} from 'react-native';
 import {StyleSheet, View, ActivityIndicator, Text, Image} from 'react-native';
-import RecommandInfo from '../../type/RecommandInfo';
+import RecommandInfo from '../../type/RecmdInfo';
 import {MainPageProps, TabName, targets} from '../../route';
 import {ImageBackground} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -25,7 +25,7 @@ const SBImageItem: React.FC<Props> = ({
   return (
     <Pressable style={{flex: 1}} onPress={() => onPress(item)}>
       <ImageBackground
-        key={item.href}
+        key={item.infoUrl}
         imageStyle={styles.image}
         style={styles.container}
         source={{uri: item.img}}>
