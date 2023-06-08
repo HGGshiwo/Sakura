@@ -6,7 +6,7 @@ import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
 import ListItemInfo from '../type/ListItemInfo';
 import Context from '../models';
-import Download from '../models/DownloadDb';
+import Download from '../models/SectionDb';
 import alert from './Toast';
 import {DownloadSectionPageProps, TabName} from '../route';
 import {DownloadContext} from '../context/DownloadContext';
@@ -14,8 +14,10 @@ import {faCircleCheck, faCircleDown} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {ApiContext} from '../context/ApiContext';
-import DownloadDb from '../models/DownloadDb';
-import DownloadItem, { DownloadState } from '../type/Download/DownloadItem';
+import DownloadDb from '../models/SectionDb';
+import DownloadItem from '../type/Download/DownloadItem';
+import Episode from '../type/Download/Episode';
+import SectionDb from '../models/SectionDb';
 
 const {useRealm, useQuery, useObject} = Context;
 
@@ -25,7 +27,7 @@ type anthologySheetProps = {
   state: string | undefined;
   visible: boolean;
   onClose: () => void;
-  listItems: ListItemInfo<string>[] | undefined;
+  listItems: Episode[] | undefined;
   infoUrl: string;
   tabName: TabName;
   apiName: string;
@@ -38,7 +40,6 @@ const DownloadSheet = ({
   state,
   visible,
   onClose,
-  listItems,
   infoUrl,
   tabName,
   apiName,
@@ -46,51 +47,39 @@ const DownloadSheet = ({
 }: anthologySheetProps) => {
   const realm = useRealm();
   const {download} = useContext(DownloadContext);
-  const downloadDb = useObject(DownloadDb, infoUrl); //数据库中下载的内容
-  const [items, setItems] = useState<DownloadItem[]>([]);
+  const [items, setItems] = useState<Episode[]>([]);
   const navigation = useNavigation<DownloadSectionPageProps['navigation']>();
   const {api} = useContext(ApiContext);
+  const section = useObject(SectionDb, infoUrl)!
 
   useEffect(() => {
-    console.log(downloadDb)
-    if (!!listItems) {
-      setItems(
-        listItems!.map(dataObj => {
-          let taskState: DownloadState = "ready";
-          if (!!downloadDb) {
-            const taskDb = downloadDb!.tasks.find(
-              taskObj => taskObj.taskUrl === dataObj.data,
-            );
-            if (!!taskDb) {
-              taskState = taskDb!.finish ? 'finish' : 'run';
-            }
-          }
-          return {...dataObj, state: taskState};
-        }),
-      );
-    }
-  }, [downloadDb, listItems]);
+    setItems(section.episodes)
+  }, [section.episodes]);
 
-  const handlePressItem = (item: DownloadItem) => {
+  const handlePressItem = (item: Episode) => {
     //是否已经下载过了
-    if (item.state !== 'ready') {
-      alert(`该集已${item.state === 'finish' ? '下载完成' : '在下载队列中'}!`);
+    if (item.start) {
+      alert(`该集已${item.finish ? '下载完成' : '在下载队列中'}!`);
       return;
     }
+    const _item = section.episodes.find(obj=>obj.taskUrl==item.taskUrl)!
+    realm.write(()=>{
+      _item.start = true
+    })
     getPlayerData(item);
   };
 
   //获取player的数据源
-  const getPlayerData = (item: DownloadItem, _times?: number) => {
+  const getPlayerData = (item: Episode, _times?: number) => {
     let times = _times === undefined ? 3 : _times; //默认尝试3次
     const loadPlayerSrc = api[tabName][apiName].pages.player!;
     if (times > 0) {
       // debugger;
       loadPlayerSrc(
-        item.data,
+        item.taskUrl,
         (data: any) => {
           alert(`开始下载 ${title} ${item.title}`);
-          download(item.data, infoUrl, data.uri, `${title} ${item.title}`);
+          download(item.taskUrl, infoUrl, data.uri, `${title} ${item.title}`);
         },
         (err: string) => {
           console.log(err, '下一次尝试开始');
@@ -129,13 +118,13 @@ const DownloadSheet = ({
             key={index}>
             <View style={styles.itemContainer}>
               <SubTitle title={item.title} />
-              {item.state === 'ready' ? (
+              {!item.start ? (
                 <></>
               ) : (
                 <FontAwesomeIcon
                   size={20}
-                  color={item.state === 'finish' ? 'limegreen' : 'deepskyblue'}
-                  icon={item.state === 'finish' ? faCircleCheck : faCircleDown}
+                  color={item.finish ? 'limegreen' : 'deepskyblue'}
+                  icon={item.finish ? faCircleCheck : faCircleDown}
                 />
               )}
             </View>

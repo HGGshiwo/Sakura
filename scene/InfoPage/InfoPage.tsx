@@ -20,7 +20,6 @@ import {DetailSheet} from '../../component/DetailSheet';
 import {AnthologySheet} from '../../component/AnthologySheet';
 import Context from '../../models';
 import History from '../../models/HistoryDb';
-import RecmdInfoDb from '../../models/RecmdInfoDb';
 import Container from '../../component/Container';
 import {InfoText, SubTitle} from '../../component/Text';
 import {TabBar, TabView} from 'react-native-tab-view';
@@ -33,10 +32,14 @@ import Profile from '../../component/Profile';
 import DownloadSheet from '../../component/DownloadSheet';
 import InfoPageInfo from '../../type/PageInfo/InfoPageInfo';
 import PlayerProps from '../../type/Player';
-import { ThemeContext } from '../../context/ThemeContext';
-import { ApiContext } from '../../context/ApiContext';
+import {ThemeContext} from '../../context/ThemeContext';
+import {ApiContext} from '../../context/ApiContext';
+import DownloadDb from '../../models/SectionDb';
+import SectionDb from '../../models/SectionDb';
+import Section from '../../type/Download/Section';
+import Episode from '../../type/Download/Episode';
 
-const {useRealm} = Context;
+const {useRealm, useObject} = Context;
 const Command = () => <View style={{flex: 1}}></View>;
 
 const routes = [
@@ -74,7 +77,8 @@ const OptionalWapper: React.FC<
 
 const InfoPage: React.FC<{
   playerHeight: number; //上方的播放器高度
-  url: string;
+  infoUrl: string;
+  taskUrl?: string;
   apiName: string;
   renderPlayer: (data: PlayerProps) => ReactNode;
   tabName: 'Comic' | 'Anime' | 'Novel';
@@ -82,7 +86,8 @@ const InfoPage: React.FC<{
   allowDragging?: boolean; //是否允许拖动profile
 }> = ({
   playerHeight,
-  url,
+  infoUrl,
+  taskUrl,
   apiName,
   renderPlayer,
   tabName,
@@ -99,7 +104,7 @@ const InfoPage: React.FC<{
   const dataAvailableRef = useRef(false); //playerd的数据源是否可用
 
   //页面展示的数据
-  const [pageInfo, setPageInfo] = useState<InfoPageInfo>();
+  const [pageInfo, setPageInfo] = useState<Section>();
 
   //sheet是否可见
   const [detailLineVisible, setDetailSheetVisible] = useState(false);
@@ -120,12 +125,12 @@ const InfoPage: React.FC<{
   const [flashData, setFlashData] = useState(true); //如果不是通过nextSource切换，则flash
   const [anthologyTitle, setAnthologyTitle] = useState(' '); //选集的名字，在player中显示
 
-  const ProfileAnthologyListRef = createRef<FlatList<ListItemInfo<string>>>();
-  const playerAnthologyListRef = createRef<FlatList<ListItemInfo<string>>>();
+  const ProfileAnthologyListRef = createRef<FlatList<Episode>>();
+  const playerAnthologyListRef = createRef<FlatList<Episode>>();
 
   const {PlayerStyle} = useContext(ThemeContext).theme;
-  const {api} = useContext(ApiContext)
-  
+  const {api} = useContext(ApiContext);
+
   const {textColor, playerTextColor, indicatorColor} = PlayerStyle;
 
   const renderScene = ({route}: any) => {
@@ -137,7 +142,7 @@ const InfoPage: React.FC<{
             refreshing={refreshing}
             onRefresh={onRefresh}
             pageInfo={pageInfo!}
-            url={url}
+            url={infoUrl}
             tabName={tabName}
             setDetailSheetVisible={setDetailSheetVisible}
             setAnthologySheetVisible={setAnthologySheetVisible}
@@ -152,7 +157,7 @@ const InfoPage: React.FC<{
                 })}
                 style={{marginBottom: 20}}
                 horizontal={true}
-                data={pageInfo?.sources}
+                data={pageInfo?.episodes}
                 renderItem={({item, index}) => (
                   <Pressable
                     onPress={() => {
@@ -178,41 +183,59 @@ const InfoPage: React.FC<{
     }
   };
 
+  const source2Section = (sources: ListItemInfo<string>[]) => {
+    return sources.map((obj: any) => ({
+      taskUrl: obj.data,
+      progress: 0,
+      finish: false,
+      start: false,
+      title: obj.title,
+      playerSrc: '',
+    }));
+  };
+
   //数据相关
   const realm = useRealm();
+  const section = useObject<SectionDb>(SectionDb, infoUrl);
+
+  const loadPageDone = (pageInfo: Section) => {
+    const {img, state, title, episodes} = pageInfo;
+    //页面内容获取成功，页面不再加载
+    setLoading(false);
+    setRefreshing(false);
+    SectionDb.create(realm, pageInfo);
+
+    //更新历史记录数据库
+    history.current = History.update(realm, infoUrl, episodes, taskUrl);
+    setPageInfo(pageInfo);
+    setDefaultProgress(history.current!.progress);
+
+    const _anthologyIndex = episodes.findIndex(
+      obj => obj.taskUrl == history.current!.taskUrl,
+    );
+    setNextDataAvailable(_anthologyIndex < pageInfo.episodes.length);
+    setAnthologyIndex(_anthologyIndex); //当前播放第一集
+    setAnthologyTitle(`${pageInfo.title} ${history.current!.title}`);
+    setFlashData(true);
+    getPlayerData(pageInfo.episodes[_anthologyIndex].taskUrl);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
-    console.log(tabName, apiName, url);
     const loadPage = api[tabName][apiName].pages.info!;
+    if (!!section) {
+      loadPageDone(section);
+    }
     loadPage(
-      url,
-      (pageInfo: InfoPageInfo) => {
-        const {img, state, title, sources} = pageInfo;
-        let _history = realm.objectForPrimaryKey(History, url);
-        //更新番剧数据库
-        RecmdInfoDb.create(realm, url, tabName, apiName, img, state, title);
-        //更新历史记录数据库
-        history.current = History.update(
-          realm,
-          url,
-          _history!,
-          sources[0],
-        );
-        setPageInfo(pageInfo);
-        setDefaultProgress(history.current!.progress);
-
-        setLoading(false); //页面内容获取成功，页面不再加载
-        setRefreshing(false);
-        const _anthologyIndex = history.current!.anthologyIndex;
-        setNextDataAvailable(_anthologyIndex < pageInfo.sources.length);
-        setAnthologyIndex(_anthologyIndex); //当前播放第一集
-        setAnthologyTitle(
-          `${pageInfo.title} ${history.current!.anthologyTitle}`,
-        );
-        setFlashData(true);
-        getPlayerData(pageInfo.sources[_anthologyIndex].data);
-      },
+      infoUrl,
+      (data: InfoPageInfo) =>
+        loadPageDone({
+          ...data,
+          infoUrl,
+          tabName,
+          apiName,
+          episodes: source2Section(data.sources),
+        }),
       (err: string) => console.log(err),
     );
   };
@@ -232,26 +255,28 @@ const InfoPage: React.FC<{
   useEffect(() => {
     if (playerAnthologyListRef.current) {
       playerAnthologyListRef.current!.scrollToIndex({
-        index: history.current!.anthologyIndex,
+        index: pageInfo!.episodes.findIndex(
+          obj => obj.taskUrl == history.current!.taskUrl,
+        ),
       });
     }
   }, [playerAnthologyListRef.current]);
 
   //切换选集
   const changeAnthology = (index: number) => {
-    const {sources, title} = pageInfo!;
+    const {episodes, title} = pageInfo!;
     //更新数据库, 记录下当前的位置
     realm.write(() => {
-      history.current!.anthologyIndex = index;
-      history.current!.anthologyTitle = sources[index].title;
+      history.current!.taskUrl = episodes[index].taskUrl;
+      history.current!.title = episodes[index].title;
     });
     setDefaultProgress(0);
-    setNextDataAvailable(index + 1 < sources.length);
+    setNextDataAvailable(index + 1 < episodes.length);
     setAnthologyIndex(index);
-    setAnthologyTitle(`${title} ${sources[index].title}`);
+    setAnthologyTitle(`${title} ${episodes[index].title}`);
     setDataAvailable(false);
     dataAvailableRef.current = false;
-    getPlayerData(sources[index].data);
+    getPlayerData(episodes[index].taskUrl);
   };
 
   //在全屏下切换下一个source
@@ -263,27 +288,50 @@ const InfoPage: React.FC<{
     changeAnthology(anthologyIndex + 1);
   };
 
-  //获取player的数据源
-  const getPlayerData = (playerPageUrl: string, _times?: number) => {
+  //获取播放数据成功之后的回调函数
+  const loadSrcCallback = (data: any) => {
+    setPlayerData(data);
+    setDataAvailable(true);
+    dataAvailableRef.current = true;
+  };
+
+  //通过网页端获取m3u8文件的地址
+  const getRemotePlayerData = (playerPageUrl: string, _times?: number) => {
     let times = _times === undefined ? 3 : _times; //默认尝试3次
     const loadPlayerSrc = api[tabName][apiName].pages.player!;
     if (times > 0) {
-      loadPlayerSrc(
-        playerPageUrl,
-        (data: any) => {
-          setPlayerData(data);
-          setDataAvailable(true);
-          dataAvailableRef.current = true;
-        },
-        (err: string) => {
-          console.log(err, "下一次尝试开始")
-          getPlayerData(playerPageUrl, times - 1)
-        },
+      loadPlayerSrc(playerPageUrl, (data: any)=>{
+        //获取到了playerUrl，则更新数据库
+        const episode = section!.episodes.find(
+          taskObj => taskObj.taskUrl === playerPageUrl,
+        );
+        realm.write(()=>{
+          episode!.playerSrc = data
+        })       
+        loadSrcCallback(data)}, (err: string) => {
+        console.log(err, '下一次尝试开始');
+        getRemotePlayerData(playerPageUrl, times - 1);
+      });
+    } else {
+      console.log('无法获取到播放地址...');
+    }
+  };
+
+  //获取player的数据源
+  const getPlayerData = (playerPageUrl: string) => {
+    //查看是否已经下载
+    const section = realm.objectForPrimaryKey(DownloadDb, infoUrl);
+    if (!!section) {
+      const task = section.episodes.find(
+        taskObj => taskObj.taskUrl === playerPageUrl,
       );
+      if (!!task && task.finish) {
+        loadSrcCallback(task.playerSrc);
+        return;
+      }
     }
-    else {
-      console.log('无法获取到播放地址...')
-    }
+    //如果没有下载，那么就从远程获取
+    getRemotePlayerData(playerPageUrl, 3);
   };
 
   //更新进度回调函数
@@ -306,7 +354,7 @@ const InfoPage: React.FC<{
           offset: 45 * index,
           index,
         })}
-        data={pageInfo?.sources}
+        data={pageInfo?.episodes}
         renderItem={({item, index}) => (
           <Pressable
             style={{flex: 1}}
@@ -416,7 +464,7 @@ const InfoPage: React.FC<{
         <FlatGrid
           contentContainerStyle={{paddingBottom: 50}}
           numColumns={2}
-          data={pageInfo?.sources}
+          data={pageInfo?.episodes}
           renderItem={({index, item}) => (
             <Pressable
               style={{flex: 1}}
@@ -444,9 +492,9 @@ const InfoPage: React.FC<{
         height={layout.height + insets.top - playerHeight}
         state={pageInfo?.state}
         visible={downloadSheetVisible}
-        infoUrl={url}
+        infoUrl={infoUrl}
         onClose={() => setDownloadSheetVisible(false)}
-        listItems={pageInfo?.sources}
+        listItems={pageInfo?.episodes}
       />
     </Container>
   );

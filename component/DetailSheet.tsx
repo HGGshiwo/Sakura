@@ -5,11 +5,12 @@ import {Tag} from './Tag';
 import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
 import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
+import Section from '../type/Download/Section';
 
 type detailSheetProps = {
   height: number;
   top: number;
-  pageInfo: InfoPageInfo | undefined;
+  pageInfo: Section | undefined;
   visible: boolean;
   onPress: () => void;
 };

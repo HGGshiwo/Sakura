@@ -21,13 +21,14 @@ import alert from './Toast';
 import Context from '../models';
 import {useNavigation} from '@react-navigation/native';
 import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
+import Section from '../type/Download/Section';
 const {useRealm} = Context;
 const Profile: React.FC<{
   loading: boolean;
   refreshing: boolean;
   onRefresh: () => void;
   url: string; //需要传入番剧url作为主键
-  pageInfo: InfoPageInfo | undefined;
+  pageInfo: Section | undefined;
   tabName: TabName;
   setDetailSheetVisible: (data: boolean) => void;
   setAnthologySheetVisible: (data: boolean) => void;

@@ -19,7 +19,7 @@ const ImagePage: React.FC<{}> = () => {
       tabName="Comic"
       apiName={apiName}
       playerHeight={height}
-      url={url}
+      infoUrl={url}
       renderPlayer={({
         dataAvailable,
         nextDataAvailable,

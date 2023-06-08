@@ -15,7 +15,7 @@ import {ListTitleLine} from '../component/ListTitleLine';
 import History from '../models/HistoryDb';
 import Context from '../models';
 import HistoryInfo from '../type/HistoryInfo';
-import RecmdInfoDb from '../models/RecmdInfoDb';
+
 import {
   InfoText,
   NumberText,
@@ -44,6 +44,7 @@ import alert from '../component/Toast';
 import {ThemeContext} from '../context/ThemeContext';
 import {SrcContext} from '../context/SrcContext';
 import RecmdInfo from '../type/RecmdInfo';
+import SectionDb from '../models/SectionDb';
 
 type Data = {
   title: string;
@@ -87,13 +88,10 @@ const SubPage: React.FC<{
   const onRefresh = () => {
     let historys = [..._historys.sorted('time', true)]
       .map(_history => {
-        const _animes = realm.objectForPrimaryKey(
-          RecmdInfoDb,
-          _history.infoUrl,
-        )!;
+        const _animes = realm.objectForPrimaryKey(SectionDb, _history.infoUrl)!;
         return {
           ..._history.extract(),
-          ..._animes.extract(),
+          ..._animes.toRecmdInfo(),
         };
       })
       .filter(history => history.tabName === tabName);
@@ -102,11 +100,8 @@ const SubPage: React.FC<{
       .filter(follow => follow.following)
       .reverse()
       .map(_follow => {
-        const _animes = realm.objectForPrimaryKey(
-          RecmdInfoDb,
-          _follow.infoUrl,
-        )!;
-        return {..._animes.extract()};
+        const _animes = realm.objectForPrimaryKey(SectionDb, _follow.infoUrl)!;
+        return {..._animes.toRecmdInfo()};
       })
       .filter(item => item.tabName === tabName);
     setFollows(follows);

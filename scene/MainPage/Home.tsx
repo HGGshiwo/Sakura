@@ -9,7 +9,6 @@ import Context from '../../models';
 import History from '../../models/HistoryDb';
 import HistoryInfo from '../../type/HistoryInfo';
 import {LoadingContainer} from '../../component/Loading';
-import RecmdInfoDb from '../../models/RecmdInfoDb';
 import {useNavigation} from '@react-navigation/native';
 import {MainPageProps, TabName, targets} from '../../route';
 import alert from '../../component/Toast';
@@ -17,6 +16,7 @@ import {SectionGrid} from '../../component/Grid';
 import HomePageInfo from '../../type/PageInfo/HomePageInfo';
 import {SrcContext} from '../../context/SrcContext';
 import {ApiContext} from '../../context/ApiContext';
+import SectionDb from '../../models/SectionDb';
 
 const {useRealm, useQuery} = Context;
 
@@ -60,10 +60,10 @@ const Home: React.FC<{
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)]
       .map(_history => {
-        const _animes = realm.objectForPrimaryKey(RecmdInfoDb, _history.infoUrl)!;
+        const _animes = realm.objectForPrimaryKey(SectionDb, _history.infoUrl)!;
         return {
           ..._history.extract(),
-          ..._animes.extract(),
+          ..._animes.toRecmdInfo(),
         };
       })
       .filter(history => history.tabName === tabName)

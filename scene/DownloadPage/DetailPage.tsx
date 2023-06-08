@@ -10,19 +10,17 @@ import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {V1DownloadInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import {useContext, useEffect, useRef, useState} from 'react';
-import RecmdInfoDb from '../../models/RecmdInfoDb';
 import Dialog from 'react-native-dialog';
 import RecmdInfo from '../../type/RecmdInfo';
 import EndLine from '../../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import {targets} from '../../route';
 import {ThemeContext} from '../../context/ThemeContext';
-import TaskDb from '../../models/TaskDb';
-import DownloadDb from '../../models/DownloadDb';
+import TaskDb from '../../models/EpisodeDb';
+import DownloadDb from '../../models/SectionDb';
 import DownloadItemInfo from '../../type/Download/DownloadItemInfo';
 
-
-const {useRealm, useQuery} = Context;
+const {useRealm, useQuery, useObject} = Context;
 
 const DetailPage: React.FC<{}> = () => {
   const route = useRoute<DownloadDetailPageProps['route']>();
@@ -33,23 +31,23 @@ const DetailPage: React.FC<{}> = () => {
   const realm = useRealm();
   const [tasks, setTasks] = useState<DownloadItemInfo[]>([]);
   const {DialogStyle} = useContext(ThemeContext).theme;
-  const downloadDb = realm.objectForPrimaryKey(DownloadDb, infoUrl)!;
+  const downloadDb = useObject(DownloadDb, infoUrl)!;
 
   useEffect(() => {
-    let tasks = [...downloadDb.tasks].map(_task => {
-      const _animes = realm.objectForPrimaryKey(RecmdInfoDb, infoUrl)!;
-      const total = _task.froms.length + _task.tos.length;
-      const progress = total === 0 ? 0 : _task.froms.length / total;
-      return {
-        ..._animes.extract(),
-        taskUrl: _task.taskUrl,
-        progress,
-        title: _task.title,
-      };
-    });
-    console.log(666, tasks);
+    let tasks = [...downloadDb.episodes]
+      .map(_task => {
+        const _animes = realm.objectForPrimaryKey(DownloadDb, infoUrl)!;
+        return {
+          ..._animes.toRecmdInfo(),
+          taskUrl: _task.taskUrl,
+          progress: _task.progress,
+          title: _task.title,
+          start: _task.start,
+        };
+      })
+      .filter(obj => obj.start);
     setTasks(tasks);
-  }, []);
+  }, [downloadDb.episodes]);
 
   const onDelete = (item: RecmdInfo) => {
     // curItem.current = item;

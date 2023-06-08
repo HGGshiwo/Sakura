@@ -10,9 +10,8 @@ import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {V1RecmdInfoItem} from '../../component/ListItem';
 import Context from '../../models';
 import {useContext, useEffect, useRef, useState} from 'react';
-import RecmdInfoDb from '../../models/RecmdInfoDb';
 import Dialog from 'react-native-dialog';
-import DownloadDb from '../../models/DownloadDb';
+import DownloadDb from '../../models/SectionDb';
 import RecommandInfo from '../../type/RecmdInfo';
 import EndLine from '../../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -21,6 +20,7 @@ import {ThemeContext} from '../../context/ThemeContext';
 import SectionInfo from '../../type/Download/SectionInfo';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import RecmdInfo from '../../type/RecmdInfo';
+import SectionDb from '../../models/SectionDb';
 
 const {useRealm, useQuery} = Context;
 
@@ -40,10 +40,13 @@ const DownloadPage: React.FC<{}> = () => {
       .reverse()
       .map(_download => {
         const _animes = realm.objectForPrimaryKey(
-          RecmdInfoDb,
+          SectionDb,
           _download.infoUrl,
         )!;
-        return {downloadNum: _download.tasks.length, ..._animes.extract()};
+        return {
+          downloadNum: _download.episodes.filter(obj => obj.start).length,
+          ..._animes.toRecmdInfo(),
+        };
       })
       .filter(download => download.tabName === tabName);
     setSections(sections);

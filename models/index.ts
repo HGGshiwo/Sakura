@@ -1,13 +1,13 @@
 import { createRealmContext } from '@realm/react';
 
 import History from './HistoryDb';
-import RecmdInfoDb from './RecmdInfoDb';
 import Follow from './FollowDb';
-import Download from './DownloadDb';
-import TaskDb from './TaskDb'
+import Download from './SectionDb';
+import EpisodeDb from './EpisodeDb'
+import ListItemInfoDb from './ListItemInfoDb';
 
 const Context = createRealmContext({
-  schema: [History, RecmdInfoDb, Follow, Download, TaskDb],
+  schema: [History, Follow, Download, EpisodeDb, ListItemInfoDb],
 })
 export default Context;
 

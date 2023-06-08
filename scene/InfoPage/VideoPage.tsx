@@ -18,7 +18,7 @@ const VideoPage: React.FC<{}> = () => {
         tabName='Anime'
         apiName={apiName}
         playerHeight={layout.width*0.56}
-        url={url}
+        infoUrl={url}
         renderPlayer={({
           title,
           onBack,

@@ -11,7 +11,6 @@ import {V1HistoryInfoItem} from '../component/ListItem';
 import Context from '../models';
 import History from '../models/HistoryDb';
 import {useContext, useEffect, useRef, useState} from 'react';
-import RecmdInfoDb from '../models/RecmdInfoDb';
 import HistoryInfo from '../type/HistoryInfo';
 import Dialog from 'react-native-dialog';
 import EndLine from '../component/EndLine';
@@ -19,6 +18,7 @@ import alert from '../component/Toast';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import {ThemeContext} from '../context/ThemeContext';
 import RecmdInfo from '../type/RecmdInfo';
+import SectionDb from '../models/SectionDb';
 
 const {useRealm, useQuery} = Context;
 const targets = {
@@ -41,12 +41,12 @@ const HistoryPage: React.FC<{}> = () => {
     let historys = [..._historys.sorted('time', true)]
       .map(_history => {
         const _animes = realm.objectForPrimaryKey(
-          RecmdInfoDb,
+          SectionDb,
           _history.infoUrl,
         )!;
         return {
           ..._history.extract(),
-          ..._animes.extract(),
+          ..._animes.toRecmdInfo(),
         };
       })
       .filter(history => history.tabName === tabName);

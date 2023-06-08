@@ -10,7 +10,6 @@ import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {V1RecmdInfoItem} from '../component/ListItem';
 import Context from '../models';
 import {useContext, useEffect, useRef, useState} from 'react';
-import RecmdInfoDb from '../models/RecmdInfoDb';
 import Dialog from 'react-native-dialog';
 import Follow from '../models/FollowDb';
 import RecmdInfo from '../type/RecmdInfo';
@@ -20,6 +19,7 @@ import alert from '../component/Toast';
 import {targets} from '../route';
 import {ThemeContext} from '../context/ThemeContext';
 import FollowDb from '../models/FollowDb';
+import SectionDb from '../models/SectionDb';
 
 const {useRealm, useQuery} = Context;
 
@@ -41,10 +41,10 @@ const FollowPage: React.FC<{}> = () => {
       .reverse()
       .map(_follow => {
         const _animes = realm.objectForPrimaryKey(
-          RecmdInfoDb,
+          SectionDb,
           _follow.infoUrl,
         )!;
-        return {..._animes.extract(), following: _follow.following};
+        return {..._animes.toRecmdInfo(), following: _follow.following};
       })
       .filter(follow => follow.tabName === tabName);
     setFollows(follows);

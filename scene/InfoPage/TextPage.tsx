@@ -19,7 +19,7 @@ const TextPage: React.FC<{}> = () => {
       tabName="Novel"
       apiName={apiName}
       playerHeight={height}
-      url={url}
+      infoUrl={url}
       renderPlayer={({
         dataAvailable,
         nextDataAvailable,

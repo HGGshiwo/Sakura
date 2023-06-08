@@ -12,7 +12,6 @@ import {SearchPageProps, TabName, targets} from '../route';
 import Container from '../component/Container';
 import {FollowButton, RoundButton} from '../component/Button';
 import Context from '../models';
-import RecmdInfoDb from '../models/RecmdInfoDb';
 import Follow from '../models/FollowDb';
 import alert from '../component/Toast';
 import {TabBar, TabView} from 'react-native-tab-view';
@@ -49,25 +48,25 @@ const ResultView: React.FC<{
     });
   }, [searchValue]);
 
-  const onPress = (item: SearchInfo & RecmdInfo, index: number) => {
-    //更新番剧数据库
-    RecmdInfoDb.create(
-      realm,
-      item.id,
-      tabName,
-      apiName,
-      item.img,
-      item.state,
-      item.title,
-    );
-    //更新追番记录
-    Follow.update(realm, item.infoUrl, !follows[index]);
-    const _follows = [...follows];
-    _follows[index] = !_follows[index];
-    setFollows([..._follows]);
+  // const onPress = (item: SearchInfo & RecmdInfo, index: number) => {
+  //   //更新番剧数据库
+  //   RecmdInfoDb.create(
+  //     realm,
+  //     item.id,
+  //     tabName,
+  //     apiName,
+  //     item.img,
+  //     item.state,
+  //     item.title,
+  //   );
+  //   //更新追番记录
+  //   Follow.update(realm, item.infoUrl, !follows[index]);
+  //   const _follows = [...follows];
+  //   _follows[index] = !_follows[index];
+  //   setFollows([..._follows]);
 
-    alert(`${!follows![index] ? '' : '取消'}追番成功`);
-  };
+  //   alert(`${!follows![index] ? '' : '取消'}追番成功`);
+  // };
 
   return (
     <LoadingContainer style={{paddingTop: '30%'}} loading={loading}>
@@ -89,10 +88,10 @@ const ResultView: React.FC<{
                   apiName: item.apiName,
                 });
               }}>
-              <FollowButton
+              {/* <FollowButton
                 onPress={() => onPress(item, index)}
                 followed={follows![index]}
-              />
+              /> */}
             </V1SearchInfoItem>
           );
         }}
