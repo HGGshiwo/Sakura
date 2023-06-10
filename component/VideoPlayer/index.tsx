@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  FlatList,
   StatusBar,
   StyleSheet,
   View,
@@ -18,12 +19,10 @@ import {
   faSun,
   faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
-import {useContext, useEffect, useRef, useState} from 'react';
-import Orientation, {
-  PORTRAIT,
-} from 'react-native-orientation-locker';
+import {useContext, useEffect, useRef, useState, createRef} from 'react';
+import Orientation, {PORTRAIT} from 'react-native-orientation-locker';
 import {Pressable} from 'react-native';
-import {LoadingText} from '../Text';
+import {InfoText, LoadingText} from '../Text';
 import {PlayButton} from './PlayButton';
 import {NextButton} from './NextButton';
 import {RateMessage} from './RateMessage';
@@ -31,13 +30,15 @@ import {BackButton} from '../Button';
 import {LoadingBox} from '../Loading';
 import RateSheet from './RateSheet';
 import Blank from './Blank';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import SystemSetting from 'react-native-system-setting';
 import {Bar} from 'react-native-progress';
 import React from 'react';
 import ControlBar, {ControlBarRow} from '../ControlBar';
-import PlayerProps from '../../type/Player';
-import { ThemeContext } from '../../context/ThemeContext';
+import Episode from '../../type/Download/Episode';
+import {useStore} from '../../scene/InfoPage';
+import {InfoPageProps} from '../../route';
+import useTheme from '../../zustand/Theme';
 
 //时间转化函数
 var sec_to_time = (s: number): string => {
@@ -55,28 +56,14 @@ var sec_to_time = (s: number): string => {
   return t;
 };
 
-const Player: React.FC<PlayerProps> = ({
-  title,
-  onBack,
-  data,
-  dataAvailable,
-  nextDataAvailable,
-  onErr,
-  toNextSource,
-  onProgress,
-  defaultProgress,
-  renderAnthologys,
-  hidePanel,
-  showPanel,
-}) => {
+const VideoPlayer: React.FC<{}> = () => {
   const videoRef = useRef<Video | null>(null);
-
+  const playerAnthologyListRef = createRef<FlatList<Episode>>();
   const [fullscreen, setFullscreen] = useState(false); //视频是否全屏
 
   const [paused, setPaused] = useState(true); //视频是否暂停
   const [loading, setLoading] = useState(true); //视频是否在加载中
   const [erring, setErring] = useState(false); //视频是否播放错误
-  const [progress, setProgress] = useState(defaultProgress); //当前视频播放进度
   const [duration, setDuration] = useState(0); //当前视频总时长
   const [cache, setCache] = useState(0); //当前视频缓存位置
   const seekingRef = useRef(false); //是否在加载
@@ -84,6 +71,18 @@ const Player: React.FC<PlayerProps> = ({
   const [fmtProgress, setFmtProgress] = useState('00:00'); //格式化后的视频时长
   const controlTimer = useRef(undefined); //当前的计时器
   const [bitrateText, setBitrateText] = useState(''); //带宽
+
+  const {
+    pageInfo,
+    episode,
+    playerLoading,
+    next,
+    nextDataAvailable,
+    updateProgress,
+    progress,
+    update,
+    playerData,
+  } = useStore();
 
   //控制是否可见
   const [controlVisible, setControlVisible] = useState(true); //是否展示control控件
@@ -113,16 +112,17 @@ const Player: React.FC<PlayerProps> = ({
   const [bright, setBright] = useState(0); //亮度
   const [volume, setVolume] = useState(0); //声音
 
-  const [orientation, setOrientation] = useState<any>(PORTRAIT);
+  const navigation = useNavigation<InfoPageProps['navigation']>();
+
   useEffect(() => {
-    if (dataAvailable) {
+    if (!playerLoading) {
       setControlVisible(true);
       setErring(false);
     } else {
       setPaused(true);
       pausedRef.current = true;
     }
-  }, [dataAvailable]);
+  }, [playerLoading]);
 
   useEffect(() => {
     setFmtProgress(sec_to_time(progressRef.current));
@@ -139,7 +139,7 @@ const Player: React.FC<PlayerProps> = ({
     const interval = setInterval(() => {
       //每15s更新数据库
       if (durationRef.current && !pausedRef.current) {
-        onProgress(
+        updateProgress(
           progressRef.current,
           progressRef.current / durationRef.current,
         );
@@ -153,10 +153,21 @@ const Player: React.FC<PlayerProps> = ({
     };
   }, []);
 
+  //滚动全屏后播放器选集列表
+  useEffect(() => {
+    if (playerAnthologyListRef.current && !!episode && !!pageInfo) {
+      playerAnthologyListRef.current!.scrollToIndex({
+        index: pageInfo!.episodes.findIndex(
+          obj => obj.taskUrl == episode.taskUrl,
+        ),
+      });
+    }
+  }, [playerAnthologyListRef.current]);
+
   const videoError = (err: any) => {
     console.log(err);
     setErring(true);
-    onErr();
+    // onErr();
   };
 
   const onLoad = (data: OnLoadData) => {
@@ -166,7 +177,7 @@ const Player: React.FC<PlayerProps> = ({
     durationRef.current = data.duration;
     setPaused(false);
     pausedRef.current = false;
-    onSlidingComplete(defaultProgress);
+    onSlidingComplete(progress);
     waitCloseControl();
   };
 
@@ -174,13 +185,14 @@ const Player: React.FC<PlayerProps> = ({
     setCache(data.playableDuration);
     if (!seekingRef.current) {
       //当seek时由slider更新progress
-      setProgress(data.currentTime);
+      update;
+      update({progress: data.currentTime});
       progressRef.current = data.currentTime;
     }
   };
 
   const onSlidingComplete = (data: number) => {
-    setProgress(data); //当seek时，由slide自己更新
+    update({progress: data}); //当seek时，由slide自己更新
     setLoading(true);
     videoRef.current?.seek(data);
     waitCloseControl();
@@ -300,7 +312,7 @@ const Player: React.FC<PlayerProps> = ({
   const onMoveX = (dprogress: number) => {
     progressRef.current =
       baseProgressRef.current + (dprogress / layout.width) * 300; //必须使用progress，否则更新对不上
-    setProgress(progressRef.current);
+    update({progress: progressRef.current});
   };
 
   const onMoveXComplete = () => {
@@ -352,20 +364,34 @@ const Player: React.FC<PlayerProps> = ({
 
   const onEnd = () => {
     console.log('end');
-    nextDataAvailable ? toNextSource() : null;
+    nextDataAvailable ? next() : null;
   };
 
-  const {PlayerStyle} = useContext(ThemeContext).theme;
+  const {PlayerStyle} = useTheme().theme;
+  const {playerTextColor} = PlayerStyle;
+
+  function setFlashData(arg0: boolean) {
+    throw new Error('Function not implemented.');
+  }
+
+  function changeAnthology(index: any) {
+    throw new Error('Function not implemented.');
+  }
+
+  function setVisible(arg0: boolean) {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <View style={fullscreen ? styles.fullscreenContaner : styles.container}>
-      {!dataAvailable ? (
+      {playerLoading ? (
         <LoadingText title="解析视频地址中..." />
       ) : (
         <>
           {/* <OrientationLocker orientation={orientation} /> */}
           <Video
             ref={videoRef}
-            source={data}
+            source={JSON.parse(playerData)}
             onLoad={onLoad} // Callback when remote video is buffering
             onError={videoError} // Callback when video cannot be loaded
             onSeek={onSeek}
@@ -404,11 +430,11 @@ const Player: React.FC<PlayerProps> = ({
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
               <BackButton
                 onPress={() => {
-                  fullscreen ? handleFullscreen() : onBack();
+                  fullscreen ? handleFullscreen() : navigation.goBack();
                 }}
               />
               <LoadingText
-                title={title}
+                title={`${pageInfo?.title} ${episode?.title}`}
                 numberOfLines={1}
                 style={{paddingLeft: 10}}
               />
@@ -464,10 +490,7 @@ const Player: React.FC<PlayerProps> = ({
             <ControlBarRow>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
                 <PlayButton onPress={handlePlay} paused={paused} />
-                <NextButton
-                  onPress={toNextSource}
-                  disabled={!nextDataAvailable}
-                />
+                <NextButton onPress={next} disabled={!nextDataAvailable} />
               </View>
               <View style={{alignItems: 'center', flexDirection: 'row'}}>
                 <Pressable onPress={() => setRateSheetVisible(true)}>
@@ -532,7 +555,51 @@ const Player: React.FC<PlayerProps> = ({
               setRateId(id);
             }}
           />
-          {renderAnthologys(anthologySheetVisible, setAnthologySheetVisible)}
+          <View
+            style={[
+              {display: anthologySheetVisible ? 'flex' : 'none'},
+              styles.listContainer,
+            ]}>
+            <FlatList
+              ref={playerAnthologyListRef}
+              getItemLayout={(item, index) => ({
+                length: 45,
+                offset: 45 * index,
+                index,
+              })}
+              data={pageInfo?.episodes}
+              renderItem={({item, index}) => (
+                <Pressable
+                  style={{flex: 1}}
+                  onPress={() => {
+                    setFlashData(true);
+                    changeAnthology(index);
+                    setVisible(false);
+                  }}>
+                  <View
+                    style={[
+                      styles.card,
+                      {
+                        borderColor: playerTextColor(
+                          item.taskUrl === episode!.taskUrl,
+                        ),
+                      },
+                    ]}>
+                    <InfoText
+                      title={item.title}
+                      style={{
+                        fontWeight:
+                          item.taskUrl === episode!.taskUrl ? 'bold' : 'normal',
+                        color: playerTextColor(
+                          item.taskUrl === episode!.taskUrl,
+                        ),
+                      }}
+                    />
+                  </View>
+                </Pressable>
+              )}
+            />
+          </View>
         </>
       )}
     </View>
@@ -602,6 +669,27 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 15,
   },
+  card: {
+    borderWidth: 2,
+    height: 40,
+    padding: 10,
+    margin: 5,
+    width: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 5,
+  },
+  listContainer: {
+    position: 'absolute',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,1)',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    right: 0,
+    bottom: 0,
+  },
 });
 
-export {Player};
+export default VideoPlayer;

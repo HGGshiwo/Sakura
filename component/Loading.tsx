@@ -1,7 +1,7 @@
 import {ReactNode, useContext} from 'react';
 import {View, ViewStyle, ActivityIndicator} from 'react-native';
 import {LoadingText} from './Text';
-import { ThemeContext } from '../context/ThemeContext';
+import useTheme from '../zustand/Theme';
 
 interface Props {
   text?: string;
@@ -45,7 +45,7 @@ const LoadingContainer: React.FC<ContainerProps> = ({
   loading = false,
   children,
 }) => {
-  const {LoadingStyle} = useContext(ThemeContext).theme;
+  const {LoadingStyle} = useTheme().theme;
   return (
     <View style={[{flex: 1}, containerStyle]}>
       {!loading ? (

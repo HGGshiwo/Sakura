@@ -14,9 +14,7 @@ const tabRoutes = [
 ]
 const routes = [
   { name: 'Tab', component: scene.TabPage },
-  { name: 'Video', component: scene.VideoPage },
-  { name: 'Image', component: scene.ImagePage },
-  { name: 'Text', component: scene.TextPage },
+  { name: 'Info', component: scene.InfoPage },
   { name: 'Search', component: scene.SearchPage },
   { name: 'Category', component: scene.CategoryPage },
   { name: 'Index', component: scene.IndexPage },
@@ -30,9 +28,7 @@ const routes = [
 type RootStackParamList = {
   MainPage: { tabName: TabName }; //Tab的三个页面
   TabPage: { tabName: TabName };
-  Video: { url: string, apiName: string }; //Anime信息页面
-  Image: { url: string, apiName: string }; //Comic信息页面
-  Text: { url: string, apiName: string }; //Novel信息页面
+  Info: { infoUrl: string, taskUrl?: string, apiName: string, tabName: TabName }; //信息页面
   Search: { tabName: TabName };
   Category: { tabName: TabName, apiName: string, url: string; title: string };
   Index: { tabName: TabName, apiName: string, url: string, title: string };
@@ -45,9 +41,7 @@ type RootStackParamList = {
   DownloadDetail: { infoUrl: string };
 };
 type TabPageProps = NativeStackScreenProps<RootStackParamList, 'TabPage'>;
-type VideoPageProps = NativeStackScreenProps<RootStackParamList, 'Video'>;
-type ImagePageProps = NativeStackScreenProps<RootStackParamList, 'Image'>
-type TextPageProps = NativeStackScreenProps<RootStackParamList, 'Text'>
+type InfoPageProps = NativeStackScreenProps<RootStackParamList, 'Info'>;
 type SearchPageProps = NativeStackScreenProps<RootStackParamList, 'Search'>;
 type MainPageProps = NativeStackScreenProps<RootStackParamList, 'MainPage'>;
 type CategoryPageProps = NativeStackScreenProps<RootStackParamList, 'Category'>;
@@ -62,9 +56,7 @@ type DownloadSectionPageProps = NativeStackScreenProps<RootStackParamList, 'Down
 
 export type {
   TabPageProps,
-  VideoPageProps, //信息页
-  ImagePageProps,
-  TextPageProps,
+  InfoPageProps,
   SearchPageProps,
   MainPageProps,
   CategoryPageProps,

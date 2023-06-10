@@ -14,9 +14,9 @@ import {MainPageProps, TabName, targets} from '../../route';
 import alert from '../../component/Toast';
 import {SectionGrid} from '../../component/Grid';
 import HomePageInfo from '../../type/PageInfo/HomePageInfo';
-import {SrcContext} from '../../context/SrcContext';
-import {ApiContext} from '../../context/ApiContext';
 import SectionDb from '../../models/SectionDb';
+import useSource from '../../zustand/Source';
+import useApi from '../../zustand/Api';
 
 const {useRealm, useQuery} = Context;
 
@@ -34,8 +34,8 @@ const Home: React.FC<{
   const realm = useRealm();
   const navigation = useNavigation<MainPageProps['navigation']>();
   const [refreshing, setRefreshing] = useState(false);
-  const {source} = useContext(SrcContext);
-  const {api} = useContext(ApiContext);
+  const {source} = useSource();
+  const {api} = useApi();
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -61,10 +61,7 @@ const Home: React.FC<{
     let historys = [..._historys.sorted('time', true)]
       .map(_history => {
         const _animes = realm.objectForPrimaryKey(SectionDb, _history.infoUrl)!;
-        return {
-          ..._history.extract(),
-          ..._animes.toRecmdInfo(),
-        };
+        return {..._animes.toRecmdInfo(), ..._history.extract()};
       })
       .filter(history => history.tabName === tabName)
       .slice(0, 10);
@@ -76,8 +73,9 @@ const Home: React.FC<{
 
   const handlePressItem = useCallback(
     (item: RecmdInfo) =>
-      navigation.push(targets[tabName], {
-        url: item.infoUrl,
+      navigation.push('Info', {
+        infoUrl: item.infoUrl,
+        tabName,
         apiName: item.apiName,
       }),
     [],

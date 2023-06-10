@@ -10,8 +10,8 @@ import {SchedulePageProps, targets} from '../route';
 import DailyInfo from '../type/DailyInfo';
 import {TabBar, TabView} from 'react-native-tab-view';
 import DailyPageInfo from '../type/PageInfo/DailyPageInfo';
-import {ThemeContext} from '../context/ThemeContext';
-import {ApiContext} from '../context/ApiContext';
+import useTheme from '../zustand/Theme';
+import useApi from '../zustand/Api';
 
 const routes = [
   {key: '0', title: '星期一'},
@@ -31,8 +31,8 @@ const DailyPage: React.FC<{}> = () => {
   const navigation = useNavigation<SchedulePageProps['navigation']>();
   const [index, setIndex] = useState(0);
   const layout = useWindowDimensions();
-  const {TabBarStyle} = useContext(ThemeContext).theme;
-  const {api} = useContext(ApiContext);
+  const {TabBarStyle} = useTheme().theme;
+  const {api} = useApi();
 
   useEffect(() => {
     console.log(tabName, apiName);
@@ -52,9 +52,10 @@ const DailyPage: React.FC<{}> = () => {
       renderItem={({item, index}) => (
         <Pressable
           onPress={() => {
-            navigation.navigate(targets[tabName], {
-              url: item.href2,
+            navigation.navigate("Info", {
+              infoUrl: item.href2,
               apiName: item.apiName,
+              tabName,
             });
           }}>
           <View

@@ -15,10 +15,10 @@ import RecmdInfo from '../../type/RecmdInfo';
 import EndLine from '../../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import {targets} from '../../route';
-import {ThemeContext} from '../../context/ThemeContext';
 import TaskDb from '../../models/EpisodeDb';
-import DownloadDb from '../../models/SectionDb';
+import SectionDb from '../../models/SectionDb';
 import DownloadItemInfo from '../../type/Download/DownloadItemInfo';
+import useTheme from '../../zustand/Theme';
 
 const {useRealm, useQuery, useObject} = Context;
 
@@ -30,24 +30,24 @@ const DetailPage: React.FC<{}> = () => {
   const curItem = useRef<RecmdInfo & TaskDb>();
   const realm = useRealm();
   const [tasks, setTasks] = useState<DownloadItemInfo[]>([]);
-  const {DialogStyle} = useContext(ThemeContext).theme;
-  const downloadDb = useObject(DownloadDb, infoUrl)!;
+  const {DialogStyle} = useTheme().theme;
+  const sectionDb = useObject(SectionDb, infoUrl)!;
 
   useEffect(() => {
-    let tasks = [...downloadDb.episodes]
+    let tasks = [...sectionDb.episodes]
       .map(_task => {
-        const _animes = realm.objectForPrimaryKey(DownloadDb, infoUrl)!;
+        const _animes = realm.objectForPrimaryKey(SectionDb, infoUrl)!;
         return {
           ..._animes.toRecmdInfo(),
           taskUrl: _task.taskUrl,
           progress: _task.progress,
-          title: _task.title,
+          title: `${sectionDb.title} ${_task.title}`,
           start: _task.start,
         };
       })
       .filter(obj => obj.start);
     setTasks(tasks);
-  }, [downloadDb.episodes]);
+  }, [sectionDb.episodes]);
 
   const onDelete = (item: RecmdInfo) => {
     // curItem.current = item;

@@ -4,82 +4,67 @@ import {InfoText, SubInfoText, SubTitle, SubTitleBold} from './Text';
 import {useContext, useEffect, useState} from 'react';
 import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
-import ListItemInfo from '../type/ListItemInfo';
 import Context from '../models';
-import Download from '../models/SectionDb';
 import alert from './Toast';
-import {DownloadSectionPageProps, TabName} from '../route';
-import {DownloadContext} from '../context/DownloadContext';
+import {DownloadSectionPageProps} from '../route';
 import {faCircleCheck, faCircleDown} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {ApiContext} from '../context/ApiContext';
-import DownloadDb from '../models/SectionDb';
-import DownloadItem from '../type/Download/DownloadItem';
+import {useNavigation} from '@react-navigation/native';
 import Episode from '../type/Download/Episode';
 import SectionDb from '../models/SectionDb';
+import {useStore} from '../scene/InfoPage';
+import useDownload from '../zustand/Download';
+import useApi from '../zustand/Api';
 
 const {useRealm, useQuery, useObject} = Context;
 
-type anthologySheetProps = {
-  height: number;
-  top: number;
-  state: string | undefined;
-  visible: boolean;
-  onClose: () => void;
-  listItems: Episode[] | undefined;
-  infoUrl: string;
-  tabName: TabName;
-  apiName: string;
-  title: string | undefined;
-};
+const DownloadSheet: React.FC<{}> = () => {
+  const {pageInfo, sheetHeight, playerHeight, update} = useStore();
 
-const DownloadSheet = ({
-  height,
-  top,
-  state,
-  visible,
-  onClose,
-  infoUrl,
-  tabName,
-  apiName,
-  title,
-}: anthologySheetProps) => {
   const realm = useRealm();
-  const {download} = useContext(DownloadContext);
+  const {download} = useDownload();
   const [items, setItems] = useState<Episode[]>([]);
   const navigation = useNavigation<DownloadSectionPageProps['navigation']>();
-  const {api} = useContext(ApiContext);
-  const section = useObject(SectionDb, infoUrl)!
+  const {infoUrl, episode} = useStore();
+  const section = useObject(SectionDb, infoUrl!)!;
+  const {downloadDone} = useStore();
+  const {api} = useApi();
 
   useEffect(() => {
-    setItems(section.episodes)
-  }, [section.episodes]);
-
-  const handlePressItem = (item: Episode) => {
-    //是否已经下载过了
-    if (item.start) {
-      alert(`该集已${item.finish ? '下载完成' : '在下载队列中'}!`);
-      return;
-    }
-    const _item = section.episodes.find(obj=>obj.taskUrl==item.taskUrl)!
-    realm.write(()=>{
-      _item.start = true
-    })
-    getPlayerData(item);
-  };
+    setItems(section?.episodes);
+  }, [section?.episodes]);
 
   //获取player的数据源
   const getPlayerData = (item: Episode, _times?: number) => {
+    if (!!item.playerSrc) {
+      alert(`开始下载 ${pageInfo!.title} ${item.title}`);
+      const m3u8Url = JSON.parse(item!.playerSrc).uri;
+      download(
+        item.taskUrl,
+        pageInfo!.infoUrl,
+        m3u8Url,
+        `${pageInfo!.title} ${item.title}`,
+        realm,
+        downloadDone,
+      );
+      return;
+    }
     let times = _times === undefined ? 3 : _times; //默认尝试3次
-    const loadPlayerSrc = api[tabName][apiName].pages.player!;
+    const loadPlayerSrc =
+      api[pageInfo!.tabName][pageInfo!.apiName].pages.player!;
     if (times > 0) {
-      // debugger;
       loadPlayerSrc(
         item.taskUrl,
         (data: any) => {
-          alert(`开始下载 ${title} ${item.title}`);
-          download(item.taskUrl, infoUrl, data.uri, `${title} ${item.title}`);
+          alert(`开始下载 ${pageInfo!.title} ${item.title}`);
+          download(
+            item.taskUrl,
+            pageInfo!.infoUrl,
+            data.uri,
+            `${pageInfo!.title} ${item.title}`,
+            realm,
+            downloadDone,
+          );
         },
         (err: string) => {
           console.log(err, '下一次尝试开始');
@@ -91,78 +76,92 @@ const DownloadSheet = ({
     }
   };
 
-  const checkDownload = () => {
-    navigation.navigate('DownloadSection', {tabName});
+  const handlePressItem = (item: Episode) => {
+    //是否已经下载过了
+    if (item.start) {
+      alert(`该集已${item.finish ? '下载完成' : '在下载队列中'}!`);
+      return;
+    }
+    const _item = section.episodes.find(obj => obj.taskUrl == item.taskUrl)!;
+    realm.write(() => {
+      _item.start = true;
+    });
+    getPlayerData(_item, 3);
   };
 
-  return !visible ? (
-    <></>
-  ) : (
-    <View style={{...styles.container, height, top}}>
-      <View style={styles.headerRow}>
-        <SubTitleBold title="下载" />
-        <CloseButton onPress={onClose} />
-      </View>
-      <View style={styles.stateRow}>
-        <Text style={styles.text2}>{state}</Text>
-      </View>
-      <FlatList
-        contentContainerStyle={{paddingBottom: 50}}
-        data={items}
-        renderItem={({index, item}) => (
-          <Pressable
-            style={{flex: 1}}
-            onPress={() => {
-              handlePressItem(item);
-            }}
-            key={index}>
-            <View style={styles.itemContainer}>
-              <SubTitle title={item.title} />
-              {!item.start ? (
-                <></>
-              ) : (
-                <FontAwesomeIcon
-                  size={20}
-                  color={item.finish ? 'limegreen' : 'deepskyblue'}
-                  icon={item.finish ? faCircleCheck : faCircleDown}
-                />
-              )}
-            </View>
-          </Pressable>
-        )}
-      />
+  const checkDownload = () => {
+    navigation.navigate('DownloadSection', {tabName: pageInfo!.tabName});
+  };
+
+  return (
+    <>
       <View
-        style={{
-          flexDirection: 'row',
-          width: '100%',
-          padding: 10,
-          justifyContent: 'space-between',
-          borderTopWidth: 1,
-          borderColor: 'lightgrey',
-        }}>
-        <InfoText
-          style={{paddingHorizontal: 20, paddingVertical: 10}}
-          title="缓存全部"
+        style={{...styles.container, height: sheetHeight, top: playerHeight}}>
+        <View style={styles.headerRow}>
+          <SubTitleBold title="下载" />
+          <CloseButton onPress={() => update({downloadSheetVisible: false})} />
+        </View>
+        <View style={styles.stateRow}>
+          <Text style={styles.text2}>{pageInfo?.state}</Text>
+        </View>
+        <FlatList
+          contentContainerStyle={{paddingBottom: 50}}
+          data={items}
+          renderItem={({index, item}) => (
+            <Pressable
+              style={{flex: 1}}
+              onPress={() => {
+                handlePressItem(item);
+              }}
+              key={index}>
+              <View style={styles.itemContainer}>
+                <SubTitle title={item.title} />
+                {!item.start ? (
+                  <></>
+                ) : (
+                  <FontAwesomeIcon
+                    size={20}
+                    color={item.finish ? 'limegreen' : 'deepskyblue'}
+                    icon={item.finish ? faCircleCheck : faCircleDown}
+                  />
+                )}
+              </View>
+            </Pressable>
+          )}
         />
-        <InfoText
-          style={{paddingHorizontal: 20, paddingVertical: 10}}
-          title="查看缓存"
-          onPress={checkDownload}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            padding: 10,
+            justifyContent: 'space-between',
+            borderTopWidth: 1,
+            borderColor: 'lightgrey',
+          }}>
+          <InfoText
+            style={{paddingHorizontal: 20, paddingVertical: 10}}
+            title="缓存全部"
+          />
+          <InfoText
+            style={{paddingHorizontal: 20, paddingVertical: 10}}
+            title="查看缓存"
+            onPress={checkDownload}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            backgroundColor: '#f1f2f3',
+            justifyContent: 'center',
+          }}>
+          <SubInfoText
+            style={{fontSize: 11, padding: 5}}
+            title={`已使用空间${`0`}B, 可使用空间${`22.4G`}B`}
+          />
+        </View>
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          width: '100%',
-          backgroundColor: '#f1f2f3',
-          justifyContent: 'center',
-        }}>
-        <SubInfoText
-          style={{fontSize: 11, padding: 5}}
-          title={`已使用空间${`0`}B, 可使用空间${`22.4G`}B`}
-        />
-      </View>
-    </View>
+    </>
   );
 };
 

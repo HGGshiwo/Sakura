@@ -5,7 +5,7 @@ import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {InfoText} from '../component/Text';
 import {useContext} from 'react';
 import {tabRoutes} from '../route';
-import { ThemeContext } from '../context/ThemeContext';
+import useTheme from '../zustand/Theme';
 
 const Tab = createBottomTabNavigator();
 const tabs = {
@@ -16,7 +16,7 @@ const tabs = {
 };
 
 const TabPage = () => {
-  const {BottomStyle} = useContext(ThemeContext).theme;
+  const {BottomStyle} = useTheme().theme;
 
   return (
     <Tab.Navigator

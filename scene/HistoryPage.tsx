@@ -16,9 +16,9 @@ import Dialog from 'react-native-dialog';
 import EndLine from '../component/EndLine';
 import alert from '../component/Toast';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import {ThemeContext} from '../context/ThemeContext';
 import RecmdInfo from '../type/RecmdInfo';
 import SectionDb from '../models/SectionDb';
+import useTheme from '../zustand/Theme';
 
 const {useRealm, useQuery} = Context;
 const targets = {
@@ -35,7 +35,7 @@ const HistoryPage: React.FC<{}> = () => {
   const curItem = useRef<HistoryInfo & RecmdInfo>();
   const realm = useRealm();
   const [historys, setHistorys] = useState<(HistoryInfo & RecmdInfo)[]>([]);
-  const {DialogStyle} = useContext(ThemeContext).theme;
+  const {DialogStyle} = useTheme().theme;
 
   useEffect(() => {
     let historys = [..._historys.sorted('time', true)]

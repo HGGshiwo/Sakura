@@ -3,8 +3,7 @@ import {useContext, useState} from 'react';
 import {Text, View, Pressable} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {InfoText} from '../Text';
-import AppContext from '../../context';
-import {ThemeContext} from '../../context/ThemeContext';
+import useTheme from '../../zustand/Theme';
 
 interface Props {
   show: boolean;
@@ -21,7 +20,7 @@ const RateSheet: React.FC<Props> = ({show, onPress, defaultActive}) => {
     {title: '1.5X', id: 4, data: 1.5},
     {title: '2.0X', id: 5, data: 2},
   ];
-  const {PlayerStyle} = useContext(ThemeContext).theme;
+  const {PlayerStyle} = useTheme().theme;
   return (
     <View
       style={{

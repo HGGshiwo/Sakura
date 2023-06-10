@@ -1,38 +1,56 @@
 import {Text} from '@rneui/themed';
-import {StyleSheet, View} from 'react-native';
-import {SubTitleBold} from './Text';
+import {Pressable, StyleSheet, View} from 'react-native';
+import {SubTitle, SubTitleBold} from './Text';
 import {ReactNode} from 'react';
 import {CloseButton} from './Button';
+import {useStore} from '../scene/InfoPage';
+import {FlatGrid} from './Grid';
+import useTheme from '../zustand/Theme';
 
-type anthologySheetProps = {
-  height: number;
-  top: number;
-  state: string | undefined;
-  visible: boolean;
-  onClose: () => void;
-  children: ReactNode;
-};
+const AnthologySheet: React.FC<{}> = () => {
+  const {
+    playerHeight,
+    sheetHeight,
+    update,
+    pageInfo,
+    episode,
+    changeEpisode,
+  } = useStore();
 
-const AnthologySheet = ({
-  height,
-  top,
-  state,
-  visible,
-  onClose,
-  children,
-}: anthologySheetProps) => {
-  return !visible ? (
-    <></>
-  ) : (
-    <View style={{...styles.container, height, top}}>
+  const {PlayerStyle} = useTheme().theme;
+  const {textColor, playerTextColor, indicatorColor} = PlayerStyle;
+  return (
+    <View style={{...styles.container, height: sheetHeight, top: playerHeight}}>
       <View style={styles.headerRow}>
         <SubTitleBold title="选集" />
-        <CloseButton onPress={onClose} />
+        <CloseButton onPress={() => update({episodeSheetVisible: false})} />
       </View>
       <View style={styles.stateRow}>
-        <Text style={styles.text2}>{state}</Text>
+        <Text style={styles.text2}>{pageInfo?.state}</Text>
       </View>
-      {children}
+      <FlatGrid
+        contentContainerStyle={{paddingBottom: 50}}
+        numColumns={2}
+        data={pageInfo?.episodes}
+        renderItem={({index, item}) => (
+          <Pressable
+            style={{flex: 1}}
+            onPress={() => {
+              update({flashData: true});
+              changeEpisode(index);
+            }}
+            key={index}>
+            <View style={styles.itemContainer}>
+              <SubTitle
+                title={item.title}
+                style={{
+                  color: textColor(item.taskUrl === episode?.taskUrl),
+                }}
+              />
+            </View>
+          </Pressable>
+        )}
+      />
     </View>
   );
 };
@@ -70,7 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e7e8e9',
     flex: 1,
     height: 75,
-    margin: 10,
+    margin: 5,
     padding: 10,
     borderRadius: 10,
     justifyContent: 'space-between',

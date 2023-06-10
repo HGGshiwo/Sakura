@@ -4,31 +4,17 @@ import {InfoText, RateText, SubTitleBold, Title} from './Text';
 import {Tag} from './Tag';
 import {CloseButton} from './Button';
 import {FlatList} from 'react-native-gesture-handler';
-import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
-import Section from '../type/Download/Section';
+import {useStore} from '../scene/InfoPage';
 
-type detailSheetProps = {
-  height: number;
-  top: number;
-  pageInfo: Section | undefined;
-  visible: boolean;
-  onPress: () => void;
-};
+const DetailSheet: React.FC<{}> = () => {
+  const {playerHeight, sheetHeight, update, pageInfo} =
+    useStore();
 
-const DetailSheet = ({
-  height,
-  top,
-  pageInfo,
-  visible,
-  onPress,
-}: detailSheetProps) => {
-  return !visible ? (
-    <></>
-  ) : (
-    <View style={[styles.container, {height: height, top: top}]}>
+  return (
+    <View style={[styles.container, {height: sheetHeight, top: playerHeight}]}>
       <View style={styles.headerRow}>
         <SubTitleBold title="详情" />
-        <CloseButton onPress={onPress} />
+        <CloseButton onPress={() => update({detailSheetVisible: false})} />
       </View>
       <ScrollView>
         <View style={styles.imageRow}>

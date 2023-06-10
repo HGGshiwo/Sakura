@@ -11,7 +11,7 @@ import {RateText, SubTitleBold} from '../component/Text';
 import RecommandInfo from '../type/RecmdInfo';
 import {RankingPageProps, targets} from '../route';
 import RankingPageInfo from '../type/PageInfo/RankingPageInfo';
-import { ApiContext } from '../context/ApiContext';
+import useApi from '../zustand/Api';
 
 const RankingPage: React.FC<{}> = () => {
   const route = useRoute<RankingPageProps['route']>();
@@ -20,10 +20,10 @@ const RankingPage: React.FC<{}> = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<RankingPageProps['navigation']>();
 
-  const {api} = useContext(ApiContext)
-  
+  const {api} = useApi();
+
   useEffect(() => {
-    const loadPage = api[tabName][apiName].pages.rank
+    const loadPage = api[tabName][apiName].pages.rank;
     loadPage(({rankings}: RankingPageInfo) => {
       setRankings(rankings);
       setLoading(false);
@@ -52,9 +52,10 @@ const RankingPage: React.FC<{}> = () => {
               key={index}
               imgVerticle={true}
               onPress={() => {
-                navigation.navigate(targets[tabName], {
-                  url: item.infoUrl,
+                navigation.navigate('Info', {
+                  infoUrl: item.infoUrl,
                   apiName: item.apiName,
+                  tabName,
                 });
               }}>
               <RateText title="9.7" />

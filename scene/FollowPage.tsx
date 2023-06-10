@@ -17,9 +17,9 @@ import EndLine from '../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import alert from '../component/Toast';
 import {targets} from '../route';
-import {ThemeContext} from '../context/ThemeContext';
 import FollowDb from '../models/FollowDb';
 import SectionDb from '../models/SectionDb';
+import useTheme from '../zustand/Theme';
 
 const {useRealm, useQuery} = Context;
 
@@ -34,7 +34,7 @@ const FollowPage: React.FC<{}> = () => {
   const curItem = useRef<FollowItem>();
   const realm = useRealm();
   const [follows, setFollows] = useState<FollowItem[]>([]);
-  const {DialogStyle} = useContext(ThemeContext).theme;
+  const {DialogStyle} = useTheme().theme;
   useEffect(() => {
     let follows = [..._follows]
       .filter(follow => follow.following)

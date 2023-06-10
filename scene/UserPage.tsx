@@ -41,10 +41,10 @@ import {
 
 import {NavBarButton} from '../component/Button';
 import alert from '../component/Toast';
-import {ThemeContext} from '../context/ThemeContext';
-import {SrcContext} from '../context/SrcContext';
 import RecmdInfo from '../type/RecmdInfo';
 import SectionDb from '../models/SectionDb';
+import useTheme from '../zustand/Theme';
+import useSource from '../zustand/Source';
 
 type Data = {
   title: string;
@@ -156,9 +156,10 @@ const SubPage: React.FC<{
 
   const handlePressItem = useCallback(
     (item: RecmdInfo) =>
-      navigation.push(targets[tabName], {
-        url: item.infoUrl,
+      navigation.push("Info", {
+        infoUrl: item.infoUrl,
         apiName: item.apiName,
+        tabName,
       }),
     [],
   );
@@ -266,8 +267,8 @@ const SubPage: React.FC<{
 };
 
 const SettingPage = () => {
-  const {theme, themeName, changeTheme} = useContext(ThemeContext);
-  const {source, changeSource} = useContext(SrcContext);
+  const {theme, themeName, changeTheme} = useTheme();
+  const {source, changeSource} = useSource();
 
   return (
     <View style={{padding: 10}}>
@@ -344,7 +345,7 @@ const UserPage: React.FC<{}> = () => {
     );
 
   const layout = useWindowDimensions();
-  const {HeaderStyle} = useContext(ThemeContext).theme;
+  const {HeaderStyle} = useTheme().theme;
 
   return (
     <Container style={{backgroundColor: '#f7f8f9'}}>

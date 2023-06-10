@@ -6,20 +6,20 @@ import Home from './Home';
 import Container from '../../component/Container';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {MainPageProps} from '../../route';
-import {SrcContext} from '../../context/SrcContext';
-import {ApiContext} from '../../context/ApiContext';
-import {ThemeContext} from '../../context/ThemeContext';
 import { InfoText } from '../../component/Text';
+import useSource from '../../zustand/Source';
+import useApi from '../../zustand/Api';
+import useTheme from '../../zustand/Theme';
 
 const MainPage: React.FC<MainPageProps> = () => {
   const navigation = useNavigation<MainPageProps['navigation']>();
   const route = useRoute<MainPageProps['route']>();
   const {tabName} = route.params;
   const layout = useWindowDimensions();
-  const {source} = useContext(SrcContext);
-  const {api} = useContext(ApiContext);
+  const {source} = useSource();
+  const {api} = useApi();
   const apiName = source[tabName];
-  const {HeaderStyle} = useContext(ThemeContext).theme;
+  const {HeaderStyle} = useTheme().theme;
   const [routes, setRoutes] = useState<Route[]>(api[tabName][apiName].routes);
   const [index, setIndex] = useState(0);
   

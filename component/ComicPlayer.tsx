@@ -23,11 +23,12 @@ import {BackButton} from './Button';
 import {InfoText, LoadingText} from './Text';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Scrubber from './Scrubber';
-import AppContext from '../context';
 import {NextButton} from './VideoPlayer/NextButton';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import PlayerProps from '../type/Player';
-import { ThemeContext } from '../context/ThemeContext';
+import useTheme from '../zustand/Theme';
+import {useStore} from '../scene/InfoPage';
+import {useNavigation} from '@react-navigation/native';
+import {InfoPageProps} from '../route';
 
 const ResizeImage = React.memo<ImageProps & {onPress: () => void}>(props => {
   const [aspectRatio, setAspectRatio] = useState(1);
@@ -66,46 +67,44 @@ const ResizeImage = React.memo<ImageProps & {onPress: () => void}>(props => {
     </Pressable>
   );
 });
-const ComicPlayer: React.FC<PlayerProps> = ({
-  dataAvailable,
-  nextDataAvailable,
-  data,
-  title,
-  onErr,
-  onBack,
-  toNextSource,
-  onProgress,
-  defaultProgress,
-  renderAnthologys,
-  playerHeight,
-  showPanel,
-  hidePanel,
-  flashData,
-}) => {
+const ComicPlayer: React.FC<{}> = () => {
   const [controlVisible, setControlVisible] = useState(false);
   const controlVisibleRef = useRef(false); //control是否可见
   const controlTimer = useRef(undefined); //当前的计时器
   const insents = useSafeAreaInsets();
-  const {PlayerStyle} = useContext(ThemeContext).theme;
-  const [progress, setProgress] = useState(defaultProgress); //当前视频播放进度
+  const {PlayerStyle} = useTheme().theme;
   const [sectionIndex, setSectionIndex] = useState(0); //当前的section的位置
   const seekingRef = useRef(false); //是否在加载
   const listRef = createRef<SectionList<any>>();
   const [totalData, setTotalData] = useState<SectionListData<string>[]>([]); //累计的图片地址
   const layout = useWindowDimensions();
+  const {
+    playerData,
+    nextDataAvailable,
+    flashData,
+    update,
+    next,
+    episode,
+    pageInfo,
+    progress,
+  } = useStore();
+
+  const navigation = useNavigation<InfoPageProps['navigation']>();
 
   useEffect(() => {
     //切换了下一个选集，则需要更新长度，加入到累计数据，
-    if (data) {
+    if (playerData) {
       if (flashData) {
-        setTotalData([{...data, index: 0}]);
+        setTotalData([{...playerData, index: 0}]);
         setSectionIndex(0);
-        setProgress(0);
+        update({progress: 0});
       } else {
-        setTotalData(totalData.concat([{...data, index: totalData.length}]));
+        setTotalData(
+          totalData.concat([{...playerData, index: totalData.length}]),
+        );
       }
     }
-  }, [data]);
+  }, [playerData]);
 
   //打开control并在一段时间之后关闭
   const openControl = () => {
@@ -130,9 +129,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
 
   //点击了空白区域
   const handlePress = useCallback(() => {
-    // setRateSheetVisible(false);
-    // setAnthologySheetVisible(false);
-    hidePanel();
+    update({profileVisible: false});
     if (controlVisibleRef.current) {
       if (controlTimer.current !== undefined) {
         clearTimeout(controlTimer.current);
@@ -155,7 +152,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
   };
 
   const onSlidingComplete = (data: number) => {
-    setProgress(data); //当seek时，由slide自己更新
+    update({progress: data}); //当seek时，由slide自己更新
     seekingRef.current = false;
     waitCloseControl();
   };
@@ -170,9 +167,9 @@ const ComicPlayer: React.FC<PlayerProps> = ({
     if (viewables[0].section.index !== sectionIndex) {
       //切换了section
       setSectionIndex(viewables[0].section.index);
-      setProgress(viewables[0].index!);
+      update({progeress: viewables[0].index!});
     } else {
-      setProgress(viewables[0].index!);
+      update({progress: viewables[0].index!});
     }
   }, []);
 
@@ -207,7 +204,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
           itemVisiblePercentThreshold: 0.5,
         }}
         onViewableItemsChanged={onViewCallBack}
-        onEndReached={nextDataAvailable ? toNextSource : null}
+        onEndReached={nextDataAvailable ? next : null}
         onEndReachedThreshold={0.8}
         renderItem={({item}) => (
           <ResizeImage source={item} onPress={handlePress} />
@@ -226,9 +223,9 @@ const ComicPlayer: React.FC<PlayerProps> = ({
           },
         ]}>
         <View style={{alignItems: 'center', flexDirection: 'row'}}>
-          <BackButton onPress={onBack} />
+          <BackButton onPress={() => navigation.goBack()} />
           <LoadingText
-            title={title}
+            title={`${pageInfo!.title} ${episode!.title}`}
             numberOfLines={1}
             style={{paddingLeft: 10}}
           />
@@ -262,7 +259,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
               />
             </GestureHandlerRootView>
           </View>
-          <NextButton onPress={toNextSource} disabled={!nextDataAvailable} />
+          <NextButton onPress={next} disabled={!nextDataAvailable} />
         </View>
         <View
           style={[
@@ -281,7 +278,7 @@ const ComicPlayer: React.FC<PlayerProps> = ({
               title="选集"
             />
           </Pressable>
-          <Pressable onPress={() => showPanel()}>
+          <Pressable onPress={() => update({profileVisible: true})}>
             <InfoText
               style={{color: 'white', fontWeight: 'bold'}}
               title="详情"

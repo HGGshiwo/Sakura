@@ -5,8 +5,8 @@ import {
   faShare,
 } from '@fortawesome/free-solid-svg-icons';
 import {Divider} from '@rneui/base';
-import {FlatList, View, Pressable} from 'react-native';
-import {TabName, VideoPageProps, targets} from '../route';
+import {FlatList, View, Pressable, StyleSheet} from 'react-native';
+import {TabName, InfoPageProps, targets} from '../route';
 import {FollowButton, TextButton} from './Button';
 import EndLine from './EndLine';
 import {V1RecmdInfoItem} from './ListItem';
@@ -15,72 +15,69 @@ import {LoadingContainer} from './Loading';
 import {Title, InfoText, SubTitle, RateText} from './Text';
 import TextIconButton from './ToolBar';
 import RecmdInfo from '../type/RecmdInfo';
-import {ReactNode, useCallback, useEffect, useState} from 'react';
+import {ReactNode, createRef, useCallback, useEffect, useState} from 'react';
 import Follow from '../models/FollowDb';
 import alert from './Toast';
 import Context from '../models';
 import {useNavigation} from '@react-navigation/native';
-import InfoPageInfo from '../type/PageInfo/InfoPageInfo';
 import Section from '../type/Download/Section';
+import {useStore} from '../scene/InfoPage';
+import Episode from '../type/Download/Episode';
+import useTheme from '../zustand/Theme';
 const {useRealm} = Context;
-const Profile: React.FC<{
-  loading: boolean;
-  refreshing: boolean;
-  onRefresh: () => void;
-  url: string; //需要传入番剧url作为主键
-  pageInfo: Section | undefined;
-  tabName: TabName;
-  setDetailSheetVisible: (data: boolean) => void;
-  setAnthologySheetVisible: (data: boolean) => void;
-  setDownloadSheetVisible: (data: boolean) => void;
-  renderAnthologys: () => ReactNode;
-}> = ({
-  loading,
-  refreshing,
-  onRefresh,
-  url,
-  pageInfo,
-  tabName,
-  setDetailSheetVisible,
-  setAnthologySheetVisible,
-  setDownloadSheetVisible,
-  renderAnthologys,
-}) => {
+const Profile: React.FC<{}> = () => {
   const realm = useRealm();
   const [followed, setFollowed] = useState(false); //是否追番
-
+  const {pageLoading, refreshing, pageInfo, update, changeEpisode, episode} =
+    useStore();
+  const ProfileAnthologyListRef = createRef<FlatList<Episode>>();
+  const {PlayerStyle} = useTheme().theme;
+  const {textColor, playerTextColor, indicatorColor} = PlayerStyle;
   //点击追番按钮的回调函数
   const handlePressFollowed = useCallback(() => {
     setFollowed(!followed);
-    Follow.update(realm, url, !followed);
+    Follow.update(realm, pageInfo!.infoUrl, !followed);
     alert(`${!followed ? '' : '取消'}追番成功`);
   }, [followed]);
 
-  const navigation = useNavigation<VideoPageProps['navigation']>();
+  const navigation = useNavigation<InfoPageProps['navigation']>();
 
   const onPressRecmd = (item: RecmdInfo) => {
-    navigation.push(targets[tabName] as any, {
-      url: item.infoUrl,
+    navigation.push('Info', {
+      infoUrl: item.infoUrl,
       apiName: item.apiName,
+      tabName: pageInfo!.tabName,
     });
   };
 
   useEffect(() => {
     //查看数据库看是否追番
-    const _follow = realm.objectForPrimaryKey(Follow, url);
-    setFollowed(!!_follow && _follow!.following);
-  }, []);
+    if (!!pageInfo) {
+      const _follow = realm.objectForPrimaryKey(Follow, pageInfo!.infoUrl);
+      setFollowed(!!_follow && _follow!.following);
+    }
+  }, [pageInfo]);
+
+  useEffect(() => {
+    if (ProfileAnthologyListRef.current) {
+      ProfileAnthologyListRef.current!.scrollToIndex({
+        index: pageInfo!.episodes.findIndex(
+          obj => obj.taskUrl === episode!.taskUrl,
+        ),
+      });
+    }
+  }, [episode]);
 
   return (
     <LoadingContainer
-      loading={loading}
+      loading={pageLoading}
       style={{paddingTop: 40}}
       backgroundColor="grey"
       color="grey"
       text="加载中...">
       <FlatList
         refreshing={refreshing}
-        onRefresh={onRefresh}
+        onRefresh={() => {}}
         ListHeaderComponent={
           <>
             <View style={{padding: 10, width: '100%'}}>
@@ -108,7 +105,7 @@ const Profile: React.FC<{
                 />
                 <TextButton
                   title={'详情'}
-                  onPress={() => setDetailSheetVisible(true)}
+                  onPress={() => update({detailSheetVisible: true})}
                 />
               </View>
               <View
@@ -122,7 +119,7 @@ const Profile: React.FC<{
                 <TextIconButton
                   style={{marginLeft: 40}}
                   title="下载"
-                  onPress={() => setDownloadSheetVisible(true)}
+                  onPress={() => update({downloadSheetVisible: true})}
                   icon={faCloudArrowDown}
                 />
                 <TextIconButton
@@ -144,7 +141,7 @@ const Profile: React.FC<{
               <ListTitleLine
                 title={'选集'}
                 buttonText={pageInfo?.state}
-                onPress={() => setAnthologySheetVisible(true)}
+                onPress={() => update({episodeSheetVisible: true})}
               />
               {pageInfo?.relatives.length == 0 ? null : (
                 <FlatList
@@ -153,9 +150,10 @@ const Profile: React.FC<{
                   renderItem={({item}) => (
                     <Pressable
                       onPress={() =>
-                        navigation.push(targets[tabName] as any, {
-                          url: item.data.url,
+                        navigation.push("Info", {
+                          infoUrl: item.data.url,
                           apiName: item.data.apiName,
+                          tabName: pageInfo!.tabName
                         })
                       }>
                       <SubTitle style={{padding: 12}} title={item.title} />
@@ -164,7 +162,33 @@ const Profile: React.FC<{
                   keyExtractor={item => `${item.id}`}
                 />
               )}
-              {renderAnthologys()}
+              <FlatList
+                ref={ProfileAnthologyListRef}
+                getItemLayout={(item, index) => ({
+                  length: 170,
+                  offset: 170 * index,
+                  index,
+                })}
+                style={{marginBottom: 20}}
+                horizontal={true}
+                data={pageInfo?.episodes}
+                renderItem={({item, index}) => (
+                  <Pressable
+                    onPress={() => {
+                      update({flashData: true});
+                      changeEpisode(index);
+                    }}>
+                    <View style={styles.itemContainer2}>
+                      <SubTitle
+                        title={item.title}
+                        style={{
+                          color: textColor(item.taskUrl === episode?.taskUrl),
+                        }}
+                      />
+                    </View>
+                  </Pressable>
+                )}
+              />
             </View>
             <Divider />
           </>
@@ -182,5 +206,45 @@ const Profile: React.FC<{
     </LoadingContainer>
   );
 };
-
+const styles = StyleSheet.create({
+  card: {
+    borderWidth: 2,
+    height: 40,
+    padding: 10,
+    margin: 5,
+    width: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 5,
+  },
+  listContainer: {
+    position: 'absolute',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,1)',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    right: 0,
+    bottom: 0,
+  },
+  itemContainer: {
+    backgroundColor: '#f1f2f3',
+    flex: 1,
+    height: 75,
+    margin: 5,
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'space-between',
+  },
+  itemContainer2: {
+    backgroundColor: '#f1f2f3',
+    width: 150,
+    height: 70,
+    marginHorizontal: 10,
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'space-between',
+  },
+});
 export default Profile;

@@ -8,17 +8,16 @@ import {V1SearchInfoItem} from '../component/ListItem';
 import HeadBar from '../component/HeadBar';
 import {LoadingContainer} from '../component/Loading';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {SearchPageProps, TabName, targets} from '../route';
+import {SearchPageProps, TabName} from '../route';
 import Container from '../component/Container';
-import {FollowButton, RoundButton} from '../component/Button';
+import {RoundButton} from '../component/Button';
 import Context from '../models';
 import Follow from '../models/FollowDb';
-import alert from '../component/Toast';
 import {TabBar, TabView} from 'react-native-tab-view';
 import SearchPageInfo from '../type/PageInfo/SearchPageInfo';
-import {ApiContext} from '../context/ApiContext';
-import {ThemeContext} from '../context/ThemeContext';
 import RecmdInfo from '../type/RecmdInfo';
+import useApi from '../zustand/Api';
+import useTheme from '../zustand/Theme';
 
 const {useRealm} = Context;
 
@@ -29,44 +28,18 @@ const ResultView: React.FC<{
 }> = ({searchValue, apiName, tabName}) => {
   const [results, setResults] = useState<(SearchInfo & RecmdInfo)[]>([]);
   const [loading, setLoading] = useState(false);
-  const [follows, setFollows] = useState<boolean[]>([]); //是否追番
   const navigation = useNavigation<SearchPageProps['navigation']>();
   const realm = useRealm();
-  const {api} = useContext(ApiContext);
+  const {api} = useApi();
 
   useEffect(() => {
     setLoading(true);
     const loadPage = api[tabName][apiName].pages.search;
     loadPage(searchValue, ({results}: SearchPageInfo) => {
       setResults(results);
-      const _follows = results.map(_result => {
-        const follow = realm.objectForPrimaryKey(Follow, _result.href);
-        return !!follow && follow.following;
-      });
-      setFollows(_follows);
       setLoading(false);
     });
   }, [searchValue]);
-
-  // const onPress = (item: SearchInfo & RecmdInfo, index: number) => {
-  //   //更新番剧数据库
-  //   RecmdInfoDb.create(
-  //     realm,
-  //     item.id,
-  //     tabName,
-  //     apiName,
-  //     item.img,
-  //     item.state,
-  //     item.title,
-  //   );
-  //   //更新追番记录
-  //   Follow.update(realm, item.infoUrl, !follows[index]);
-  //   const _follows = [...follows];
-  //   _follows[index] = !_follows[index];
-  //   setFollows([..._follows]);
-
-  //   alert(`${!follows![index] ? '' : '取消'}追番成功`);
-  // };
 
   return (
     <LoadingContainer style={{paddingTop: '30%'}} loading={loading}>
@@ -83,15 +56,12 @@ const ResultView: React.FC<{
               item={item}
               index={index}
               onPress={() => {
-                navigation.navigate(targets[tabName], {
-                  url: item.infoUrl,
+                navigation.navigate("Info", {
+                  infoUrl: item.infoUrl,
                   apiName: item.apiName,
+                  tabName,
                 });
               }}>
-              {/* <FollowButton
-                onPress={() => onPress(item, index)}
-                followed={follows![index]}
-              /> */}
             </V1SearchInfoItem>
           );
         }}
@@ -113,8 +83,8 @@ const SearchPage: React.FC<{}> = () => {
   const [searchValue2, setSearchValue2] = useState('');
   const [historyVisible, setHistoryVisible] = useState(true);
   const [index, setIndex] = useState(0);
-  const {TabBarStyle} = useContext(ThemeContext).theme;
-  const {api} = useContext(ApiContext);
+  const {TabBarStyle} = useTheme().theme;
+  const {api} = useApi();
   const [routes] = useState(
     Object.entries(api[tabName]).map(([apiName, apiObj]) => ({
       key: apiName,

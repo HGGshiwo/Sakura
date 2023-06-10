@@ -15,7 +15,7 @@ import {CategoryPageProps, targets} from '../route';
 import {Section} from '../type/Section';
 import {SectionGrid} from '../component/Grid';
 import CategoryPageInfo from '../type/PageInfo/CategoryPageInfo';
-import { ApiContext } from '../context/ApiContext';
+import useApi from '../zustand/Api';
 
 const CategoryPage: React.FC<{}> = () => {
   const [carousels, setCarousels] = useState<RecmdInfo[]>([]);
@@ -24,7 +24,7 @@ const CategoryPage: React.FC<{}> = () => {
   const navigation = useNavigation<CategoryPageProps['navigation']>();
   const [loading, setLoading] = useState(true);
   const {url, title, tabName, apiName} = route.params;
-  const {api} = useContext(ApiContext)
+  const {api} = useApi()
 
   useEffect(() => {
     const loadPage = api[tabName][apiName].pages.category
@@ -37,8 +37,9 @@ const CategoryPage: React.FC<{}> = () => {
 
   const handlePressItem = useCallback(
     (item: RecmdInfo) =>
-      navigation.navigate(targets[tabName], {
-        url: item.infoUrl,
+      navigation.navigate("Info", {
+        infoUrl: item.infoUrl,
+        tabName,
         apiName: item.apiName,
       }),
     [],

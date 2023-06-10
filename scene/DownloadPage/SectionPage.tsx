@@ -15,12 +15,11 @@ import DownloadDb from '../../models/SectionDb';
 import RecommandInfo from '../../type/RecmdInfo';
 import EndLine from '../../component/EndLine';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import {targets} from '../../route';
-import {ThemeContext} from '../../context/ThemeContext';
 import SectionInfo from '../../type/Download/SectionInfo';
 import {faYoutube} from '@fortawesome/free-brands-svg-icons';
 import RecmdInfo from '../../type/RecmdInfo';
 import SectionDb from '../../models/SectionDb';
+import useTheme from '../../zustand/Theme';
 
 const {useRealm, useQuery} = Context;
 
@@ -32,7 +31,7 @@ const DownloadPage: React.FC<{}> = () => {
   const curItem = useRef<RecommandInfo & SectionInfo>();
   const realm = useRealm();
   const [sections, setSections] = useState<(SectionInfo & RecmdInfo)[]>([]);
-  const {DialogStyle} = useContext(ThemeContext).theme;
+  const {DialogStyle} = useTheme().theme;
   const _downloads = useQuery<DownloadDb>(DownloadDb);
 
   useEffect(() => {
