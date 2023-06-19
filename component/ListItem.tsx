@@ -272,18 +272,23 @@ const V1DownloadInfoItem: React.FC<Props<DownloadItemInfo>> = ({
           style={styles.ibContainer80H}
           source={{uri: item.img}}
         />
-        <View style={styles.infoContainer}>
+        <View style={[styles.infoContainer]}>
           <SubTitle style={{color: 'black'}} title={item.title} />
-          <SubInfoText title={(item.progress * 100).toFixed(2) + '%'} />
-          <Bar
-            progress={item.progress}
-            height={3}
-            unfilledColor="lightgrey"
-            borderColor="white"
-            color='grey'
-          />
+          <View style={{width: 150}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <SubInfoText title={(item.progress * 100).toFixed(2) + '%'} />
+              <SubInfoText title={'20MB'}/>
+            </View>
+            <Bar
+              style={{marginTop: 5}}
+              progress={item.progress}
+              height={3}
+              unfilledColor="lightgrey"
+              borderColor="white"
+              color="grey"
+            />
+          </View>
         </View>
-        <View style={styles.rateContainer}>{children}</View>
       </View>
     </Pressable>
   );

@@ -2,6 +2,7 @@ import RNFS from 'react-native-fs';
 import { create } from 'zustand'
 import SectionDb from '../models/SectionDb';
 import { TaskDbUtile } from '../models/utils';
+import { InteractionManager } from 'react-native';
 
 //获取到ts的完整路径
 const getRemotePath = (m3u8Url: string, tsUrl: string) => {
@@ -59,7 +60,7 @@ const downloadM3u8 = (
         const downloadFile = (times: number) => {
           if (times == 3) return;
           times += 1;
-          RNFS.downloadFile({ fromUrl: from, toFile: to })
+          return RNFS.downloadFile({ fromUrl: from, toFile: to })
             .promise.then(() => {
               doneNum += 1;
               done(doneNum / urls.length);
@@ -68,17 +69,15 @@ const downloadM3u8 = (
               downloadFile(times);
             });
         };
-        return downloadFile(0);
+        return downloadFile;
       });
-      let size = 4;
-      let chunks = [];
-      for (let i = 0; i < promises.length; i += size) {
-        let chunk = promises.slice(i, i + size);
-        chunks.push(chunk);
-      }
-      for await (const chunk of chunks) {
-        Promise.all(chunk);
-      }
+      let size = 1;
+      InteractionManager.runAfterInteractions(async () => {
+        for (let i = 0; i < promises.length; i += size) {
+          let chunk = promises.slice(i, i + size);
+          await Promise.all(chunk.map(c => c(0)))
+        }
+      });
     });
 };
 
